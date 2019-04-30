@@ -1,4 +1,6 @@
-from matplotlib.animation import FuncAnimation
+"""
+画图支持
+"""
 import matplotlib.pyplot as plt
 
 # 支持中文

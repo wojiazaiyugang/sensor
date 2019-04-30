@@ -1,3 +1,6 @@
+"""
+提供GUI界面
+"""
 import tkinter as tk
 from enum import Enum, unique
 import PySimpleGUI as sg
@@ -6,6 +9,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, FigureCanvasAgg
 
 from sensor.plot import PlotManager
 from sensor.util import get_static_file_full_path
+
 
 class GuiManager:
     @unique
@@ -20,8 +24,10 @@ class GuiManager:
         # 构建gui
         self.layout = [
             [sg.Text("213213")],
-            [sg.Canvas(size=(self.plot_manager.figure_w, self.plot_manager.figure_h), key=self.KEYS.CANVAS),sg.Text("213213")],
-            [sg.Image(filename=get_static_file_full_path("1.png"), key=self.KEYS.IMAGE)],
+            [sg.Canvas(size=(self.plot_manager.figure_w, self.plot_manager.figure_h), key=self.KEYS.CANVAS),
+             sg.Text("213213")],
+            [sg.Image(filename=get_static_file_full_path("1.png"), size=(78, 78), key=self.KEYS.IMAGE,
+                      background_color="#FF0000")],
         ]
 
         self.ax = self.plot_manager.ax_acc
@@ -30,20 +36,20 @@ class GuiManager:
         self.canvas_element = self.window.FindElement(self.KEYS.CANVAS)
         self.graph = FigureCanvasTkAgg(self.plot_manager.fig, master=self.canvas_element.TKCanvas)
         self.canvas = self.canvas_element.TKCanvas
+
     def run(self):
-        # n = 0
+        n = 0
         while True:
-            event, values = self.window.Read(timeout=1)
+            event, values = self.window.Read(timeout=5)
             if not event:
                 break
-            # n += 1
-            # if n % 2 == 0:
-            #     self.window.FindElement(self.KEYS.IMAGE).Update(filename=get_static_file_full_path("2.png"))
-            # else:
-            #     self.window.FindElement(self.KEYS.IMAGE).Update(filename=get_static_file_full_path("1.png"))
+            n += 1
+            self.window.FindElement(self.KEYS.IMAGE).Update(
+                filename=get_static_file_full_path("{0}.png".format(12 - n % 13)))
             self.plot_manager.update()
-            photo = tk.PhotoImage(master=self.canvas, width=self.plot_manager.figure_w, height=self.plot_manager.figure_h)
-            self.canvas.create_image(self.plot_manager.figure_w/2, self.plot_manager.figure_h/2, image=photo)
+            photo = tk.PhotoImage(master=self.canvas, width=self.plot_manager.figure_w,
+                                  height=self.plot_manager.figure_h)
+            self.canvas.create_image(self.plot_manager.figure_w / 2, self.plot_manager.figure_h / 2, image=photo)
 
             figure_canvas_agg = FigureCanvasAgg(self.plot_manager.fig)
             figure_canvas_agg.draw()

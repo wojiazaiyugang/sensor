@@ -1,3 +1,6 @@
+"""
+传感器数据相关支持
+"""
 from numpy import short
 import pywinusb.hid as hid
 
