@@ -1,0 +1,4 @@
+from earthgod import EarthGod
+
+e = EarthGod("eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoieXVqaWFubmFuIiwiZXhwIjoxNTU3MjQ0MDk2fQ.Pk6JSvgLvE8YthAAsJShvfU4bgEjgY2PDrR8BL0WQeT11io-ywi4_jDj7PEe2f7YluVm5cSIB6kbPAlHV4ynmQ")
+print(e.get_employee("于剑楠"))
