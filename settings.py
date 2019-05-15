@@ -4,6 +4,7 @@
 import os
 import logging
 
+WRITE_LOG_FILE = False # 是否把日志写入文件
 # 项目目录
 PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
 # 配置日志配置同时输出到屏幕和日志文件
@@ -16,7 +17,8 @@ file_handler.setLevel(logging.DEBUG)
 console_handler = logging.StreamHandler()
 console_handler.setFormatter(formatter)
 console_handler.setLevel(logging.DEBUG)
-logger.addHandler(file_handler)
+if WRITE_LOG_FILE:
+    logger.addHandler(file_handler)
 logger.addHandler(console_handler)
 # 算法相关
 ALGORITHM_DIR = os.path.join(PROJECT_PATH, "sensor", "algorithm")
@@ -28,6 +30,6 @@ if not os.path.exists(MODEL_DIR):
 DATA_DIR = os.path.join(ALGORITHM_DIR, "data")
 
 # 使用的data0数据，1 - 10 ，如果为空表示使用实时数据
-SENSOR_DATA = 0
+SENSOR_DATA = 1
 # SENSOR_DATA = 1
 assert SENSOR_DATA is None or 0 <= int(SENSOR_DATA) <= 9, "数据错误"

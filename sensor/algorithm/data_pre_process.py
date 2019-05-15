@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 from scipy import signal
 from scipy import interpolate
 
-from settings import DATA_DIR
+from settings import DATA_DIR, logger
 from util import get_data0_data, validate_raw_data_with_timestamp, validate_raw_data_without_timestamp
 
 
@@ -23,11 +23,10 @@ class DataPreProcess:
     def __init__(self):
         self.template_duration = 1000  # 模板的长度，单位ms
         self.template = None  # 模板
-        self.template_mag_threshold = 8  # 确定模板最低点的阈值，当一个点小于这个值的时候，就把这个点左右两侧共self.template_duration的窗口作为模板
-        self.gait_cycle_threshold = None  # 确定最低点的阈值
         self.point_count_per_cycle = 200  # 插值的时候一个周期里点的个数
-        self.expect_gait_cycle_duration = (1000, 2000)  # 步态周期的阈值，如果检测出来的步态周期的时间不在这个范围内，就认为检测出来的是有问题的，不使用
+        self.expect_gait_cycle_duration = (400, 1200)  # 步态周期的阈值，如果检测出来的步态周期的时间不在这个范围内，就认为检测出来的是有问题的，不使用
 
+        self.data_type = None  # 当前正在处理的数据类型，acc或者是gyro，用于决定不同的阈值
         # 把生成的步态转换为gei图像存储
         self.acc_geis = []
         self.gyro_geis = []
@@ -67,8 +66,7 @@ class DataPreProcess:
         list2 = list2 - numpy.average(list2)
         return 1 - sum(list1 * list2) / (numpy.linalg.norm(list1) * numpy.linalg.norm(list2))
 
-    def _find_first_gait_cycle(self, data: numpy.ndarray) -> Union[
-        numpy.ndarray, None]:
+    def _find_first_gait_cycle(self, data: numpy.ndarray) -> Union[numpy.ndarray, None]:
         """
         检测寻找第一个步态周期
         :param template: 模板
@@ -87,17 +85,20 @@ class DataPreProcess:
         for i in range(len(mags) - len(self.template) + 1):
             corr_distance.append(self._corr_distance(template_mag, mags[i:i + len(self.template)]))
             if i >= 2 and corr_distance[i - 1] < min(corr_distance[i - 2], corr_distance[i]) and corr_distance[
-                i - 1] < self.gait_cycle_threshold:
+                i - 1] < self._get_gait_cycle_threshold():
                 cycle_index_points.append(i - 1)
-                if len(cycle_index_points) == 2:
+                if len(cycle_index_points) == 2:  # 判断两个步态的形态，挑右边高的步态作为结果
+                    # cycle1 = data[cycle_index_points[0]:cycle_index_points[1] + 1]
+                    # cycle2 = data[cycle_index_points[1]:cycle_index_points[2] + 1]
+                    # if numpy.argmax(cycle1) > numpy.argmin(cycle1):
+                    #     cycle = cycle1
+                    # elif numpy.argmax(cycle2) > numpy.argmin(cycle2):
+                    #     cycle = cycle2
+                    # else:
+                    #     return None
                     cycle = data[cycle_index_points[0]:cycle_index_points[1] + 1]
-                    cycle_duration = int(data[cycle_index_points[1]][0]) - int(
-                        data[cycle_index_points[0]][0])  # 检测出来的步态周期的时长，ms
-                    if not self.expect_gait_cycle_duration[0] <= cycle_duration <= self.expect_gait_cycle_duration[1]:
-                        return None
-                        # print("时间长度:{0}ms".format(cycle_duration))
                     self.template = self._updata_template(cycle)
-                    return cycle
+                    return self._validate_cycle(cycle)
         self.template = None
         return None
 
@@ -114,8 +115,8 @@ class DataPreProcess:
         mags = numpy.array([math.sqrt(d[1] * d[1] + d[2] * d[2] + d[3] * d[3]) for d in data])
         for index in range(len(mags)):
             # step1
-            if 0 < index < len(mags) - 1 and mags[index] < min(mags[index - 1], mags[index + 1]) and mags[
-                index] < self.template_mag_threshold:
+            # logger.info("thres:{0}".format(self.gait_cycle_threshold))
+            if 0 < index < len(mags) - 1 and mags[index] < min(mags[index - 1], mags[index + 1]):
                 start, end = index, index
                 while start >= 0 and end < len(mags) and data[end][0] - data[start][0] < self.template_duration:
                     start -= 1
@@ -145,10 +146,7 @@ class DataPreProcess:
         :return:
         """
         assert data_type in ["acc", "gyro"], "data type 错误"
-        if data_type == "acc":
-            self.gait_cycle_threshold = 0.2
-        elif data_type == "gyro":
-            self.gait_cycle_threshold = 0.1
+        self.data_type = data_type
         if not data.any():
             return None
         validate_raw_data_with_timestamp(data)
@@ -159,6 +157,8 @@ class DataPreProcess:
         if len(transformed_cycle) < 4:  # 点的数量太少无法插值
             return None
         interpolated_cycle = self._interpolate(transformed_cycle)
+        # if numpy.argmax(interpolated_cycle[:,2]) < numpy.argmin(interpolated_cycle[:,2]):
+        #     return None
         return interpolated_cycle
 
     def _interpolate(self, data: numpy.ndarray) -> numpy.ndarray:
@@ -211,6 +211,47 @@ class DataPreProcess:
         if len(cycle) < len(self.template):
             return self.template
         return 0.9 * self.template + 0.1 * cycle[:len(self.template)]
+
+    def _validate_cycle(self, cycle: numpy.ndarray) -> Union[numpy.ndarray, None]:
+        """
+        对检测出来的步态进行校验，通过校验的才认为是一个合法的步态，否则就返回None
+        :param cycle:
+        :return:
+        """
+        validate_raw_data_with_timestamp(cycle)
+        cycle = self._validate_cycle_duration(cycle)
+        return cycle
+
+    def _validate_cycle_duration(self, cycle: numpy.ndarray) -> Union[numpy.ndarray, None]:
+        """
+        获取步态周期的有效时长
+        :return:
+        """
+        if cycle is None:
+            return None
+        if self.data_type == "acc":
+            expect_duration = (1000, 1500)
+        elif self.data_type == "gyro":
+            expect_duration = (1000, 1500)
+        else:
+            raise Exception("data type 错误")
+        cycle_duration = int(cycle[-1][0]) - int(cycle[0][0])  # 检测出来的步态周期的时长，ms
+        if not expect_duration[0] <= cycle_duration <= expect_duration[1]:
+            logger.info("无效步态，数据类型:{0},期望时长:{1},实际时长{2}".format(self.data_type, expect_duration,cycle_duration))
+            return None
+        return cycle
+
+    def _get_gait_cycle_threshold(self) -> float:
+        """
+        获取阈值
+        :return:
+        """
+        if self.data_type == "acc":
+            return 0.2
+        elif self.data_type == "gyro":
+            return 0.2
+        else:
+            raise Exception("data type 错误")
 
 
 if __name__ == "__main__":

@@ -11,7 +11,7 @@ from sensor.sensor import SensorManager
 from sensor.algorithm import AlgorithmManager
 from util import validate_raw_data_with_timestamp
 
-from settings import SENSOR_DATA
+from settings import SENSOR_DATA, logger
 
 
 class PlotManager:
