@@ -26,6 +26,7 @@ class DataPreProcess:
         self.template_mag_threshold = 8  # 确定模板最低点的阈值，当一个点小于这个值的时候，就把这个点左右两侧共self.template_duration的窗口作为模板
         self.gait_cycle_threshold = None  # 确定最低点的阈值
         self.point_count_per_cycle = 200  # 插值的时候一个周期里点的个数
+        self.expect_gait_cycle_duration = (1000, 2000)  # 步态周期的阈值，如果检测出来的步态周期的时间不在这个范围内，就认为检测出来的是有问题的，不使用
 
         # 把生成的步态转换为gei图像存储
         self.acc_geis = []
@@ -90,6 +91,11 @@ class DataPreProcess:
                 cycle_index_points.append(i - 1)
                 if len(cycle_index_points) == 2:
                     cycle = data[cycle_index_points[0]:cycle_index_points[1] + 1]
+                    cycle_duration = int(data[cycle_index_points[1]][0]) - int(
+                        data[cycle_index_points[0]][0])  # 检测出来的步态周期的时长，ms
+                    if not self.expect_gait_cycle_duration[0] <= cycle_duration <= self.expect_gait_cycle_duration[1]:
+                        return None
+                        # print("时间长度:{0}ms".format(cycle_duration))
                     self.template = self._updata_template(cycle)
                     return cycle
         self.template = None
@@ -108,7 +114,8 @@ class DataPreProcess:
         mags = numpy.array([math.sqrt(d[1] * d[1] + d[2] * d[2] + d[3] * d[3]) for d in data])
         for index in range(len(mags)):
             # step1
-            if 0 < index < len(mags) - 1 and mags[index] < min(mags[index - 1], mags[index + 1]) and mags[index] < self.template_mag_threshold:
+            if 0 < index < len(mags) - 1 and mags[index] < min(mags[index - 1], mags[index + 1]) and mags[
+                index] < self.template_mag_threshold:
                 start, end = index, index
                 while start >= 0 and end < len(mags) and data[end][0] - data[start][0] < self.template_duration:
                     start -= 1
@@ -141,7 +148,7 @@ class DataPreProcess:
         if data_type == "acc":
             self.gait_cycle_threshold = 0.2
         elif data_type == "gyro":
-            self.gait_cycle_threshold = 0.2
+            self.gait_cycle_threshold = 0.1
         if not data.any():
             return None
         validate_raw_data_with_timestamp(data)

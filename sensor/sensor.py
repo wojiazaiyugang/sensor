@@ -4,7 +4,7 @@
 import os
 
 from numpy import short
-# import pywinusb.hid as hid
+import pywinusb.hid as hid
 
 from util import get_current_timestamp, get_data0_data
 from settings import SENSOR_DATA, DATA_DIR, logger
