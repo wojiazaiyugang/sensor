@@ -260,34 +260,3 @@ class DataPreProcess:
             return 0.2
         else:
             raise Exception("data type 错误")
-
-
-if __name__ == "__main__":
-    data = get_data0_data(os.path.join(DATA_DIR, "data0", "gyrData0.txt"))
-    validate_raw_data_with_timestamp(data)
-    g = DataPreProcess()
-    g.DEBUG = True
-    d = []
-    fig = plt.figure()
-    for i in range(len(data)):
-        # print(len(d))
-        d.append(data[i])
-        result = g.pre_process(numpy.array(d), "gyro")
-        # print(result)
-        if result is None:
-            pass
-        elif result == 0:
-            d = []
-        else:
-            pass
-            # plt.clf()
-            # plt.plot(result[:, 1], color="black", linewidth=20)
-            # fig.canvas.draw()
-            # gei = numpy.fromstring(fig.canvas.tostring_rgb(), dtype=numpy.uint8, sep="").reshape(
-            #     fig.canvas.get_width_height()[::-1] + (3,))
-            # g.acc_geis.append(gei)
-            # cv2.imshow("1", numpy.average(g.acc_geis[-30:], axis=0).astype("uint8"))
-            # cv2.waitKey()
-        # print(int(d[-1][0]) - int(d[0][0]))
-        if d and int(d[-1][0]) - int(d[0][0]) > g.time_duration_threshold_to_clear:
-            d = []

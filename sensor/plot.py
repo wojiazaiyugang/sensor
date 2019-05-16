@@ -152,17 +152,14 @@ class PlotManager:
             self.ax_gait_acc_z.cla()
             self.ax_gait_acc_z.plot(acc_gait_cycle[:, 3], color=color, linewidth=linewidth)
             self.sensor_manager.acc.clear()
-            # self.sensor_manager.acc = self.sensor_manager.acc[len(self.sensor_manager.acc) // 2:]
             self.fig_acc_gait.canvas.draw()
             gei = numpy.fromstring(self.fig_acc_gait.canvas.tostring_rgb(), dtype=numpy.uint8, sep="").reshape(
                 self.fig_acc_gait.canvas.get_width_height()[::-1] + (3,))
             self.algorithm_manager.data_pre_process.acc_geis.append(gei)
             self.acc_gei = numpy.average(self.algorithm_manager.data_pre_process.acc_geis[-self.gei_count_to_generate_geis:], axis=0).astype("uint8")
-        # 清除数据
         gyro_gait_cycle = self.algorithm_manager.get_gyro_gait_cycle()
         # 步态数据
         if gyro_gait_cycle is not None:
-
             self.ax_gait_gyro_mag.cla()
             self.ax_gait_gyro_mag.plot(gyro_gait_cycle[:, 0], color=color, linewidth=linewidth)
             self.ax_gait_gyro_x.cla()

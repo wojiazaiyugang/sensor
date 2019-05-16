@@ -23,7 +23,8 @@ class AlgorithmManager:
         self.count_threshold_clear = 400  # 阈值，超过这个阈值还没有生成步态就认为数据有问题，直接清除数据
         self.fig = plt.plot([], [])
 
-    def _get_gait_cycle(self, data_type, data: list, gait_cycle_threshold: float = None, expect_duration: tuple = None) -> Tuple[list, Union[numpy.ndarray, None]]:
+    def _get_gait_cycle(self, data_type, data: list, gait_cycle_threshold: float = None,
+                        expect_duration: tuple = None) -> Tuple[list, Union[numpy.ndarray, None]]:
         """
         获取步态周期
         :return: 原始数据使用之后修改成的新的list，步态周期
@@ -49,12 +50,14 @@ class AlgorithmManager:
         获取acc的一个步态周期
         :return:
         """
-        new_acc_data, cycle = self._get_gait_cycle("acc", self._sensor_manager.acc, gait_cycle_threshold=0.4, expect_duration = (800,1400))
+        new_acc_data, cycle = self._get_gait_cycle("acc", self._sensor_manager.acc, gait_cycle_threshold=0.4,
+                                                   expect_duration=(800, 1400))
         self._sensor_manager.acc = new_acc_data
         return cycle
 
     def get_gyro_gait_cycle(self) -> Union[numpy.ndarray, None]:
-        new_gyro_data, cycle = self._get_gait_cycle("gyro", self._sensor_manager.gyro, gait_cycle_threshold=0.2, expect_duration = (800,1400))
+        new_gyro_data, cycle = self._get_gait_cycle("gyro", self._sensor_manager.gyro, gait_cycle_threshold=0.2,
+                                                    expect_duration=(800, 1400))
         self._sensor_manager.gyro = new_gyro_data
         return cycle
 
