@@ -47,7 +47,7 @@ class PlotManager:
         # 陀螺仪
         # self.ax_gyro.set_title("陀螺仪")
         self.ax_gyro.set_xlim(0, self.sensor_manager.GYRO_POINT_COUNT)
-        self.ax_gyro.set_ylim(-20, 20)
+        self.ax_gyro.set_ylim(-5, 5)
         self.line_gyro_x = self.ax_gyro.plot([], [], "b-", label="gyro_x")[0]
         self.line_gyro_y = self.ax_gyro.plot([], [], "g-", label="gyro_y")[0]
         self.line_gyro_z = self.ax_gyro.plot([], [], "r-", label="gyro_z")[0]

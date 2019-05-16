@@ -13,7 +13,7 @@ logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter("%(asctime)s - %(filename)s:%(funcName)s:%(lineno)d - %(levelname)s - %(message)s")
 file_handler = logging.FileHandler(os.path.join(PROJECT_PATH, "log.txt"), encoding="utf8")
 file_handler.setFormatter(formatter)
-file_handler.setLevel(logging.DEBUG)
+file_handler.setLevel(logging.INFO)
 console_handler = logging.StreamHandler()
 console_handler.setFormatter(formatter)
 console_handler.setLevel(logging.DEBUG)
@@ -30,6 +30,5 @@ if not os.path.exists(MODEL_DIR):
 DATA_DIR = os.path.join(ALGORITHM_DIR, "data")
 
 # 使用的data0数据，1 - 10 ，如果为空表示使用实时数据
-SENSOR_DATA = 1
-# SENSOR_DATA = 1
+SENSOR_DATA = 0
 assert SENSOR_DATA is None or 0 <= int(SENSOR_DATA) <= 9, "数据错误"

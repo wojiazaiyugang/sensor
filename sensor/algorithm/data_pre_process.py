@@ -193,7 +193,10 @@ class DataPreProcess:
         u = numpy.average(matrix_a_f, axis=0)
         matrix_a_norm_f = matrix_a_f - u
         sigma = numpy.dot(matrix_a_norm_f.T, matrix_a_norm_f) / (matrix_a.shape[0] - 1)
-        eigenvalue, eigenvector = numpy.linalg.eig(sigma)
+        try:
+            eigenvalue, eigenvector = numpy.linalg.eig(sigma)
+        except Exception as err:
+            pass
         vector_n2 = eigenvector[numpy.argmax(eigenvalue)]  # 两撇撇
         vector_n3 = numpy.cross(vector_n1, vector_n2)
         vector_a_n2 = numpy.dot(matrix_a, vector_n2)
@@ -219,7 +222,7 @@ class DataPreProcess:
         :return:
         """
         validate_raw_data_with_timestamp(cycle)
-        cycle = self._validate_cycle_duration(cycle)
+        # cycle = self._validate_cycle_duration(cycle)
         return cycle
 
     def _validate_cycle_duration(self, cycle: numpy.ndarray) -> Union[numpy.ndarray, None]:
@@ -230,14 +233,14 @@ class DataPreProcess:
         if cycle is None:
             return None
         if self.data_type == "acc":
-            expect_duration = (1000, 1500)
+            expect_duration = (1100, 1400)
         elif self.data_type == "gyro":
-            expect_duration = (1000, 1500)
+            expect_duration = (1100, 1400)
         else:
             raise Exception("data type 错误")
         cycle_duration = int(cycle[-1][0]) - int(cycle[0][0])  # 检测出来的步态周期的时长，ms
         if not expect_duration[0] <= cycle_duration <= expect_duration[1]:
-            logger.info("无效步态，数据类型:{0},期望时长:{1},实际时长{2}".format(self.data_type, expect_duration,cycle_duration))
+            logger.debug("无效步态，数据类型:{0},期望时长:{1},实际时长{2}".format(self.data_type, expect_duration,cycle_duration))
             return None
         return cycle
 

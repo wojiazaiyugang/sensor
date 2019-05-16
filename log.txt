@@ -1,0 +1,3 @@
+2019-05-15 20:59:47,379 - sensor.py:set_handler:84 - INFO - 是否使用实时数据：False
+2019-05-15 20:59:47,379 - sensor.py:set_handler:92 - INFO - 载入data0加速度数据
+2019-05-15 20:59:47,457 - sensor.py:set_handler:94 - INFO - 载入data0陀螺仪数据
