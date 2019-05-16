@@ -26,10 +26,13 @@ class DataPreProcess:
         self.point_count_per_cycle = 200  # 插值的时候一个周期里点的个数
         self.expect_gait_cycle_duration = (400, 1200)  # 步态周期的阈值，如果检测出来的步态周期的时间不在这个范围内，就认为检测出来的是有问题的，不使用
 
+        self.time_duration_threshold_to_clear = 3000 # 超过多长时间没有识别到成功的步态，就认为已经找到了步态但是不合格，那么就清除所有数据
         self.data_type = None  # 当前正在处理的数据类型，acc或者是gyro，用于决定不同的阈值
         # 把生成的步态转换为gei图像存储
         self.acc_geis = []
         self.gyro_geis = []
+
+        self.DEBUG = None # 用于显示debug信息
 
     def _lowpass(self, data: numpy.ndarray) -> numpy.ndarray:
         """
@@ -69,7 +72,6 @@ class DataPreProcess:
     def _find_first_gait_cycle(self, data: numpy.ndarray) -> Union[numpy.ndarray, None]:
         """
         检测寻找第一个步态周期
-        :param template: 模板
         :param data: 原始数据
         :return: 步态周期
         """
@@ -87,18 +89,18 @@ class DataPreProcess:
             if i >= 2 and corr_distance[i - 1] < min(corr_distance[i - 2], corr_distance[i]) and corr_distance[
                 i - 1] < self._get_gait_cycle_threshold():
                 cycle_index_points.append(i - 1)
-                if len(cycle_index_points) == 2:  # 判断两个步态的形态，挑右边高的步态作为结果
-                    # cycle1 = data[cycle_index_points[0]:cycle_index_points[1] + 1]
-                    # cycle2 = data[cycle_index_points[1]:cycle_index_points[2] + 1]
-                    # if numpy.argmax(cycle1) > numpy.argmin(cycle1):
-                    #     cycle = cycle1
-                    # elif numpy.argmax(cycle2) > numpy.argmin(cycle2):
-                    #     cycle = cycle2
-                    # else:
-                    #     return None
+                if len(cycle_index_points) == 2:
+                    if self.DEBUG:
+                        plt.cla()
+                        plt.plot(corr_distance, "r")
+                        plt.axvline(cycle_index_points[0])
+                        plt.axvline(cycle_index_points[1])
+
+                        plt.plot(mags,"b")
+                        plt.show()
                     cycle = data[cycle_index_points[0]:cycle_index_points[1] + 1]
                     self.template = self._updata_template(cycle)
-                    return self._validate_cycle(cycle)
+                    return cycle
         self.template = None
         return None
 
@@ -136,13 +138,14 @@ class DataPreProcess:
                 return data[start:end]
         return None
 
-    def pre_process(self, data: numpy.ndarray, data_type: str) -> Union[numpy.ndarray, None]:
+    def pre_process(self, data: numpy.ndarray, data_type: str) -> Union[numpy.ndarray, None, int]:
         """
         数据预处理
         1、周期检测
         2、坐标转换
         3、插值
-        :param data:检测到了周期就返回 (a_mag, a_n1, a_n2, a_n3)，n1表示new axis 1。否则返回None
+        :param data_type: 检测的数据类型
+        :param data:检测到了周期就返回 (a_mag, a_n1, a_n2, a_n3)，n1表示new axis 1。检测到了但是不合格就返回0，没有检测到返回None
         :return:
         """
         assert data_type in ["acc", "gyro"], "data type 错误"
@@ -153,12 +156,13 @@ class DataPreProcess:
         cycle = self._find_first_gait_cycle(data)
         if cycle is None:
             return None
+        cycle = self._validate_cycle(cycle)
+        if cycle is None:
+            return 0
         transformed_cycle = self._transform(cycle)
         if len(transformed_cycle) < 4:  # 点的数量太少无法插值
             return None
         interpolated_cycle = self._interpolate(transformed_cycle)
-        # if numpy.argmax(interpolated_cycle[:,2]) < numpy.argmin(interpolated_cycle[:,2]):
-        #     return None
         return interpolated_cycle
 
     def _interpolate(self, data: numpy.ndarray) -> numpy.ndarray:
@@ -222,7 +226,7 @@ class DataPreProcess:
         :return:
         """
         validate_raw_data_with_timestamp(cycle)
-        # cycle = self._validate_cycle_duration(cycle)
+        cycle = self._validate_cycle_duration(cycle)
         return cycle
 
     def _validate_cycle_duration(self, cycle: numpy.ndarray) -> Union[numpy.ndarray, None]:
@@ -233,9 +237,9 @@ class DataPreProcess:
         if cycle is None:
             return None
         if self.data_type == "acc":
-            expect_duration = (1100, 1400)
+            expect_duration = (800, 1400)
         elif self.data_type == "gyro":
-            expect_duration = (1100, 1400)
+            expect_duration = (800, 1400)
         else:
             raise Exception("data type 错误")
         cycle_duration = int(cycle[-1][0]) - int(cycle[0][0])  # 检测出来的步态周期的时长，ms
@@ -250,7 +254,7 @@ class DataPreProcess:
         :return:
         """
         if self.data_type == "acc":
-            return 0.2
+            return 0.4
         elif self.data_type == "gyro":
             return 0.2
         else:
@@ -258,26 +262,31 @@ class DataPreProcess:
 
 
 if __name__ == "__main__":
-    data = get_data0_data(os.path.join(DATA_DIR, "data0", "accData6.txt"))
+    data = get_data0_data(os.path.join(DATA_DIR, "data0", "gyrData0.txt"))
+    validate_raw_data_with_timestamp(data)
     g = DataPreProcess()
+    g.DEBUG = True
     d = []
     fig = plt.figure()
-    ax = fig.add_subplot(111)
-    ax.get_yaxis().set_visible(False)
-    ax.get_xaxis().set_visible(False)
     for i in range(len(data)):
+        # print(len(d))
         d.append(data[i])
-        result = g.pre_process(numpy.array(d))
-        if result is not None:
+        result = g.pre_process(numpy.array(d), "gyro")
+        # print(result)
+        if result is None:
+            pass
+        elif result == 0:
             d = []
-            ax.cla()
-            ax.plot(result[:, 1], color="black", linewidth=20)
-            fig.canvas.draw()
-            gei = numpy.fromstring(fig.canvas.tostring_rgb(), dtype=numpy.uint8, sep="").reshape(
-                fig.canvas.get_width_height()[::-1] + (3,))
-            g.acc_geis.append(gei)
-            print(len(g.acc_geis))
-            cv2.imshow("1", numpy.average(g.acc_geis[-30:], axis=0).astype("uint8"))
-            cv2.waitKey(30)
-        if len(d) > 400:
+        else:
+            pass
+            # plt.clf()
+            # plt.plot(result[:, 1], color="black", linewidth=20)
+            # fig.canvas.draw()
+            # gei = numpy.fromstring(fig.canvas.tostring_rgb(), dtype=numpy.uint8, sep="").reshape(
+            #     fig.canvas.get_width_height()[::-1] + (3,))
+            # g.acc_geis.append(gei)
+            # cv2.imshow("1", numpy.average(g.acc_geis[-30:], axis=0).astype("uint8"))
+            # cv2.waitKey()
+        # print(int(d[-1][0]) - int(d[0][0]))
+        if d and int(d[-1][0]) - int(d[0][0]) > g.time_duration_threshold_to_clear:
             d = []

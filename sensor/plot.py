@@ -156,6 +156,7 @@ class PlotManager:
             self.ax_gait_acc_z.cla()
             self.ax_gait_acc_z.plot(self.acc_data[:, 3], color=color, linewidth=linewidth)
             self.sensor_manager.acc.clear()
+            # self.sensor_manager.acc = self.sensor_manager.acc[len(self.sensor_manager.acc) // 2:]
             self.fig_acc_gait.canvas.draw()
             gei = numpy.fromstring(self.fig_acc_gait.canvas.tostring_rgb(), dtype=numpy.uint8, sep="").reshape(
                 self.fig_acc_gait.canvas.get_width_height()[::-1] + (3,))
