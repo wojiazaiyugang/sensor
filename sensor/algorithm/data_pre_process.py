@@ -69,9 +69,10 @@ class DataPreProcess:
         list2 = list2 - numpy.average(list2)
         return 1 - sum(list1 * list2) / (numpy.linalg.norm(list1) * numpy.linalg.norm(list2))
 
-    def _find_first_gait_cycle(self, data: numpy.ndarray) -> Union[numpy.ndarray, None]:
+    def find_first_gait_cycle(self, data: numpy.ndarray, gait_cycle_threshold: float) -> Union[numpy.ndarray, None]:
         """
         检测寻找第一个步态周期
+        :param gait_cycle_threshold: 用于找最低点的阈值
         :param data: 原始数据
         :return: 步态周期
         """
@@ -87,7 +88,7 @@ class DataPreProcess:
         for i in range(len(mags) - len(self.template) + 1):
             corr_distance.append(self._corr_distance(template_mag, mags[i:i + len(self.template)]))
             if i >= 2 and corr_distance[i - 1] < min(corr_distance[i - 2], corr_distance[i]) and corr_distance[
-                i - 1] < self._get_gait_cycle_threshold():
+                i - 1] < gait_cycle_threshold:
                 cycle_index_points.append(i - 1)
                 if len(cycle_index_points) == 2:
                     if self.DEBUG:
@@ -138,14 +139,14 @@ class DataPreProcess:
                 return data[start:end]
         return None
 
-    def pre_process(self, data: numpy.ndarray, data_type: str) -> Union[numpy.ndarray, None, int]:
+    def pre_process(self, data: numpy.ndarray, data_type: str) -> Union[numpy.ndarray, None]:
         """
         数据预处理
         1、周期检测
         2、坐标转换
         3、插值
         :param data_type: 检测的数据类型
-        :param data:检测到了周期就返回 (a_mag, a_n1, a_n2, a_n3)，n1表示new axis 1。检测到了但是不合格就返回0，没有检测到返回None
+        :param data:检测到了周期就返回 (a_mag, a_n1, a_n2, a_n3)，n1表示new axis 1。没有检测到返回None
         :return:
         """
         assert data_type in ["acc", "gyro"], "data type 错误"
@@ -153,19 +154,19 @@ class DataPreProcess:
         if not data.any():
             return None
         validate_raw_data_with_timestamp(data)
-        cycle = self._find_first_gait_cycle(data)
+        cycle = self.find_first_gait_cycle(data)
         if cycle is None:
             return None
-        cycle = self._validate_cycle(cycle)
-        if cycle is None:
-            return 0
-        transformed_cycle = self._transform(cycle)
+        # cycle = self._validate_cycle(cycle)
+        # if cycle is None:
+        #     return 0
+        transformed_cycle = self.transform(cycle)
         if len(transformed_cycle) < 4:  # 点的数量太少无法插值
             return None
-        interpolated_cycle = self._interpolate(transformed_cycle)
+        interpolated_cycle = self.interpolate(transformed_cycle)
         return interpolated_cycle
 
-    def _interpolate(self, data: numpy.ndarray) -> numpy.ndarray:
+    def interpolate(self, data: numpy.ndarray) -> numpy.ndarray:
         """
         对数据进行插值
         :param point_number: 插值之后每个周期内的数据点个数
@@ -182,7 +183,7 @@ class DataPreProcess:
         new_z = interpolate.interp1d(x, z_old, kind="quadratic")(x_index)
         return numpy.array([new_mag, new_x, new_y, new_z]).T
 
-    def _transform(self, matrix_a: numpy.ndarray) -> numpy.ndarray:
+    def transform(self, matrix_a: numpy.ndarray) -> numpy.ndarray:
         """
         将步态周期进行坐标转换
         :param matrix_a: 周期
@@ -219,17 +220,17 @@ class DataPreProcess:
             return self.template
         return 0.9 * self.template + 0.1 * cycle[:len(self.template)]
 
-    def _validate_cycle(self, cycle: numpy.ndarray) -> Union[numpy.ndarray, None]:
+    def validate_cycle(self, cycle: numpy.ndarray) -> Union[numpy.ndarray, None]:
         """
         对检测出来的步态进行校验，通过校验的才认为是一个合法的步态，否则就返回None
         :param cycle:
         :return:
         """
         validate_raw_data_with_timestamp(cycle)
-        cycle = self._validate_cycle_duration(cycle)
+        cycle = self.validate_cycle_duration(cycle)
         return cycle
 
-    def _validate_cycle_duration(self, cycle: numpy.ndarray) -> Union[numpy.ndarray, None]:
+    def validate_cycle_duration(self, cycle: numpy.ndarray) -> Union[numpy.ndarray, None]:
         """
         获取步态周期的有效时长
         :return:

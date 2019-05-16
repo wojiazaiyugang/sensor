@@ -96,10 +96,6 @@ class PlotManager:
         self.ax_gait_gyro_z.get_yaxis().set_visible(False)
         self.ax_gait_gyro_z.get_xaxis().set_visible(False)
 
-        self.count_threshold_clear = 400 # 阈值，超过这个阈值还没有生成步态就认为数据有问题，直接清除数据
-        # 预处理之后的数据，用于显示绘图
-        self.acc_data = None
-        self.gyro_data = None
         self.gei_count_to_generate_geis = 30 # 使用多少张gei来生成geis
         #geis图像
         self.acc_gei = None
@@ -145,16 +141,16 @@ class PlotManager:
         color = "black"
         linewidth = 3
         # 加速度步态数据
-        self.acc_data = self.algorithm_manager.data_pre_process.pre_process(numpy.array(self.sensor_manager.acc), "acc")
-        if self.acc_data is not None:
+        acc_gait_cycle = self.algorithm_manager.get_acc_gait_cycle()
+        if acc_gait_cycle is not None:
             self.ax_gait_acc_mag.cla()
-            self.ax_gait_acc_mag.plot(self.acc_data[:, 0], color=color, linewidth=linewidth)
+            self.ax_gait_acc_mag.plot(acc_gait_cycle[:, 0], color=color, linewidth=linewidth)
             self.ax_gait_acc_x.cla()
-            self.ax_gait_acc_x.plot(self.acc_data[:, 1], color=color, linewidth=linewidth)
+            self.ax_gait_acc_x.plot(acc_gait_cycle[:, 1], color=color, linewidth=linewidth)
             self.ax_gait_acc_y.cla()
-            self.ax_gait_acc_y.plot(self.acc_data[:, 2], color=color, linewidth=linewidth)
+            self.ax_gait_acc_y.plot(acc_gait_cycle[:, 2], color=color, linewidth=linewidth)
             self.ax_gait_acc_z.cla()
-            self.ax_gait_acc_z.plot(self.acc_data[:, 3], color=color, linewidth=linewidth)
+            self.ax_gait_acc_z.plot(acc_gait_cycle[:, 3], color=color, linewidth=linewidth)
             self.sensor_manager.acc.clear()
             # self.sensor_manager.acc = self.sensor_manager.acc[len(self.sensor_manager.acc) // 2:]
             self.fig_acc_gait.canvas.draw()
@@ -163,20 +159,18 @@ class PlotManager:
             self.algorithm_manager.data_pre_process.acc_geis.append(gei)
             self.acc_gei = numpy.average(self.algorithm_manager.data_pre_process.acc_geis[-self.gei_count_to_generate_geis:], axis=0).astype("uint8")
         # 清除数据
-        if self.acc_data is not None or len(self.sensor_manager.acc) > self.count_threshold_clear:
-            self.sensor_manager.acc.clear()
-        self.gyro_data = self.algorithm_manager.data_pre_process.pre_process(numpy.array(self.sensor_manager.gyro), "gyro")
+        gyro_gait_cycle = self.algorithm_manager.get_gyro_gait_cycle()
         # 步态数据
-        if self.gyro_data is not None:
+        if gyro_gait_cycle is not None:
 
             self.ax_gait_gyro_mag.cla()
-            self.ax_gait_gyro_mag.plot(self.gyro_data[:, 0], color=color, linewidth=linewidth)
+            self.ax_gait_gyro_mag.plot(gyro_gait_cycle[:, 0], color=color, linewidth=linewidth)
             self.ax_gait_gyro_x.cla()
-            self.ax_gait_gyro_x.plot(self.gyro_data[:, 1], color=color, linewidth=linewidth)
+            self.ax_gait_gyro_x.plot(gyro_gait_cycle[:, 1], color=color, linewidth=linewidth)
             self.ax_gait_gyro_y.cla()
-            self.ax_gait_gyro_y.plot(self.gyro_data[:, 2], color=color, linewidth=linewidth)
+            self.ax_gait_gyro_y.plot(gyro_gait_cycle[:, 2], color=color, linewidth=linewidth)
             self.ax_gait_gyro_z.cla()
-            self.ax_gait_gyro_z.plot(self.gyro_data[:, 3], color=color, linewidth=linewidth)
+            self.ax_gait_gyro_z.plot(gyro_gait_cycle[:, 3], color=color, linewidth=linewidth)
             self.sensor_manager.gyro.clear()
             self.fig_gyro_gait.canvas.draw()
             gei = numpy.fromstring(self.fig_gyro_gait.canvas.tostring_rgb(), dtype=numpy.uint8, sep="").reshape(
@@ -185,6 +179,3 @@ class PlotManager:
             self.gyro_gei = numpy.average(
                 self.algorithm_manager.data_pre_process.gyro_geis[-self.gei_count_to_generate_geis:], axis=0).astype(
                 "uint8")
-        # 清除数据
-        if self.gyro_data is not None or len(self.sensor_manager.gyro) > self.count_threshold_clear:
-            self.sensor_manager.gyro.clear()
