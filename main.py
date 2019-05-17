@@ -25,11 +25,10 @@ if __name__ == "__main__":
     # fig = plt.figure()
     for i in range(len(data)):
         d.append(data[i])
-
-        d, cycle = algorithm_manager._get_gait_cycle("gyro", d, gait_cycle_threshold=0.2,
+        d, cycle = algorithm_manager._get_gait_cycle(None, d, gait_cycle_threshold=0.2,
                                                     expect_duration=(800, 1400))
-        if cycle is None:
-            continue
+        # if cycle is None:
+        #     continue
         # plt.clf()
         # plt.plot(cycle[:, 1], color="black", linewidth=20)
         # fig.canvas.draw()
@@ -38,5 +37,3 @@ if __name__ == "__main__":
         # geis.append(gei)
         # cv2.imshow("1", numpy.average(geis[-30:], axis=0).astype("uint8"))
         # cv2.waitKey()
-        if d and int(d[-1][0]) - int(d[0][0]) > algorithm_manager.data_pre_process.time_duration_threshold_to_clear:
-            d = []

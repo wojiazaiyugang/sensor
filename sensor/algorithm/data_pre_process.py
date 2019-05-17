@@ -96,8 +96,7 @@ class DataPreProcess:
                         plt.plot(corr_distance, "r")
                         plt.axvline(cycle_index_points[0])
                         plt.axvline(cycle_index_points[1])
-
-                        plt.plot(mags,"b")
+                        plt.plot(data[:,1],"b")
                         plt.show()
                     cycle = data[cycle_index_points[0]:cycle_index_points[1] + 1]
                     self.template = self._updata_template(cycle)
