@@ -22,7 +22,8 @@ from util import get_data0_data, validate_raw_data_with_timestamp, validate_raw_
 class DataPreProcess:
     def __init__(self):
         self.template_duration = 1000  # 模板的长度，单位ms
-        self.template = None  # 模板
+        self.acc_template = None  # 模板
+        self.gyro_template = None
         self.point_count_per_cycle = 200  # 插值的时候一个周期里点的个数
         self.expect_gait_cycle_duration = (400, 1200)  # 步态周期的阈值，如果检测出来的步态周期的时间不在这个范围内，就认为检测出来的是有问题的，不使用
 
@@ -69,7 +70,7 @@ class DataPreProcess:
         list2 = list2 - numpy.average(list2)
         return 1 - sum(list1 * list2) / (numpy.linalg.norm(list1) * numpy.linalg.norm(list2))
 
-    def find_first_gait_cycle(self, data: numpy.ndarray, gait_cycle_threshold: float) -> Union[numpy.ndarray, None]:
+    def find_first_gait_cycle(self, data: numpy.ndarray, gait_cycle_threshold: float, expect_duration:tuple) -> Union[numpy.ndarray, None]:
         """
         检测寻找第一个步态周期
         :param gait_cycle_threshold: 用于找最低点的阈值
@@ -78,30 +79,40 @@ class DataPreProcess:
         """
         validate_raw_data_with_timestamp(data)
         mags = self._mag(data[:, 1:])
-        if self.template is None:
-            self.template = self._find_new_template(data)
-        if self.template is None:
+        if self.acc_template is None:
+            self.acc_template = self._find_new_template(data)
+        if self.acc_template is None:
             return None
         cycle_index_points = []
-        template_mag = self._mag(self.template[:, 1:])
+        template_mag = self._mag(self.acc_template[:, 1:])
         corr_distance = []
-        for i in range(len(mags) - len(self.template) + 1):
-            corr_distance.append(self._corr_distance(template_mag, mags[i:i + len(self.template)]))
+        for i in range(len(mags) - len(self.acc_template) + 1):
+            corr_distance.append(self._corr_distance(template_mag, mags[i:i + len(self.acc_template)]))
             if i >= 2 and corr_distance[i - 1] < min(corr_distance[i - 2], corr_distance[i]) and corr_distance[
                 i - 1] < gait_cycle_threshold:
                 cycle_index_points.append(i - 1)
                 if len(cycle_index_points) == 2:
+                    # 如果找到的周期时间不够的话，就凑上下一个周期
+                    cycle_duration = int(data[cycle_index_points[1]][0]) - int(data[cycle_index_points[0]][0])
+                    if cycle_duration < expect_duration[0]:
+                        del cycle_index_points[-1]
+                        continue
+                    elif cycle_duration > expect_duration[1]:
+                        cycle_index_points[0] = cycle_index_points[1]
+                        del cycle_index_points[-1]
+                        continue
                     if self.DEBUG:
                         plt.cla()
                         plt.plot(corr_distance, "r")
                         plt.axvline(cycle_index_points[0])
                         plt.axvline(cycle_index_points[1])
-                        plt.plot(data[:,1],"b")
+                        plt.plot(mags,"b")
+                        plt.plot(template_mag, "g")
                         plt.show()
                     cycle = data[cycle_index_points[0]:cycle_index_points[1] + 1]
-                    self.template = self._updata_template(cycle)
+                    self.acc_template = self._updata_template(cycle)
                     return cycle
-        self.template = None
+        # self.template = None
         return None
 
     def _find_new_template(self, data) -> Union[numpy.ndarray, None]:
@@ -156,9 +167,6 @@ class DataPreProcess:
         cycle = self.find_first_gait_cycle(data)
         if cycle is None:
             return None
-        # cycle = self._validate_cycle(cycle)
-        # if cycle is None:
-        #     return 0
         transformed_cycle = self.transform(cycle)
         if len(transformed_cycle) < 4:  # 点的数量太少无法插值
             return None
@@ -213,11 +221,11 @@ class DataPreProcess:
         :param cycle:
         :return: 更新后的模板
         """
-        if self.template is None:
+        if self.acc_template is None:
             return cycle
-        if len(cycle) < len(self.template):
-            return self.template
-        return 0.9 * self.template + 0.1 * cycle[:len(self.template)]
+        if len(cycle) < len(self.acc_template):
+            return self.acc_template
+        return 0.9 * self.acc_template + 0.1 * cycle[:len(self.acc_template)]
 
     def validate_cycle(self, cycle: numpy.ndarray) -> Union[numpy.ndarray, None]:
         """

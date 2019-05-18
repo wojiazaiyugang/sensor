@@ -29,11 +29,13 @@ class AlgorithmManager:
         获取步态周期
         :return: 原始数据使用之后修改成的新的list，步态周期
         """
+        assert data_type in ["acc", "gyro"], "data type错误"
         validate_raw_data_with_timestamp(numpy.array(data))
-        first_cycle = self.data_pre_process.find_first_gait_cycle(numpy.array(data), gait_cycle_threshold)
+        first_cycle = self.data_pre_process.find_first_gait_cycle(numpy.array(data), gait_cycle_threshold, expect_duration)
         if first_cycle is None:
             if len(data) > self.count_threshold_clear:
                 data = []
+                self.data_pre_process.acc_template = None
             return data, None
         cycle_duration = int(first_cycle[-1][0]) - int(first_cycle[0][0])  # 检测出来的步态周期的时长，ms
         if not expect_duration[0] <= cycle_duration <= expect_duration[1]:
@@ -56,7 +58,7 @@ class AlgorithmManager:
         return cycle
 
     def get_gyro_gait_cycle(self) -> Union[numpy.ndarray, None]:
-        new_gyro_data, cycle = self._get_gait_cycle("gyro", self._sensor_manager.gyro, gait_cycle_threshold=0.2,
+        new_gyro_data, cycle = self._get_gait_cycle("gyro", self._sensor_manager.gyro, gait_cycle_threshold=0.4,
                                                     expect_duration=(800, 1400))
         self._sensor_manager.gyro = new_gyro_data
         return cycle
