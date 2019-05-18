@@ -6,7 +6,7 @@ from sensor.sensor import SensorManager
 from settings import DATA_DIR
 from util import get_data0_data
 
-DEBUG = True
+DEBUG = False
 
 if __name__ == "__main__":
     if not DEBUG:
@@ -14,7 +14,7 @@ if __name__ == "__main__":
     sensor_manager = SensorManager()
     algorithm_manager = AlgorithmManager(sensor_manager)
     algorithm_manager.gyro_data_pre_process.DEBUG = True
-    data = get_data0_data(os.path.join(DATA_DIR, "data0", "gyrData0.txt"))
+    data = get_data0_data(os.path.join(DATA_DIR, "data0", "gyrData0.txt"))[300:]
     d = []
     for i in range(len(data)):
         d.append(data[i])

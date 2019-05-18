@@ -96,11 +96,15 @@ class DataPreProcess:
                         continue
                     if self.DEBUG:
                         plt.cla()
-                        plt.plot(corr_distance, "r")
-                        plt.plot(data[:, 1], "b")
-                        plt.plot(template_mag, "g")
+                        plt.plot(data[:, 1], "r", label="x")
+                        plt.plot(data[:, 2], "g", label="y")
+                        plt.plot(data[:, 3], "b", label="z")
+                        plt.plot(corr_distance, "y", label="dis")
+                        plt.plot(template_mag, "black", label="template")
                         plt.axvline(cycle_index_points[0])
                         plt.axvline(cycle_index_points[1])
+                        plt.legend()
+                        plt.title("search cycle")
                         plt.show()
                     cycle = data[cycle_index_points[0]:cycle_index_points[1] + 1]
                     self.template = self._updata_template(cycle)
@@ -140,27 +144,6 @@ class DataPreProcess:
                     continue
                 return data[start:end]
         return None
-
-    def pre_process(self, data: numpy.ndarray) -> Union[numpy.ndarray, None]:
-        """
-        数据预处理
-        1、周期检测
-        2、坐标转换
-        3、插值
-        :param data:检测到了周期就返回 (a_mag, a_n1, a_n2, a_n3)，n1表示new axis 1。没有检测到返回None
-        :return:
-        """
-        if not data.any():
-            return None
-        validate_raw_data_with_timestamp(data)
-        cycle = self._find_first_gait_cycle(data)
-        if cycle is None:
-            return None
-        transformed_cycle = self.transform(cycle)
-        if len(transformed_cycle) < 4:  # 点的数量太少无法插值
-            return None
-        interpolated_cycle = self.interpolate(transformed_cycle)
-        return interpolated_cycle
 
     def interpolate(self, data: numpy.ndarray) -> numpy.ndarray:
         """
@@ -207,10 +190,11 @@ class DataPreProcess:
         :return: 更新后的模板
         """
         if self.template is None:
+            logger.debug("return cycle")
             return cycle
         if len(cycle) < len(self.template):
             return self.template
-        return 0.9 * self.template + 0.1 * cycle[:len(self.template)]
+        return 0.8 * self.template + 0.2 * cycle[:len(self.template)]
 
     def get_gait_cycle(self, data: list) -> Tuple[list, Union[numpy.ndarray, None]]:
         """
@@ -224,11 +208,37 @@ class DataPreProcess:
                 data = []
                 self.template = None
             return data, None
+        if self.DEBUG:
+            plt.plot(self._mag(first_cycle[:,1:]), "black", label="mag")
+            plt.plot(first_cycle[:, 1], "r", label="x")
+            plt.plot(first_cycle[:, 2], "g", label="y")
+            plt.plot(first_cycle[:, 3], "b", label="z")
+            plt.title("first_cycle")
+            plt.legend()
+            plt.show()
         transformed_cycle = self.transform(first_cycle)
+        if self.DEBUG:
+            plt.plot(transformed_cycle[:, 0], "black", label="mag")
+            plt.plot(transformed_cycle[:, 1], "r", label="x")
+            plt.plot(transformed_cycle[:, 2], "g", label="y")
+            plt.plot(transformed_cycle[:, 3], "b", label="z")
+            plt.title("transformed_cycle")
+            plt.legend()
+            plt.show()
         if len(transformed_cycle) < 4:  # 点的数量太少无法插值
             return [], None
         interpolated_cycle = self.interpolate(transformed_cycle)
-        return data[-5:], interpolated_cycle  # TODO -5 ？
+        if self.DEBUG:
+            if self.DEBUG:
+                plt.plot(interpolated_cycle[:, 0], "black", label="mag")
+                plt.plot(interpolated_cycle[:, 1], "r", label="x")
+                plt.plot(interpolated_cycle[:, 2], "g", label="y")
+                plt.plot(interpolated_cycle[:, 3], "b", label="z")
+                plt.title("interpolated_cycle")
+                plt.legend()
+                plt.show()
+        return data[-5:], numpy.concatenate((numpy.array([self._mag(first_cycle[:,1:])]).T, first_cycle[:,1:]), axis=1)  # TODO -5 ？
+        # return data[-5:], interpolated_cycle  # TODO -5 ？
 
 
 class AccDataPreProcess(DataPreProcess):

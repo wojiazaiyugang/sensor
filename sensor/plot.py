@@ -28,6 +28,8 @@ class PlotManager:
         self.sensor_manager = sensor_manager
         # TODO
         self.algorithm_manager = algorithm_manager
+
+        self.DEBUG = None
         # 原始数据图 ===================================================================================================
         # 数据图
         self.fig_raw_data, (self.ax_acc, self.ax_gyro, self.ax_ang) = plt.subplots(nrows=3, ncols=1, figsize=(3, 9))
@@ -153,14 +155,13 @@ class PlotManager:
             self.ax_gait_acc_y.plot(acc_gait_cycle[:, 2], color=color, linewidth=linewidth)
             self.ax_gait_acc_z.cla()
             self.ax_gait_acc_z.plot(acc_gait_cycle[:, 3], color=color, linewidth=linewidth)
-            self.sensor_manager.acc.clear()
             self.fig_acc_gait.canvas.draw()
             gei = numpy.fromstring(self.fig_acc_gait.canvas.tostring_rgb(), dtype=numpy.uint8, sep="").reshape(
                 self.fig_acc_gait.canvas.get_width_height()[::-1] + (3,))
             self.acc_geis.append(gei)
             self.fig_acc_gei = numpy.average(self.acc_geis[-self.gei_count_to_generate_geis:], axis=0).astype("uint8")
+
         gyro_gait_cycle = self.algorithm_manager.get_gyro_gait_cycle()
-        # 步态数据
         if gyro_gait_cycle is not None:
             self.ax_gait_gyro_mag.cla()
             self.ax_gait_gyro_mag.plot(gyro_gait_cycle[:, 0], color=color, linewidth=linewidth)
@@ -170,7 +171,6 @@ class PlotManager:
             self.ax_gait_gyro_y.plot(gyro_gait_cycle[:, 2], color=color, linewidth=linewidth)
             self.ax_gait_gyro_z.cla()
             self.ax_gait_gyro_z.plot(gyro_gait_cycle[:, 3], color=color, linewidth=linewidth)
-            self.sensor_manager.gyro.clear()
             self.fig_gyro_gait.canvas.draw()
             gei = numpy.fromstring(self.fig_gyro_gait.canvas.tostring_rgb(), dtype=numpy.uint8, sep="").reshape(
                 self.fig_gyro_gait.canvas.get_width_height()[::-1] + (3,))
