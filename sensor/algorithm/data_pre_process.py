@@ -24,13 +24,8 @@ class DataPreProcess:
         self.template = None  # 模板
         self.count_threshold_clear = 400
         self.point_count_per_cycle = 200  # 插值的时候一个周期里点的个数
-        self.expect_gait_cycle_duration = (400, 1200)  # 步态周期的阈值，如果检测出来的步态周期的时间不在这个范围内，就认为检测出来的是有问题的，不使用
-
+        self.expect_gait_cycle_duration = None  # 步态周期的阈值，如果检测出来的步态周期的时间不在这个范围内，就认为检测出来的是有问题的，不使用
         self.time_duration_threshold_to_clear = 3000  # 超过多长时间没有识别到成功的步态，就认为已经找到了步态但是不合格，那么就清除所有数据
-        self.data_type = None  # 当前正在处理的数据类型，acc或者是gyro，用于决定不同的阈值
-        # 把生成的步态转换为gei图像存储
-        self.acc_geis = []
-        self.gyro_geis = []
 
         self.DEBUG = None  # 用于显示debug信息
 
@@ -69,7 +64,7 @@ class DataPreProcess:
         list2 = list2 - numpy.average(list2)
         return 1 - sum(list1 * list2) / (numpy.linalg.norm(list1) * numpy.linalg.norm(list2))
 
-    def find_first_gait_cycle(self, data: numpy.ndarray) -> Union[numpy.ndarray, None]:
+    def _find_first_gait_cycle(self, data: numpy.ndarray) -> Union[numpy.ndarray, None]:
         """
         检测寻找第一个步态周期
         :param data: 原始数据
@@ -158,7 +153,7 @@ class DataPreProcess:
         if not data.any():
             return None
         validate_raw_data_with_timestamp(data)
-        cycle = self.find_first_gait_cycle(data)
+        cycle = self._find_first_gait_cycle(data)
         if cycle is None:
             return None
         transformed_cycle = self.transform(cycle)
@@ -217,54 +212,13 @@ class DataPreProcess:
             return self.template
         return 0.9 * self.template + 0.1 * cycle[:len(self.template)]
 
-    def validate_cycle(self, cycle: numpy.ndarray) -> Union[numpy.ndarray, None]:
-        """
-        对检测出来的步态进行校验，通过校验的才认为是一个合法的步态，否则就返回None
-        :param cycle:
-        :return:
-        """
-        validate_raw_data_with_timestamp(cycle)
-        cycle = self.validate_cycle_duration(cycle)
-        return cycle
-
-    def validate_cycle_duration(self, cycle: numpy.ndarray) -> Union[numpy.ndarray, None]:
-        """
-        获取步态周期的有效时长
-        :return:
-        """
-        if cycle is None:
-            return None
-        if self.data_type == "acc":
-            expect_duration = (800, 1400)
-        elif self.data_type == "gyro":
-            expect_duration = (800, 1400)
-        else:
-            raise Exception("data type 错误")
-        cycle_duration = int(cycle[-1][0]) - int(cycle[0][0])  # 检测出来的步态周期的时长，ms
-        if not expect_duration[0] <= cycle_duration <= expect_duration[1]:
-            logger.debug("无效步态，数据类型:{0},期望时长:{1},实际时长{2}".format(self.data_type, expect_duration, cycle_duration))
-            return None
-        return cycle
-
-    def _get_gait_cycle_threshold(self) -> float:
-        """
-        获取阈值
-        :return:
-        """
-        if self.data_type == "acc":
-            return 0.4
-        elif self.data_type == "gyro":
-            return 0.2
-        else:
-            raise Exception("data type 错误")
-
     def get_gait_cycle(self, data: list) -> Tuple[list, Union[numpy.ndarray, None]]:
         """
         获取步态周期
         :return: 原始数据使用之后修改成的新的list，步态周期
         """
         validate_raw_data_with_timestamp(numpy.array(data))
-        first_cycle = self.find_first_gait_cycle(numpy.array(data))
+        first_cycle = self._find_first_gait_cycle(numpy.array(data))
         if first_cycle is None:
             if len(data) > self.count_threshold_clear:
                 data = []
