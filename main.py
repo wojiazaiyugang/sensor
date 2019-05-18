@@ -8,7 +8,7 @@ from sensor.gui import GuiManager
 from sensor.sensor import SensorManager
 from sensor.algorithm import AlgorithmManager
 from util import get_data0_data, validate_raw_data_with_timestamp
-from settings import DATA_DIR
+from settings import DATA_DIR, DataType
 
 DEBUG = False
 
@@ -17,7 +17,7 @@ if __name__ == "__main__":
         GuiManager().run()
     sensor_manager = SensorManager()
     algorithm_manager = AlgorithmManager(sensor_manager)
-    data = get_data0_data(os.path.join(DATA_DIR, "data0", "accData0.txt"))
+    data = get_data0_data(os.path.join(DATA_DIR, "data0", "gyrData0.txt"))
     validate_raw_data_with_timestamp(data)
     algorithm_manager.data_pre_process.DEBUG = True
     d = []
@@ -25,8 +25,8 @@ if __name__ == "__main__":
     # fig = plt.figure()
     for i in range(len(data)):
         d.append(data[i])
-        d, cycle = algorithm_manager._get_gait_cycle(None, d, gait_cycle_threshold=0.4,
-                                                    expect_duration=(800, 1400))
+        d, cycle = algorithm_manager._get_gait_cycle(DataType.gyro, d, gait_cycle_threshold=0.4,
+                                                     expect_duration=(800, 1400))
         # if cycle is None:
         #     continue
         # plt.clf()

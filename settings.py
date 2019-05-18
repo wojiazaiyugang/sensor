@@ -3,8 +3,9 @@
 """
 import os
 import logging
+from enum import Enum
 
-WRITE_LOG_FILE = False # 是否把日志写入文件
+WRITE_LOG_FILE = False  # 是否把日志写入文件
 # 项目目录
 PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
 # 配置日志配置同时输出到屏幕和日志文件
@@ -33,3 +34,7 @@ DATA_DIR = os.path.join(ALGORITHM_DIR, "data")
 SENSOR_DATA = 0
 assert SENSOR_DATA is None or 0 <= int(SENSOR_DATA) <= 9, "数据错误"
 
+
+class DataType(Enum):
+    acc = 0,
+    gyro = 1,

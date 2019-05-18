@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 from scipy import signal
 from scipy import interpolate
 
-from settings import DATA_DIR, logger
+from settings import DATA_DIR, logger, DataType
 from util import get_data0_data, validate_raw_data_with_timestamp, validate_raw_data_without_timestamp
 
 
@@ -70,7 +70,7 @@ class DataPreProcess:
         list2 = list2 - numpy.average(list2)
         return 1 - sum(list1 * list2) / (numpy.linalg.norm(list1) * numpy.linalg.norm(list2))
 
-    def find_first_gait_cycle(self, data: numpy.ndarray, gait_cycle_threshold: float, expect_duration:tuple) -> Union[numpy.ndarray, None]:
+    def find_first_gait_cycle(self, data_type: DataType, data: numpy.ndarray, gait_cycle_threshold: float, expect_duration:tuple) -> Union[numpy.ndarray, None]:
         """
         检测寻找第一个步态周期
         :param gait_cycle_threshold: 用于找最低点的阈值
@@ -79,15 +79,22 @@ class DataPreProcess:
         """
         validate_raw_data_with_timestamp(data)
         mags = self._mag(data[:, 1:])
-        if self.acc_template is None:
-            self.acc_template = self._find_new_template(data)
-        if self.acc_template is None:
-            return None
+        template = None
+        if data_type == DataType.acc.name:
+            template = self.acc_template if self.acc_template is not None else self._find_new_template(data)
+            if template is None:
+                return None
+        elif data_type == DataType.gyro.name:
+            template = self.gyro_template if self.gyro_template is not None else self._find_new_template(data)
+            if template is None:
+                return None
+        else:
+            raise Exception("data type 错误")
         cycle_index_points = []
-        template_mag = self._mag(self.acc_template[:, 1:])
+        template_mag = self._mag(template[:, 1:])
         corr_distance = []
-        for i in range(len(mags) - len(self.acc_template) + 1):
-            corr_distance.append(self._corr_distance(template_mag, mags[i:i + len(self.acc_template)]))
+        for i in range(len(mags) - len(template) + 1):
+            corr_distance.append(self._corr_distance(template_mag, mags[i:i + len(template)]))
             if i >= 2 and corr_distance[i - 1] < min(corr_distance[i - 2], corr_distance[i]) and corr_distance[
                 i - 1] < gait_cycle_threshold:
                 cycle_index_points.append(i - 1)
@@ -106,13 +113,16 @@ class DataPreProcess:
                         plt.plot(corr_distance, "r")
                         plt.axvline(cycle_index_points[0])
                         plt.axvline(cycle_index_points[1])
-                        plt.plot(mags,"b")
+                        plt.plot(data[:,1],"b")
                         plt.plot(template_mag, "g")
                         plt.show()
                     cycle = data[cycle_index_points[0]:cycle_index_points[1] + 1]
-                    self.acc_template = self._updata_template(cycle)
+                    new_template = self._updata_template(cycle)
+                    if data_type == DataType.acc.name:
+                        self.acc_template = new_template
+                    elif data_type == DataType.gyro.name:
+                        self.gyro_template = new_template
                     return cycle
-        # self.template = None
         return None
 
     def _find_new_template(self, data) -> Union[numpy.ndarray, None]:
