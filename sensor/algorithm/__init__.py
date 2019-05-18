@@ -7,7 +7,7 @@ import numpy
 import matplotlib.pyplot as plt
 # from sensor.algorithm.activity_recognition import ActivityRecognitionNetwork
 # from sensor.algorithm.svm.one_class_svm import OneClassSvm
-from sensor.algorithm.data_pre_process import DataPreProcess
+from sensor.algorithm.data_pre_process import AccDataPreProcess, GyoDataPreProcess
 from sensor.sensor import SensorManager
 from util import get_current_timestamp, validate_raw_data_with_timestamp
 from settings import logger, DataType
@@ -18,48 +18,20 @@ class AlgorithmManager:
         self._sensor_manager = sensor_manager
         # self.activity_recognition_network = ActivityRecognitionNetwork()
         # self.one_class_svm_on_data0 = OneClassSvm()
-        self.data_pre_process = DataPreProcess()
+        self.acc_data_pre_process = AccDataPreProcess()
+        self.gyro_data_pre_process = GyoDataPreProcess()
 
         self.count_threshold_clear = 400  # 阈值，超过这个阈值还没有生成步态就认为数据有问题，直接清除数据
         self.fig = plt.plot([], [])
 
-    def _get_gait_cycle(self, data_type: DataType, data: list, gait_cycle_threshold: float = None,
-                        expect_duration: tuple = None) -> Tuple[list, Union[numpy.ndarray, None]]:
-        """
-        获取步态周期
-        :return: 原始数据使用之后修改成的新的list，步态周期
-        """
-        validate_raw_data_with_timestamp(numpy.array(data))
-        first_cycle = self.data_pre_process.find_first_gait_cycle(data_type, numpy.array(data), gait_cycle_threshold,
-                                                                  expect_duration)
-        if first_cycle is None:
-            if len(data) > self.count_threshold_clear:
-                data = []
-                if data_type == DataType.acc.name:
-                    self.data_pre_process.acc_template = None
-                elif data_type == DataType.gyro.name:
-                    self.data_pre_process.gyro_template = None
-            return data, None
-        transformed_cycle = self.data_pre_process.transform(first_cycle)
-        if len(transformed_cycle) < 4:  # 点的数量太少无法插值
-            return [], None
-        interpolated_cycle = self.data_pre_process.interpolate(transformed_cycle)
-        return data[-5:], interpolated_cycle  # TODO -5 ？
-
     def get_acc_gait_cycle(self) -> Union[numpy.ndarray, None]:
-        """
-        获取acc的一个步态周期
-        :return:
-        """
-        new_acc_data, cycle = self._get_gait_cycle("acc", self._sensor_manager.acc, gait_cycle_threshold=0.4,
-                                                   expect_duration=(800, 1400))
-        self._sensor_manager.acc = new_acc_data
+        new_list, cycle = self.acc_data_pre_process.get_gait_cycle(self._sensor_manager.acc)
+        self._sensor_manager.acc = new_list
         return cycle
 
     def get_gyro_gait_cycle(self) -> Union[numpy.ndarray, None]:
-        new_gyro_data, cycle = self._get_gait_cycle("gyro", self._sensor_manager.gyro, gait_cycle_threshold=0.2,
-                                                    expect_duration=(800, 1400))
-        self._sensor_manager.gyro = new_gyro_data
+        new_list, cycle = self.gyro_data_pre_process.get_gait_cycle(self._sensor_manager.gyro)
+        self._sensor_manager.gyro = new_list
         return cycle
 
     def get_current_activity(self) -> int:

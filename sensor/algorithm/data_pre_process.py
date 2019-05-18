@@ -1,39 +1,38 @@
 """
 步态周期相关
 """
-import os
-import math
 from typing import Tuple, Union
 
-import cv2
-import numpy
+import math
 # TODO: 这两句是为了兼容mac
 import matplotlib
+import numpy
 
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from scipy import signal
 from scipy import interpolate
 
-from settings import DATA_DIR, logger, DataType
-from util import get_data0_data, validate_raw_data_with_timestamp, validate_raw_data_without_timestamp
+from settings import logger
+from util import validate_raw_data_with_timestamp, validate_raw_data_without_timestamp
 
 
 class DataPreProcess:
     def __init__(self):
         self.template_duration = 1000  # 模板的长度，单位ms
-        self.acc_template = None  # 模板
-        self.gyro_template = None
+        self.gait_cycle_threshold = None
+        self.template = None  # 模板
+        self.count_threshold_clear = 400
         self.point_count_per_cycle = 200  # 插值的时候一个周期里点的个数
         self.expect_gait_cycle_duration = (400, 1200)  # 步态周期的阈值，如果检测出来的步态周期的时间不在这个范围内，就认为检测出来的是有问题的，不使用
 
-        self.time_duration_threshold_to_clear = 3000 # 超过多长时间没有识别到成功的步态，就认为已经找到了步态但是不合格，那么就清除所有数据
+        self.time_duration_threshold_to_clear = 3000  # 超过多长时间没有识别到成功的步态，就认为已经找到了步态但是不合格，那么就清除所有数据
         self.data_type = None  # 当前正在处理的数据类型，acc或者是gyro，用于决定不同的阈值
         # 把生成的步态转换为gei图像存储
         self.acc_geis = []
         self.gyro_geis = []
 
-        self.DEBUG = None # 用于显示debug信息
+        self.DEBUG = None  # 用于显示debug信息
 
     def _lowpass(self, data: numpy.ndarray) -> numpy.ndarray:
         """
@@ -70,58 +69,46 @@ class DataPreProcess:
         list2 = list2 - numpy.average(list2)
         return 1 - sum(list1 * list2) / (numpy.linalg.norm(list1) * numpy.linalg.norm(list2))
 
-    def find_first_gait_cycle(self, data_type: DataType, data: numpy.ndarray, gait_cycle_threshold: float, expect_duration:tuple) -> Union[numpy.ndarray, None]:
+    def find_first_gait_cycle(self, data: numpy.ndarray) -> Union[numpy.ndarray, None]:
         """
         检测寻找第一个步态周期
-        :param gait_cycle_threshold: 用于找最低点的阈值
         :param data: 原始数据
         :return: 步态周期
         """
         validate_raw_data_with_timestamp(data)
         mags = self._mag(data[:, 1:])
-        template = None
-        if data_type == DataType.acc.name:
-            template = self.acc_template if self.acc_template is not None else self._find_new_template(data)
-            if template is None:
-                return None
-        elif data_type == DataType.gyro.name:
-            template = self.gyro_template if self.gyro_template is not None else self._find_new_template(data)
-            if template is None:
-                return None
-        else:
-            raise Exception("data type 错误")
+        if self.template is None:
+            self.template = self._find_new_template(data)
+        if self.template is None:
+            return None
         cycle_index_points = []
-        template_mag = self._mag(template[:, 1:])
+        template_mag = self._mag(self.template[:, 1:])
         corr_distance = []
-        for i in range(len(mags) - len(template) + 1):
-            corr_distance.append(self._corr_distance(template_mag, mags[i:i + len(template)]))
+        for i in range(len(mags) - len(self.template) + 1):
+            corr_distance.append(self._corr_distance(template_mag, mags[i:i + len(self.template)]))
             if i >= 2 and corr_distance[i - 1] < min(corr_distance[i - 2], corr_distance[i]) and corr_distance[
-                i - 1] < gait_cycle_threshold:
+                i - 1] < self.gait_cycle_threshold:
                 cycle_index_points.append(i - 1)
                 if len(cycle_index_points) == 2:
                     # 如果找到的周期时间不够的话，就凑上下一个周期
                     cycle_duration = int(data[cycle_index_points[1]][0]) - int(data[cycle_index_points[0]][0])
-                    if cycle_duration < expect_duration[0]:
+                    if cycle_duration < self.expect_gait_cycle_duration[0]:
                         del cycle_index_points[-1]
                         continue
-                    elif cycle_duration > expect_duration[1]:
+                    elif cycle_duration > self.expect_gait_cycle_duration[1]:
                         cycle_index_points[0] = cycle_index_points[1]
                         del cycle_index_points[-1]
                         continue
                     if self.DEBUG:
                         plt.cla()
                         plt.plot(corr_distance, "r")
+                        plt.plot(data[:, 1], "b")
+                        plt.plot(template_mag, "g")
                         plt.axvline(cycle_index_points[0])
                         plt.axvline(cycle_index_points[1])
-                        plt.plot(data[:,1],"b")
-                        plt.plot(template_mag, "g")
                         plt.show()
                     cycle = data[cycle_index_points[0]:cycle_index_points[1] + 1]
-                    new_template = self._updata_template(cycle)
-                    if data_type == DataType.acc.name:
-                        self.acc_template = new_template
-                    elif data_type == DataType.gyro.name:
-                        self.gyro_template = new_template
+                    self.template = self._updata_template(cycle)
                     return cycle
         return None
 
@@ -159,18 +146,15 @@ class DataPreProcess:
                 return data[start:end]
         return None
 
-    def pre_process(self, data: numpy.ndarray, data_type: str) -> Union[numpy.ndarray, None]:
+    def pre_process(self, data: numpy.ndarray) -> Union[numpy.ndarray, None]:
         """
         数据预处理
         1、周期检测
         2、坐标转换
         3、插值
-        :param data_type: 检测的数据类型
         :param data:检测到了周期就返回 (a_mag, a_n1, a_n2, a_n3)，n1表示new axis 1。没有检测到返回None
         :return:
         """
-        assert data_type in ["acc", "gyro"], "data type 错误"
-        self.data_type = data_type
         if not data.any():
             return None
         validate_raw_data_with_timestamp(data)
@@ -186,7 +170,6 @@ class DataPreProcess:
     def interpolate(self, data: numpy.ndarray) -> numpy.ndarray:
         """
         对数据进行插值
-        :param point_number: 插值之后每个周期内的数据点个数
         :param data: 一个list，里面是n个list，每个list里面是若干个[x,y,z]
         :return: 一个list，里面是n个list，每个list里面是:POINT_NUMBER_PER_CYCLE个插值完的[x,y,z]
         """
@@ -215,10 +198,7 @@ class DataPreProcess:
         u = numpy.average(matrix_a_f, axis=0)
         matrix_a_norm_f = matrix_a_f - u
         sigma = numpy.dot(matrix_a_norm_f.T, matrix_a_norm_f) / (matrix_a.shape[0] - 1)
-        try:
-            eigenvalue, eigenvector = numpy.linalg.eig(sigma)
-        except Exception as err:
-            pass
+        eigenvalue, eigenvector = numpy.linalg.eig(sigma)
         vector_n2 = eigenvector[numpy.argmax(eigenvalue)]  # 两撇撇
         vector_n3 = numpy.cross(vector_n1, vector_n2)
         vector_a_n2 = numpy.dot(matrix_a, vector_n2)
@@ -231,11 +211,11 @@ class DataPreProcess:
         :param cycle:
         :return: 更新后的模板
         """
-        if self.acc_template is None:
+        if self.template is None:
             return cycle
-        if len(cycle) < len(self.acc_template):
-            return self.acc_template
-        return 0.9 * self.acc_template + 0.1 * cycle[:len(self.acc_template)]
+        if len(cycle) < len(self.template):
+            return self.template
+        return 0.9 * self.template + 0.1 * cycle[:len(self.template)]
 
     def validate_cycle(self, cycle: numpy.ndarray) -> Union[numpy.ndarray, None]:
         """
@@ -262,7 +242,7 @@ class DataPreProcess:
             raise Exception("data type 错误")
         cycle_duration = int(cycle[-1][0]) - int(cycle[0][0])  # 检测出来的步态周期的时长，ms
         if not expect_duration[0] <= cycle_duration <= expect_duration[1]:
-            logger.debug("无效步态，数据类型:{0},期望时长:{1},实际时长{2}".format(self.data_type, expect_duration,cycle_duration))
+            logger.debug("无效步态，数据类型:{0},期望时长:{1},实际时长{2}".format(self.data_type, expect_duration, cycle_duration))
             return None
         return cycle
 
@@ -277,3 +257,37 @@ class DataPreProcess:
             return 0.2
         else:
             raise Exception("data type 错误")
+
+    def get_gait_cycle(self, data: list) -> Tuple[list, Union[numpy.ndarray, None]]:
+        """
+        获取步态周期
+        :return: 原始数据使用之后修改成的新的list，步态周期
+        """
+        validate_raw_data_with_timestamp(numpy.array(data))
+        first_cycle = self.find_first_gait_cycle(numpy.array(data))
+        if first_cycle is None:
+            if len(data) > self.count_threshold_clear:
+                data = []
+                self.template = None
+            return data, None
+        transformed_cycle = self.transform(first_cycle)
+        if len(transformed_cycle) < 4:  # 点的数量太少无法插值
+            return [], None
+        interpolated_cycle = self.interpolate(transformed_cycle)
+        return data[-5:], interpolated_cycle  # TODO -5 ？
+
+
+class AccDataPreProcess(DataPreProcess):
+    def __init__(self):
+        super().__init__()
+        self.gait_cycle_threshold = 0.4
+        self.expect_gait_cycle_duration = (800, 1400)
+        self.template = None
+
+
+class GyoDataPreProcess(DataPreProcess):
+    def __init__(self):
+        super().__init__()
+        self.gait_cycle_threshold = 0.4
+        self.expect_gait_cycle_duration = (800, 1400)
+        self.template = None

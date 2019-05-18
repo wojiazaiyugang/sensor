@@ -98,8 +98,10 @@ class PlotManager:
 
         self.gei_count_to_generate_geis = 30 # 使用多少张gei来生成geis
         #geis图像
-        self.acc_gei = None
-        self.gyro_gei = None
+        self.fig_acc_gei = None
+        self.acc_geis = []
+        self.fig_gyro_gei = None
+        self.gyro_geis =[]
 
     def update_raw_data(self):
         """
@@ -155,8 +157,8 @@ class PlotManager:
             self.fig_acc_gait.canvas.draw()
             gei = numpy.fromstring(self.fig_acc_gait.canvas.tostring_rgb(), dtype=numpy.uint8, sep="").reshape(
                 self.fig_acc_gait.canvas.get_width_height()[::-1] + (3,))
-            self.algorithm_manager.data_pre_process.acc_geis.append(gei)
-            self.acc_gei = numpy.average(self.algorithm_manager.data_pre_process.acc_geis[-self.gei_count_to_generate_geis:], axis=0).astype("uint8")
+            self.acc_geis.append(gei)
+            self.fig_acc_gei = numpy.average(self.acc_geis[-self.gei_count_to_generate_geis:], axis=0).astype("uint8")
         gyro_gait_cycle = self.algorithm_manager.get_gyro_gait_cycle()
         # 步态数据
         if gyro_gait_cycle is not None:
@@ -172,7 +174,7 @@ class PlotManager:
             self.fig_gyro_gait.canvas.draw()
             gei = numpy.fromstring(self.fig_gyro_gait.canvas.tostring_rgb(), dtype=numpy.uint8, sep="").reshape(
                 self.fig_gyro_gait.canvas.get_width_height()[::-1] + (3,))
-            self.algorithm_manager.data_pre_process.gyro_geis.append(gei)
-            self.gyro_gei = numpy.average(
-                self.algorithm_manager.data_pre_process.gyro_geis[-self.gei_count_to_generate_geis:], axis=0).astype(
+            self.gyro_geis.append(gei)
+            self.fig_gyro_gei = numpy.average(
+                self.gyro_geis[-self.gei_count_to_generate_geis:], axis=0).astype(
                 "uint8")

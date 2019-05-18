@@ -122,12 +122,12 @@ class GuiManager:
             raw_data_pic = self._update_gait_pic(self.plot_manager.fig_raw_data, self.window.FindElement(self.KEYS.CANVAS_RAW_DATA).TKCanvas,
                                                  )
             acc = self._update_gait_and_gei(self.plot_manager.fig_acc_gait,
-                                                 self.window.FindElement(self.KEYS.CANVAS_GAIT_ACC).TKCanvas,
-                                            self.window.FindElement(self.KEYS.CANVAS_GEI_ACC).TKCanvas, self.plot_manager.acc_gei)
+                                            self.window.FindElement(self.KEYS.CANVAS_GAIT_ACC).TKCanvas,
+                                            self.window.FindElement(self.KEYS.CANVAS_GEI_ACC).TKCanvas, self.plot_manager.fig_acc_gei)
 
             gyro = self._update_gait_and_gei(self.plot_manager.fig_gyro_gait,
-                                                          self.window.FindElement(self.KEYS.CANVAS_GAIT_GYRO).TKCanvas,
-                                             self.window.FindElement(self.KEYS.CANVAS_GEI_GYRO).TKCanvas, self.plot_manager.gyro_gei)
+                                             self.window.FindElement(self.KEYS.CANVAS_GAIT_GYRO).TKCanvas,
+                                             self.window.FindElement(self.KEYS.CANVAS_GEI_GYRO).TKCanvas, self.plot_manager.fig_gyro_gei)
             # # 更新加速度步态图像
             # figure_photo_gait_acc = self._draw_figure(self.window.FindElement(self.KEYS.CANVAS_GAIT_ACC).TKCanvas,
             #                                           self.plot_manager.fig_acc_gait)
