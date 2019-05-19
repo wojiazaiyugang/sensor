@@ -2,7 +2,7 @@
 项目配置文件，保证在项目的根目录下
 """
 
-SENSOR_DATA = 0  # 使用的data0数据，1 - 10 ，如果为None表示使用实时数据
+SENSOR_DATA = 1  # 使用的data0数据，1 - 10 ，如果为None表示使用实时数据
 WRITE_LOG_FILE = False  # 是否把日志写入文件
 
 import os
