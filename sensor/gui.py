@@ -46,7 +46,7 @@ class GuiManager:
             [
                 sg.Column([
                     [sg.Frame("原始数据", [
-                        [sg.Canvas(size=(self.plot_manager.raw_data_fig.fig_raw_data_w, self.plot_manager.raw_data_fig.fig_raw_data_h),
+                        [sg.Canvas(size=(self.plot_manager.raw_data_fig.width, self.plot_manager.raw_data_fig.height),
                                    key=self.KEYS.CANVAS_RAW_DATA)]
                     ])]
                 ]),
@@ -129,11 +129,11 @@ class GuiManager:
             self.plot_manager.update_figures()
             raw_data_pic = self._update_gait_pic(self.plot_manager.raw_data_fig.fig, self.window.FindElement(self.KEYS.CANVAS_RAW_DATA).TKCanvas,
                                                  )
-            acc = self._update_gait_and_gei(self.plot_manager.gait_acc_fig.fig_acc_gait,
+            acc = self._update_gait_and_gei(self.plot_manager.gait_acc_fig.fig,
                                             self.window.FindElement(self.KEYS.CANVAS_GAIT_ACC).TKCanvas,
                                             self.window.FindElement(self.KEYS.CANVAS_GEI_ACC).TKCanvas, self.plot_manager.gait_acc_fig.get_gei())
 
-            gyro = self._update_gait_and_gei(self.plot_manager.gait_gyro_fig.fig_acc_gait,
+            gyro = self._update_gait_and_gei(self.plot_manager.gait_gyro_fig.fig,
                                              self.window.FindElement(self.KEYS.CANVAS_GAIT_GYRO).TKCanvas,
                                              self.window.FindElement(self.KEYS.CANVAS_GEI_GYRO).TKCanvas, self.plot_manager.gait_gyro_fig.get_gei())
 

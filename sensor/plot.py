@@ -20,7 +20,7 @@ class RawDataFig:
         # 数据图
         self.fig, (self.ax_acc, self.ax_gyro, self.ax_ang) = plt.subplots(nrows=3, ncols=1, figsize=(3, 9))
         self.fig.subplots_adjust(left=0.1, bottom=0.005, right=1, top=1, hspace=0.1)
-        self._, self._, self.fig_raw_data_w, self.fig_raw_data_h = [int(i) for i in self.fig.bbox.bounds]
+        self._, self._, self.width, self.height = [int(i) for i in self.fig.bbox.bounds]
 
 
 class RawDataAxes:
@@ -29,10 +29,9 @@ class RawDataAxes:
         self.sensor_manager = sensor_manager
         ax.get_xaxis().set_visible(False)
         ax.set_xlim(0, 400)
-        ax.set_ylim(-15, 15)
-        self.line_acc_x = ax.plot([], [], "b-", label="{0}_x".format(self.data_type))[0]
-        self.line_acc_y = ax.plot([], [], "g-", label="{0}_y".format(self.data_type))[0]
-        self.line_acc_z = ax.plot([], [], "r-", label="{0}_z".format(self.data_type))[0]
+        self.line_x = ax.plot([], [], "b-", label="{0}_x".format(self.data_type))[0]
+        self.line_y = ax.plot([], [], "g-", label="{0}_y".format(self.data_type))[0]
+        self.line_z = ax.plot([], [], "r-", label="{0}_z".format(self.data_type))[0]
         ax.legend(loc="upper right")
 
     def get_raw_data(self):
@@ -47,15 +46,16 @@ class RawDataAxes:
         if acc_data.any():
             validate_raw_data_with_timestamp(acc_data)
             t = list(range(len(acc_data)))
-            self.line_acc_x.set_data(t, acc_data[:, 1])
-            self.line_acc_y.set_data(t, acc_data[:, 2])
-            self.line_acc_z.set_data(t, acc_data[:, 3])
+            self.line_x.set_data(t, acc_data[:, 1])
+            self.line_y.set_data(t, acc_data[:, 2])
+            self.line_z.set_data(t, acc_data[:, 3])
 
 
 class RawDataAccAxes(RawDataAxes):
     def __init__(self, ax, sensor_manager):
         self.data_type = "acc"
-        super().__init__( ax, sensor_manager)
+        ax.set_ylim(-15, 15)
+        super().__init__(ax, sensor_manager)
 
     def get_raw_data(self):
         return self.sensor_manager.acc
@@ -64,7 +64,8 @@ class RawDataAccAxes(RawDataAxes):
 class RawDataGyroAxes(RawDataAxes):
     def __init__(self, ax, sensor_manager):
         self.data_type = "gyro"
-        super().__init__( ax, sensor_manager)
+        ax.set_ylim(-15, 15)
+        super().__init__(ax, sensor_manager)
 
     def get_raw_data(self):
         return self.sensor_manager.gyro
@@ -73,53 +74,34 @@ class RawDataGyroAxes(RawDataAxes):
 class GaitFig:
     def __init__(self, algorithm_manager: AlgorithmManager):
         self.algorithm_manager = algorithm_manager
-        self.acc_geis = []
+        self.gait_cycles = []
+        self.fig, self.axs = plt.subplots(nrows=1, ncols=4, figsize=(4, 1))
+        self.fig.subplots_adjust(left=0, bottom=0, right=1, top=1, wspace=0)
+        self._, self._, self.fig_gait_acc_w, self.fig_gait_acc_h = [int(i) for i in self.fig.bbox.bounds]
+        for ax in self.axs:
+            ax.set_title(str(ax))
+            ax.get_yaxis().set_visible(False)
+            ax.get_xaxis().set_visible(False)
 
-        self.fig_acc_gait, (
-            self.ax_gait_acc_mag, self.ax_gait_acc_x, self.ax_gait_acc_y, self.ax_gait_acc_z) = plt.subplots(nrows=1,
-                                                                                                             ncols=4,
-                                                                                                             figsize=(
-                                                                                                                 4, 1))
-        self.fig_acc_gait.subplots_adjust(left=0, bottom=0, right=1, top=1, wspace=0)
-        self._, self._, self.fig_gait_acc_w, self.fig_gait_acc_h = [int(i) for i in self.fig_acc_gait.bbox.bounds]
-        self.ax_gait_acc_mag.set_title("mag")
-        self.ax_gait_acc_mag.get_yaxis().set_visible(False)
-        self.ax_gait_acc_mag.get_xaxis().set_visible(False)
-        self.ax_gait_acc_x.set_title("x")
-        self.ax_gait_acc_x.get_yaxis().set_visible(False)
-        self.ax_gait_acc_x.get_xaxis().set_visible(False)
-        self.ax_gait_acc_y.set_title("y")
-        self.ax_gait_acc_y.get_yaxis().set_visible(False)
-        self.ax_gait_acc_y.get_xaxis().set_visible(False)
-        self.ax_gait_acc_z.set_title("z")
-        self.ax_gait_acc_z.get_yaxis().set_visible(False)
-        self.ax_gait_acc_z.get_xaxis().set_visible(False)
+        self.gei_count_to_generate_geis = 30  # 使用多少张gei来生成geis
 
     def get_gait_cycle(self):
         pass
 
     def update_cycle_fig(self):
-        color = "black"
-        linewidth = 3
-        acc_gait_cycle = self.get_gait_cycle()
-        if acc_gait_cycle is not None:
-            self.ax_gait_acc_mag.cla()
-            self.ax_gait_acc_mag.plot(acc_gait_cycle[:, 0], color=color, linewidth=linewidth)
-            self.ax_gait_acc_x.cla()
-            self.ax_gait_acc_x.plot(acc_gait_cycle[:, 1], color=color, linewidth=linewidth)
-            self.ax_gait_acc_y.cla()
-            self.ax_gait_acc_y.plot(acc_gait_cycle[:, 2], color=color, linewidth=linewidth)
-            self.ax_gait_acc_z.cla()
-            self.ax_gait_acc_z.plot(acc_gait_cycle[:, 3], color=color, linewidth=linewidth)
-            self.fig_acc_gait.canvas.draw()
-            gei = numpy.fromstring(self.fig_acc_gait.canvas.tostring_rgb(), dtype=numpy.uint8, sep="").reshape(
-                self.fig_acc_gait.canvas.get_width_height()[::-1] + (3,))
-            self.acc_geis.append(gei)
+        gait_cycle = self.get_gait_cycle()
+        if gait_cycle is not None:
+            for index,ax in enumerate(self.axs):
+                ax.cla()
+                ax.plot(gait_cycle[:, index], color="black", linewidth=3)
+            self.fig.canvas.draw()
+            gei = numpy.fromstring(self.fig.canvas.tostring_rgb(), dtype=numpy.uint8, sep="").reshape(self.fig.canvas.get_width_height()[::-1] + (3,))
+            self.gait_cycles.append(gei)
 
     def get_gei(self):
-        if not self.acc_geis:
+        if not self.gait_cycles:
             return None
-        return numpy.average(self.acc_geis[-30:], axis=0).astype("uint8")
+        return numpy.average(self.gait_cycles[-self.gei_count_to_generate_geis:], axis=0).astype("uint8")
 
 
 class GaitAccFig(GaitFig):
@@ -144,7 +126,6 @@ class PlotManager:
         """
         # 传感器管理类，用于获得数据
         self.sensor_manager = sensor_manager
-        # TODO
         self.algorithm_manager = algorithm_manager
 
         self.DEBUG = None
@@ -154,8 +135,6 @@ class PlotManager:
 
         self.gait_acc_fig = GaitAccFig(algorithm_manager)
         self.gait_gyro_fig = GaitGyroFig(algorithm_manager)
-
-        self.gei_count_to_generate_geis = 30  # 使用多少张gei来生成geis
 
     def update_figures(self):
         """
