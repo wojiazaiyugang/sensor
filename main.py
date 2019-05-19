@@ -1,5 +1,5 @@
 import os
-
+import time
 from sensor.algorithm import AlgorithmManager
 from sensor.gui import GuiManager
 from sensor.sensor import SensorManager
@@ -14,8 +14,6 @@ if __name__ == "__main__":
     sensor_manager = SensorManager()
     algorithm_manager = AlgorithmManager(sensor_manager)
     algorithm_manager.gyro_data_pre_process.DEBUG = True
-    data = get_data0_data(os.path.join(DATA_DIR, "data0", "gyrData0.txt"))[300:]
-    d = []
-    for i in range(len(data)):
-        d.append(data[i])
-        d, cycle = algorithm_manager.gyro_data_pre_process.get_gait_cycle(d)
+    while True:
+        sensor_manager.mock_real_time_data_from_data0()
+        sensor_manager.gyro, cycle = algorithm_manager.gyro_data_pre_process.get_gait_cycle(sensor_manager.gyro)

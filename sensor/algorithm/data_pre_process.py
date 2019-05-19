@@ -20,14 +20,16 @@ from util import validate_raw_data_with_timestamp, validate_raw_data_without_tim
 class DataPreProcess:
     def __init__(self):
         self.template_duration = 1000  # 模板的长度，单位ms
-        self.gait_cycle_threshold = None
+        self.gait_cycle_threshold = self.gait_cycle_threshold
         self.template = None  # 模板
+        self.data_type = self.data_type
         self.count_threshold_clear = 400
         self.point_count_per_cycle = 200  # 插值的时候一个周期里点的个数
-        self.expect_gait_cycle_duration = None  # 步态周期的阈值，如果检测出来的步态周期的时间不在这个范围内，就认为检测出来的是有问题的，不使用
+        self.expect_gait_cycle_duration = self.expect_gait_cycle_duration  # 步态周期的阈值，如果检测出来的步态周期的时间不在这个范围内，就认为检测出来的是有问题的，不使用
         self.time_duration_threshold_to_clear = 3000  # 超过多长时间没有识别到成功的步态，就认为已经找到了步态但是不合格，那么就清除所有数据
 
         self.DEBUG = None  # 用于显示debug信息
+        self.cycle_count = 0
 
     def _lowpass(self, data: numpy.ndarray) -> numpy.ndarray:
         """
@@ -208,14 +210,14 @@ class DataPreProcess:
                 data = []
                 self.template = None
             return data, None
-        if self.DEBUG:
-            plt.plot(self._mag(first_cycle[:, 1:]), "black", label="mag")
-            plt.plot(first_cycle[:, 1], "r", label="x")
-            plt.plot(first_cycle[:, 2], "g", label="y")
-            plt.plot(first_cycle[:, 3], "b", label="z")
-            plt.title("first_cycle")
-            plt.legend()
-            plt.show()
+        # if self.DEBUG:
+        #     plt.plot(self._mag(first_cycle[:, 1:]), "black", label="mag")
+        #     plt.plot(first_cycle[:, 1], "r", label="x")
+        #     plt.plot(first_cycle[:, 2], "g", label="y")
+        #     plt.plot(first_cycle[:, 3], "b", label="z")
+        #     plt.title("first_cycle")
+        #     plt.legend()
+        #     plt.show()
         # transformed_cycle = self.transform(first_cycle)
         # if self.DEBUG:
         #     plt.plot(transformed_cycle[:, 0], "black", label="mag")
@@ -238,24 +240,35 @@ class DataPreProcess:
         #         plt.legend()
         #         plt.show()
         interpolated_cycle_without_transform = self.interpolate(first_cycle)
+        self.cycle_count += 1
+        if self.DEBUG:
+            plt.plot(interpolated_cycle_without_transform[:, 1], "r", label="x")
+            plt.plot(interpolated_cycle_without_transform[:, 2], "g", label="y")
+            plt.plot(interpolated_cycle_without_transform[:, 3], "b", label="z")
+            plt.title("interpolated_cycle")
+            plt.legend()
+            plt.show()
+        if self.DEBUG:
+            logger.debug("{0}:CYCYLE INDEX:{1}".format(self.data_type, self.cycle_count))
         return data[-5:], numpy.concatenate((numpy.array([self._mag(interpolated_cycle_without_transform[:, 1:])]).T,
                                              interpolated_cycle_without_transform[:, 1:]), axis=1)
 
 
 class AccDataPreProcess(DataPreProcess):
     def __init__(self):
-        super().__init__()
+        self.data_type = "加速度"
         self.gait_cycle_threshold = 0.4
         self.expect_gait_cycle_duration = (800, 1400)
-        self.template = None
+        super().__init__()
 
 
 class GyoDataPreProcess(DataPreProcess):
     def __init__(self):
-        super().__init__()
+        self.data_type = "陀螺仪"
         self.gait_cycle_threshold = 0.4
         self.expect_gait_cycle_duration = (800, 1400)
-        self.template = None
+        super().__init__()
+
 
 
 class AngDataPreProcess(DataPreProcess):

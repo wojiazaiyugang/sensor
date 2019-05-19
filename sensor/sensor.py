@@ -104,12 +104,10 @@ class SensorManager:
         使用data0中的数据模拟真实数据，做法是通过时间戳来决定读取数据的多少
         :return:
         """
-        current_timestamp = get_current_timestamp()
-        mock_data_count = (current_timestamp - self.last_data_timestamp) // 5 # // 20 # data0中的数据是采样频率50HZ
+        mock_data_count = 20
         current_data_index = self.last_data_index + mock_data_count
         self.acc.extend(self.acc_data_lines[self.last_data_index: current_data_index])
         self.gyro.extend(self.gyro_data_lines[self.last_data_index: current_data_index])
-        self.last_data_timestamp = current_timestamp
         self.last_data_index = current_data_index
 
     def _validate_raw_data(self, data, threshold):
