@@ -97,6 +97,26 @@ class PlotManager:
         self.ax_gait_gyro_z.set_title("z")
         self.ax_gait_gyro_z.get_yaxis().set_visible(False)
         self.ax_gait_gyro_z.get_xaxis().set_visible(False)
+        # 欧拉角步态数据图 ===================================================================================================
+        self.fig_ang_gait, (
+            self.ax_gait_ang_mag, self.ax_gait_ang_x, self.ax_gait_ang_y, self.ax_gait_ang_z) = plt.subplots(
+            nrows=1,
+            ncols=4,
+            figsize=(4, 1))
+        self.fig_ang_gait.subplots_adjust(left=0, bottom=0, right=1, top=1, wspace=0)
+        self._, self._, self.fig_gait_ang_w, self.fig_gait_ang_h = [int(i) for i in self.fig_ang_gait.bbox.bounds]
+        self.ax_gait_ang_mag.set_title("mag")
+        self.ax_gait_ang_mag.get_yaxis().set_visible(False)
+        self.ax_gait_ang_mag.get_xaxis().set_visible(False)
+        self.ax_gait_ang_x.set_title("x")
+        self.ax_gait_ang_x.get_yaxis().set_visible(False)
+        self.ax_gait_ang_x.get_xaxis().set_visible(False)
+        self.ax_gait_ang_y.set_title("y")
+        self.ax_gait_ang_y.get_yaxis().set_visible(False)
+        self.ax_gait_ang_y.get_xaxis().set_visible(False)
+        self.ax_gait_ang_z.set_title("z")
+        self.ax_gait_ang_z.get_yaxis().set_visible(False)
+        self.ax_gait_ang_z.get_xaxis().set_visible(False)
 
         self.gei_count_to_generate_geis = 30 # 使用多少张gei来生成geis
         #geis图像
@@ -104,6 +124,8 @@ class PlotManager:
         self.acc_geis = []
         self.fig_gyro_gei = None
         self.gyro_geis =[]
+        self.fig_ang_gei = None
+        self.ang_geis = []
 
     def update_raw_data(self):
         """
@@ -124,13 +146,13 @@ class PlotManager:
             self.line_gyro_x.set_data(t, gyro_data[:, 1])
             self.line_gyro_y.set_data(t, gyro_data[:, 2])
             self.line_gyro_z.set_data(t, gyro_data[:, 3])
-        ang_data = numpy.array(self.sensor_manager.ang[-self.sensor_manager.ANG_POINT_COUNT:])
-        if ang_data.any():
-            validate_raw_data_with_timestamp(ang_data)
-            t = list(range(len(ang_data)))
-            self.line_ang_x.set_data(t, ang_data[:, 1])
-            self.line_ang_y.set_data(t, ang_data[:, 2])
-            self.line_ang_z.set_data(t, ang_data[:, 3])
+        # ang_data = numpy.array(self.sensor_manager.ang[-self.sensor_manager.ANG_POINT_COUNT:])
+        # if ang_data.any():
+        #     validate_raw_data_with_timestamp(ang_data)
+        #     t = list(range(len(ang_data)))
+        #     self.line_ang_x.set_data(t, ang_data[:, 1])
+        #     self.line_ang_y.set_data(t, ang_data[:, 2])
+        #     self.line_ang_z.set_data(t, ang_data[:, 3])
 
     def update_figures(self):
         """
@@ -178,3 +200,21 @@ class PlotManager:
             self.fig_gyro_gei = numpy.average(
                 self.gyro_geis[-self.gei_count_to_generate_geis:], axis=0).astype(
                 "uint8")
+
+        # ang_gait_cycle = self.algorithm_manager.get_ang_gait_cycle()
+        # if ang_gait_cycle is not None:
+        #     self.ax_gait_ang_mag.cla()
+        #     self.ax_gait_ang_mag.plot(ang_gait_cycle[:, 0], color=color, linewidth=linewidth)
+        #     self.ax_gait_ang_x.cla()
+        #     self.ax_gait_ang_x.plot(ang_gait_cycle[:, 1], color=color, linewidth=linewidth)
+        #     self.ax_gait_ang_y.cla()
+        #     self.ax_gait_ang_y.plot(ang_gait_cycle[:, 2], color=color, linewidth=linewidth)
+        #     self.ax_gait_ang_z.cla()
+        #     self.ax_gait_ang_z.plot(ang_gait_cycle[:, 3], color=color, linewidth=linewidth)
+        #     self.fig_ang_gait.canvas.draw()
+        #     gei = numpy.fromstring(self.fig_ang_gait.canvas.tostring_rgb(), dtype=numpy.uint8, sep="").reshape(
+        #         self.fig_ang_gait.canvas.get_width_height()[::-1] + (3,))
+        #     self.ang_geis.append(gei)
+        #     self.fig_ang_gei = numpy.average(
+        #         self.ang_geis[-self.gei_count_to_generate_geis:], axis=0).astype(
+        #         "uint8")

@@ -209,36 +209,37 @@ class DataPreProcess:
                 self.template = None
             return data, None
         if self.DEBUG:
-            plt.plot(self._mag(first_cycle[:,1:]), "black", label="mag")
+            plt.plot(self._mag(first_cycle[:, 1:]), "black", label="mag")
             plt.plot(first_cycle[:, 1], "r", label="x")
             plt.plot(first_cycle[:, 2], "g", label="y")
             plt.plot(first_cycle[:, 3], "b", label="z")
             plt.title("first_cycle")
             plt.legend()
             plt.show()
-        transformed_cycle = self.transform(first_cycle)
-        if self.DEBUG:
-            plt.plot(transformed_cycle[:, 0], "black", label="mag")
-            plt.plot(transformed_cycle[:, 1], "r", label="x")
-            plt.plot(transformed_cycle[:, 2], "g", label="y")
-            plt.plot(transformed_cycle[:, 3], "b", label="z")
-            plt.title("transformed_cycle")
-            plt.legend()
-            plt.show()
-        if len(transformed_cycle) < 4:  # 点的数量太少无法插值
-            return [], None
-        interpolated_cycle = self.interpolate(transformed_cycle)
-        if self.DEBUG:
-            if self.DEBUG:
-                plt.plot(interpolated_cycle[:, 0], "black", label="mag")
-                plt.plot(interpolated_cycle[:, 1], "r", label="x")
-                plt.plot(interpolated_cycle[:, 2], "g", label="y")
-                plt.plot(interpolated_cycle[:, 3], "b", label="z")
-                plt.title("interpolated_cycle")
-                plt.legend()
-                plt.show()
-        return data[-5:], numpy.concatenate((numpy.array([self._mag(first_cycle[:,1:])]).T, first_cycle[:,1:]), axis=1)  # TODO -5 ？
-        # return data[-5:], interpolated_cycle  # TODO -5 ？
+        # transformed_cycle = self.transform(first_cycle)
+        # if self.DEBUG:
+        #     plt.plot(transformed_cycle[:, 0], "black", label="mag")
+        #     plt.plot(transformed_cycle[:, 1], "r", label="x")
+        #     plt.plot(transformed_cycle[:, 2], "g", label="y")
+        #     plt.plot(transformed_cycle[:, 3], "b", label="z")
+        #     plt.title("transformed_cycle")
+        #     plt.legend()
+        #     plt.show()
+        # if len(transformed_cycle) < 4:  # 点的数量太少无法插值
+        #     return [], None
+        # interpolated_cycle = self.interpolate(transformed_cycle)
+        # if self.DEBUG:
+        #     if self.DEBUG:
+        #         plt.plot(interpolated_cycle[:, 0], "black", label="mag")
+        #         plt.plot(interpolated_cycle[:, 1], "r", label="x")
+        #         plt.plot(interpolated_cycle[:, 2], "g", label="y")
+        #         plt.plot(interpolated_cycle[:, 3], "b", label="z")
+        #         plt.title("interpolated_cycle")
+        #         plt.legend()
+        #         plt.show()
+        interpolated_cycle_without_transform = self.interpolate(first_cycle)
+        return data[-5:], numpy.concatenate((numpy.array([self._mag(interpolated_cycle_without_transform[:, 1:])]).T,
+                                             interpolated_cycle_without_transform[:, 1:]), axis=1)
 
 
 class AccDataPreProcess(DataPreProcess):
@@ -250,6 +251,14 @@ class AccDataPreProcess(DataPreProcess):
 
 
 class GyoDataPreProcess(DataPreProcess):
+    def __init__(self):
+        super().__init__()
+        self.gait_cycle_threshold = 0.4
+        self.expect_gait_cycle_duration = (800, 1400)
+        self.template = None
+
+
+class AngDataPreProcess(DataPreProcess):
     def __init__(self):
         super().__init__()
         self.gait_cycle_threshold = 0.4

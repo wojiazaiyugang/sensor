@@ -33,6 +33,11 @@ class AlgorithmManager:
         new_list, cycle = self.gyro_data_pre_process.get_gait_cycle(self._sensor_manager.gyro)
         self._sensor_manager.gyro = new_list
         return cycle
+    
+    def get_ang_gait_cycle(self) -> Union[numpy.ndarray, None]:
+        new_list, cycle = self.gyro_data_pre_process.get_gait_cycle(self._sensor_manager.ang)
+        self._sensor_manager.ang = new_list
+        return cycle
 
     def get_current_activity(self) -> int:
         """

@@ -5,7 +5,7 @@ import os
 import math
 
 from numpy import short
-# import pywinusb.hid as hid
+import pywinusb.hid as hid
 
 from util import get_current_timestamp, get_data0_data
 from settings import SENSOR_DATA, DATA_DIR, logger
@@ -48,7 +48,7 @@ class SensorManager:
                 self.acc.append([get_current_timestamp(), (short((axh << 8) | axl)) / 32768 * 16 * 9.8,
                                  (short((ayh << 8) | ayl)) / 32768 * 16 * 9.8,
                                  (short((azh << 8) | azl)) / 32768 * 16 * 9.8])
-                self._validate_raw_data(self.acc)
+                self._validate_raw_data(self.acc, 10)
 
             if data[i] == 0x55 and data[i + 1] == 0x52:
                 wxl, wxh, wyl, wyh, wzl, wzh, *_ = data[i + 2:i + 11]
@@ -57,11 +57,12 @@ class SensorManager:
                 # TODO: 这里每两个数就有一个是0，目前不知道为什么，影响效果先去除
                 # if len(self.gyro) > 2 and self.gyro[-1][1] and not self.gyro[-2][1] and self.gyro[-3][1]:
                 #     del self.gyro[-1]
-                self._validate_raw_data(self.gyro)
-            # if data[i] == 0x55 and data[i + 1] == 0x53:
-            #     rol, roh, pil, pih, yal, yah, *_ = data[i + 2:i + 11]
-            #     self.ang.append([get_current_timestamp(), (short(roh << 8 | rol) / 32768 * 180),
-            #                      (short(pih << 8 | pil) / 32768 * 180), (short(yah << 8 | yal) / 32768 * 180)])
+                self._validate_raw_data(self.gyro, 10)
+            if data[i] == 0x55 and data[i + 1] == 0x53:
+                rol, roh, pil, pih, yal, yah, *_ = data[i + 2:i + 11]
+                self.ang.append([get_current_timestamp(), (short(roh << 8 | rol) / 32768 * 180),
+                                 (short(pih << 8 | pil) / 32768 * 180), (short(yah << 8 | yal) / 32768 * 180)])
+                self._validate_raw_data(self.ang, 40)
 
     @staticmethod
     def _get_sensor():
@@ -111,8 +112,7 @@ class SensorManager:
         self.last_data_timestamp = current_timestamp
         self.last_data_index = current_data_index
 
-    def _validate_raw_data(self, data):
-        threshold = 5
+    def _validate_raw_data(self, data, threshold):
         if len(data) > 1 and abs(data[-1][1] - data[-2][1]) > threshold:
             logger.debug("EE")
             del data[-1]

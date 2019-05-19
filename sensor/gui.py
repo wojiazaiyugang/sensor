@@ -27,6 +27,8 @@ class GuiManager:
         CANVAS_GEI_ACC = "显示加速度GEI的区域"
         CANVAS_GAIT_GYRO = "显示陀螺仪步态数据的区域"
         CANVAS_GEI_GYRO = "显示陀螺仪GEI的区域"
+        CANVAS_GAIT_ANG = "显示欧拉角步态数据的区域"
+        CANVAS_GEI_ANG = "显示欧拉角GEI的区域"
         IMAGE_STATUS = "当前运动状态的图片"
         TEXT_ACTIVITY = "当前运动状态"
         TEXT_IS_WALK_LIKE_DATA0 = "当前是否像data0一样"
@@ -60,6 +62,12 @@ class GuiManager:
                                    key=self.KEYS.CANVAS_GAIT_GYRO)],
                         [sg.Canvas(size=(self.plot_manager.fig_gait_gyro_w, self.plot_manager.fig_gait_gyro_h),
                                    key=self.KEYS.CANVAS_GEI_GYRO)]])
+                     ],
+                    [sg.Frame("欧拉角步态", [
+                        [sg.Canvas(size=(self.plot_manager.fig_gait_ang_w, self.plot_manager.fig_gait_ang_h),
+                                   key=self.KEYS.CANVAS_GAIT_ANG)],
+                        [sg.Canvas(size=(self.plot_manager.fig_gait_ang_w, self.plot_manager.fig_gait_ang_h),
+                                   key=self.KEYS.CANVAS_GEI_ANG)]])
                      ],
                 ]),
                 sg.Column([
@@ -126,6 +134,10 @@ class GuiManager:
                                             self.window.FindElement(self.KEYS.CANVAS_GEI_ACC).TKCanvas, self.plot_manager.fig_acc_gei)
 
             gyro = self._update_gait_and_gei(self.plot_manager.fig_gyro_gait,
+                                             self.window.FindElement(self.KEYS.CANVAS_GAIT_GYRO).TKCanvas,
+                                             self.window.FindElement(self.KEYS.CANVAS_GEI_GYRO).TKCanvas, self.plot_manager.fig_gyro_gei)
+
+            ang = self._update_gait_and_gei(self.plot_manager.fig_gyro_gait,
                                              self.window.FindElement(self.KEYS.CANVAS_GAIT_GYRO).TKCanvas,
                                              self.window.FindElement(self.KEYS.CANVAS_GEI_GYRO).TKCanvas, self.plot_manager.fig_gyro_gei)
             # # 更新加速度步态图像
