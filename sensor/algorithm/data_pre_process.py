@@ -300,7 +300,7 @@ class AccDataPreProcess(DataPreProcess):
 class GyoDataPreProcess(DataPreProcess):
     def __init__(self):
         self.data_type = "陀螺仪"
-        self.gait_cycle_threshold = 0.6
+        self.gait_cycle_threshold = 1
         self.expect_gait_cycle_duration = (400, 700)
         super().__init__()
 

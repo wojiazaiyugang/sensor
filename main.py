@@ -13,7 +13,7 @@ if __name__ == "__main__":
         GuiManager().run()
     sensor_manager = SensorManager()
     algorithm_manager = AlgorithmManager(sensor_manager)
-    algorithm_manager.acc_data_pre_process.DEBUG = True
+    algorithm_manager.gyro_data_pre_process.DEBUG = True
     while True:
         sensor_manager.mock_real_time_data_from_data0()
-        sensor_manager.acc, cycle = algorithm_manager.acc_data_pre_process.get_gait_cycle(sensor_manager.acc)
+        sensor_manager.gyro, cycle = algorithm_manager.gyro_data_pre_process.get_gait_cycle(sensor_manager.gyro)
