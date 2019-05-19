@@ -46,29 +46,29 @@ class GuiManager:
             [
                 sg.Column([
                     [sg.Frame("原始数据", [
-                        [sg.Canvas(size=(self.plot_manager.fig_raw_data_w, self.plot_manager.fig_raw_data_h),
+                        [sg.Canvas(size=(self.plot_manager.raw_data_fig.fig_raw_data_w, self.plot_manager.raw_data_fig.fig_raw_data_h),
                                    key=self.KEYS.CANVAS_RAW_DATA)]
                     ])]
                 ]),
                 sg.Column([
                     [sg.Frame("加速度步态", [
-                        [sg.Canvas(size=(self.plot_manager.fig_gait_acc_w, self.plot_manager.fig_gait_acc_h),
+                        [sg.Canvas(size=(self.plot_manager.gait_acc_fig.fig_gait_acc_w, self.plot_manager.gait_acc_fig.fig_gait_acc_h),
                                    key=self.KEYS.CANVAS_GAIT_ACC)],
-                        [sg.Canvas(size=(self.plot_manager.fig_gait_acc_w, self.plot_manager.fig_gait_acc_h),
+                        [sg.Canvas(size=(self.plot_manager.gait_acc_fig.fig_gait_acc_w, self.plot_manager.gait_acc_fig.fig_gait_acc_h),
                                    key=self.KEYS.CANVAS_GEI_ACC)]])
                      ],
                     [sg.Frame("陀螺仪步态", [
-                        [sg.Canvas(size=(self.plot_manager.fig_gait_gyro_w, self.plot_manager.fig_gait_gyro_h),
+                        [sg.Canvas(size=(self.plot_manager.gait_gyro_fig.fig_gait_acc_w,self.plot_manager.gait_gyro_fig.fig_gait_acc_h),
                                    key=self.KEYS.CANVAS_GAIT_GYRO)],
-                        [sg.Canvas(size=(self.plot_manager.fig_gait_gyro_w, self.plot_manager.fig_gait_gyro_h),
+                        [sg.Canvas(size=(self.plot_manager.gait_gyro_fig.fig_gait_acc_w,self.plot_manager.gait_gyro_fig.fig_gait_acc_h),
                                    key=self.KEYS.CANVAS_GEI_GYRO)]])
                      ],
-                    [sg.Frame("欧拉角步态", [
-                        [sg.Canvas(size=(self.plot_manager.fig_gait_ang_w, self.plot_manager.fig_gait_ang_h),
-                                   key=self.KEYS.CANVAS_GAIT_ANG)],
-                        [sg.Canvas(size=(self.plot_manager.fig_gait_ang_w, self.plot_manager.fig_gait_ang_h),
-                                   key=self.KEYS.CANVAS_GEI_ANG)]])
-                     ],
+                    # [sg.Frame("欧拉角步态", [
+                    #     [sg.Canvas(size=(self.plot_manager.fig_gait_ang_w, self.plot_manager.fig_gait_ang_h),
+                    #                key=self.KEYS.CANVAS_GAIT_ANG)],
+                    #     [sg.Canvas(size=(self.plot_manager.fig_gait_ang_w, self.plot_manager.fig_gait_ang_h),
+                    #                key=self.KEYS.CANVAS_GEI_ANG)]])
+                    #  ],
                 ]),
                 sg.Column([
                     [sg.Image(filename=get_static_file_full_path("1.png"), key=self.KEYS.IMAGE_STATUS,
@@ -127,19 +127,19 @@ class GuiManager:
             if not event:
                 break
             self.plot_manager.update_figures()
-            raw_data_pic = self._update_gait_pic(self.plot_manager.fig_raw_data, self.window.FindElement(self.KEYS.CANVAS_RAW_DATA).TKCanvas,
+            raw_data_pic = self._update_gait_pic(self.plot_manager.raw_data_fig.fig, self.window.FindElement(self.KEYS.CANVAS_RAW_DATA).TKCanvas,
                                                  )
-            acc = self._update_gait_and_gei(self.plot_manager.fig_acc_gait,
+            acc = self._update_gait_and_gei(self.plot_manager.gait_acc_fig.fig_acc_gait,
                                             self.window.FindElement(self.KEYS.CANVAS_GAIT_ACC).TKCanvas,
-                                            self.window.FindElement(self.KEYS.CANVAS_GEI_ACC).TKCanvas, self.plot_manager.fig_acc_gei)
+                                            self.window.FindElement(self.KEYS.CANVAS_GEI_ACC).TKCanvas, self.plot_manager.gait_acc_fig.get_gei())
 
-            gyro = self._update_gait_and_gei(self.plot_manager.fig_gyro_gait,
+            gyro = self._update_gait_and_gei(self.plot_manager.gait_gyro_fig.fig_acc_gait,
                                              self.window.FindElement(self.KEYS.CANVAS_GAIT_GYRO).TKCanvas,
-                                             self.window.FindElement(self.KEYS.CANVAS_GEI_GYRO).TKCanvas, self.plot_manager.fig_gyro_gei)
+                                             self.window.FindElement(self.KEYS.CANVAS_GEI_GYRO).TKCanvas, self.plot_manager.gait_gyro_fig.get_gei())
 
-            ang = self._update_gait_and_gei(self.plot_manager.fig_gyro_gait,
-                                             self.window.FindElement(self.KEYS.CANVAS_GAIT_GYRO).TKCanvas,
-                                             self.window.FindElement(self.KEYS.CANVAS_GEI_GYRO).TKCanvas, self.plot_manager.fig_gyro_gei)
+            # ang = self._update_gait_and_gei(self.plot_manager.fig_gyro_gait,
+            #                                  self.window.FindElement(self.KEYS.CANVAS_GAIT_GYRO).TKCanvas,
+            #                                  self.window.FindElement(self.KEYS.CANVAS_GEI_GYRO).TKCanvas, self.plot_manager.fig_gyro_gei)
             # # 更新加速度步态图像
             # figure_photo_gait_acc = self._draw_figure(self.window.FindElement(self.KEYS.CANVAS_GAIT_ACC).TKCanvas,
             #                                           self.plot_manager.fig_acc_gait)

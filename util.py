@@ -153,7 +153,7 @@ def validate_raw_data_without_timestamp(data: numpy.ndarray) -> None:
 
 def validate_raw_data_with_timestamp(data: numpy.ndarray) -> None:
     """
-    校验原始数据的格式，要求不包含timestamp列
+    校验原始数据的格式，要求包含timestamp列
     :param data:
     :return:
     """
