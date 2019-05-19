@@ -8,6 +8,10 @@ WRITE_LOG_FILE = False  # 是否把日志写入文件
 import os
 import logging
 from enum import Enum
+import matplotlib.pyplot as plt
+# 支持中文
+plt.rcParams["font.sans-serif"] = ['SimHei']  # 用来正常显示中文标签
+plt.rcParams["axes.unicode_minus"] = False  # 用来正常显示负号
 
 # 项目目录
 PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
