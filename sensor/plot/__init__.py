@@ -1,8 +1,8 @@
-from sensor.sensor import SensorManager
 from sensor.algorithm import AlgorithmManager
-from sensor.plot.raw_data import RawDataFig, RawDataAccAxes, RawDataGyroAxes
-from sensor.plot.gait import GaitAccFig, GaitGyroFig
-from settings import SENSOR_DATA
+from sensor.plot.gait import GaitAccFig, GaitGyroFig, GaitAngFig
+from sensor.plot.raw_data import RawDataFig, RawDataAccAxes, RawDataGyroAxes, RawDataAngAxes
+from sensor.sensor import SensorManager
+
 
 class PlotManager:
     """
@@ -22,9 +22,11 @@ class PlotManager:
         self.raw_data_fig = RawDataFig(sensor_manager)
         self.raw_data_acc_axes = RawDataAccAxes(self.raw_data_fig.ax_acc, sensor_manager)
         self.raw_data_gyro_axes = RawDataGyroAxes(self.raw_data_fig.ax_gyro, sensor_manager)
+        self.raw_data_ang_axes = RawDataAngAxes(self.raw_data_fig.ax_ang, sensor_manager)
 
         self.gait_acc_fig = GaitAccFig(algorithm_manager)
         self.gait_gyro_fig = GaitGyroFig(algorithm_manager)
+        self.gait_ang_fig = GaitAngFig(algorithm_manager)
 
     def update_figures(self):
         """
@@ -32,10 +34,13 @@ class PlotManager:
         :return:
         """
         # 原始数据
-        if SENSOR_DATA is not None:  # 不是实时数据的话，需要先去模拟一波数据
-            self.sensor_manager.mock_real_time_data_from_data0()
+        if self.sensor_manager.sensor_data is not None:  # 不是实时数据的话，需要先去模拟一波数据
+            self.sensor_manager.get_data()
+
         self.raw_data_acc_axes.update_raw_data()
         self.raw_data_gyro_axes.update_raw_data()
+        self.raw_data_ang_axes.update_raw_data()
 
         self.gait_acc_fig.update_cycle_fig()
         self.gait_gyro_fig.update_cycle_fig()
+        self.gait_ang_fig.update_cycle_fig()

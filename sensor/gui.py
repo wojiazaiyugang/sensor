@@ -16,7 +16,6 @@ from sensor.algorithm import AlgorithmManager
 from sensor.plot import PlotManager
 from sensor.sensor import SensorManager
 from util import get_static_file_full_path
-from settings import SENSOR_DATA
 
 
 class GuiManager:
@@ -37,7 +36,7 @@ class GuiManager:
         # gui通用设置
         sg.SetOptions(background_color="#FFFFFF", element_background_color="#FFFFFF", text_color="#FF0000")
         # plot manager，用于获取绘图信息
-        self.sensor_manager = SensorManager()
+        self.sensor_manager = SensorManager(0)
         self.algorithm_manager = AlgorithmManager(self.sensor_manager)
         self.plot_manager = PlotManager(self.sensor_manager, self.algorithm_manager)
 
@@ -63,12 +62,12 @@ class GuiManager:
                         [sg.Canvas(size=(self.plot_manager.gait_gyro_fig.fig_gait_acc_w,self.plot_manager.gait_gyro_fig.fig_gait_acc_h),
                                    key=self.KEYS.CANVAS_GEI_GYRO)]])
                      ],
-                    # [sg.Frame("欧拉角步态", [
-                    #     [sg.Canvas(size=(self.plot_manager.fig_gait_ang_w, self.plot_manager.fig_gait_ang_h),
-                    #                key=self.KEYS.CANVAS_GAIT_ANG)],
-                    #     [sg.Canvas(size=(self.plot_manager.fig_gait_ang_w, self.plot_manager.fig_gait_ang_h),
-                    #                key=self.KEYS.CANVAS_GEI_ANG)]])
-                    #  ],
+                    [sg.Frame("欧拉角步态", [
+                        [sg.Canvas(size=(self.plot_manager.gait_ang_fig.fig_gait_acc_w, self.plot_manager.gait_ang_fig.fig_gait_acc_h),
+                                   key=self.KEYS.CANVAS_GAIT_ANG)],
+                        [sg.Canvas(size=(self.plot_manager.gait_ang_fig.fig_gait_acc_w, self.plot_manager.gait_ang_fig.fig_gait_acc_h),
+                                   key=self.KEYS.CANVAS_GEI_ANG)]])
+                     ],
                 ]),
                 sg.Column([
                     [sg.Image(filename=get_static_file_full_path("1.png"), key=self.KEYS.IMAGE_STATUS,
@@ -127,8 +126,7 @@ class GuiManager:
             if not event:
                 break
             self.plot_manager.update_figures()
-            raw_data_pic = self._update_gait_pic(self.plot_manager.raw_data_fig.fig, self.window.FindElement(self.KEYS.CANVAS_RAW_DATA).TKCanvas,
-                                                 )
+            raw_data_pic = self._update_gait_pic(self.plot_manager.raw_data_fig.fig, self.window.FindElement(self.KEYS.CANVAS_RAW_DATA).TKCanvas,)
             acc = self._update_gait_and_gei(self.plot_manager.gait_acc_fig.fig,
                                             self.window.FindElement(self.KEYS.CANVAS_GAIT_ACC).TKCanvas,
                                             self.window.FindElement(self.KEYS.CANVAS_GEI_ACC).TKCanvas, self.plot_manager.gait_acc_fig.get_gei())
@@ -137,9 +135,9 @@ class GuiManager:
                                              self.window.FindElement(self.KEYS.CANVAS_GAIT_GYRO).TKCanvas,
                                              self.window.FindElement(self.KEYS.CANVAS_GEI_GYRO).TKCanvas, self.plot_manager.gait_gyro_fig.get_gei())
 
-            # ang = self._update_gait_and_gei(self.plot_manager.fig_gyro_gait,
-            #                                  self.window.FindElement(self.KEYS.CANVAS_GAIT_GYRO).TKCanvas,
-            #                                  self.window.FindElement(self.KEYS.CANVAS_GEI_GYRO).TKCanvas, self.plot_manager.fig_gyro_gei)
+            ang = self._update_gait_and_gei(self.plot_manager.gait_ang_fig.fig,
+                                             self.window.FindElement(self.KEYS.CANVAS_GAIT_ANG).TKCanvas,
+                                             self.window.FindElement(self.KEYS.CANVAS_GEI_ANG).TKCanvas, self.plot_manager.gait_ang_fig.get_gei())
             # # 更新加速度步态图像
             # figure_photo_gait_acc = self._draw_figure(self.window.FindElement(self.KEYS.CANVAS_GAIT_ACC).TKCanvas,
             #                                           self.plot_manager.fig_acc_gait)

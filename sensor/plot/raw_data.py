@@ -14,7 +14,7 @@ class RawDataFig:
         self._, self._, self.width, self.height = [int(i) for i in self.fig.bbox.bounds]
 
 
-class RawDataAxes:
+class _RawDataAxes:
     def __init__(self, ax, sensor_manager: SensorManager):
         self.data_type = self.data_type
         self.sensor_manager = sensor_manager
@@ -42,7 +42,7 @@ class RawDataAxes:
             self.line_z.set_data(t, acc_data[:, 3])
 
 
-class RawDataAccAxes(RawDataAxes):
+class RawDataAccAxes(_RawDataAxes):
     def __init__(self, ax, sensor_manager):
         self.data_type = "acc"
         ax.set_ylim(-15, 15)
@@ -52,7 +52,7 @@ class RawDataAccAxes(RawDataAxes):
         return self.sensor_manager.acc
 
 
-class RawDataGyroAxes(RawDataAxes):
+class RawDataGyroAxes(_RawDataAxes):
     def __init__(self, ax, sensor_manager):
         self.data_type = "gyro"
         ax.set_ylim(-15, 15)
@@ -60,3 +60,13 @@ class RawDataGyroAxes(RawDataAxes):
 
     def get_raw_data(self):
         return self.sensor_manager.gyro
+
+
+class RawDataAngAxes(_RawDataAxes):
+    def __init__(self, ax, sensor_manager):
+        self.data_type = "ang"
+        ax.set_ylim(-180, 180)
+        super().__init__(ax, sensor_manager)
+
+    def get_raw_data(self):
+        return self.sensor_manager.ang

@@ -262,6 +262,8 @@ class DataPreProcess:
         获取步态周期
         :return: 原始数据使用之后修改成的新的list，步态周期
         """
+        if len(data) == 0:
+            return [], None
         validate_raw_data_with_timestamp(numpy.array(data))
         first_cycle = self._find_first_gait_cycle(numpy.array(data))
         if first_cycle is None:

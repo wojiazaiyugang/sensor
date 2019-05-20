@@ -1,8 +1,6 @@
 """
 项目配置文件，保证在项目的根目录下
 """
-
-SENSOR_DATA = 0 # 使用的data0数据，1 - 10 ，如果为None表示使用实时数据
 WRITE_LOG_FILE = False  # 是否把日志写入文件
 
 import os
@@ -37,7 +35,6 @@ if not os.path.exists(MODEL_DIR):
 # 数据的存储位置
 DATA_DIR = os.path.join(ALGORITHM_DIR, "data")
 CYCLE_FILE_DIR = os.path.join(DATA_DIR, "data0_cycle")
-assert SENSOR_DATA is None or 0 <= int(SENSOR_DATA) <= 9, "数据错误"
 
 
 class DataType(Enum):
