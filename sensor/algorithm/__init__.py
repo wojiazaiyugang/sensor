@@ -69,3 +69,5 @@ class AlgorithmManager:
         #     return self.one_class_svm_on_data0.predict_acc(numpy.array(self._sensor_manager.acc)[p:, 1:])
         # else:
         #     return False
+
+

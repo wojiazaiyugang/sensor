@@ -158,3 +158,4 @@ def validate_raw_data_with_timestamp(data: numpy.ndarray) -> None:
     :return:
     """
     assert isinstance(data, numpy.ndarray) and len(data.shape) == 2 and data.shape[1] == 4, "原始数据格式错误"
+
