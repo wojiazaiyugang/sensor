@@ -9,6 +9,11 @@ version = "0.7.1"
 [package.dependencies]
 six = "*"
 
+[package.source]
+reference = "douban"
+type = "legacy"
+url = "https://pypi.doubanio.com/simple"
+
 [[package]]
 category = "main"
 description = "Read/rewrite/write Python ASTs"
@@ -16,6 +21,11 @@ name = "astor"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "0.7.1"
+
+[package.source]
+reference = "douban"
+type = "legacy"
+url = "https://pypi.doubanio.com/simple"
 
 [[package]]
 category = "main"
@@ -28,6 +38,27 @@ version = "0.10.0"
 [package.dependencies]
 six = "*"
 
+[package.source]
+reference = "douban"
+type = "legacy"
+url = "https://pypi.doubanio.com/simple"
+
+[[package]]
+category = "main"
+description = "Dynamic Time Warping (DTW) algorithm with an O(N) time and memory complexity."
+name = "fastdtw"
+optional = false
+python-versions = "*"
+version = "0.3.2"
+
+[package.dependencies]
+numpy = "*"
+
+[package.source]
+reference = "douban"
+type = "legacy"
+url = "https://pypi.doubanio.com/simple"
+
 [[package]]
 category = "main"
 description = "Python AST that abstracts the underlying Python version"
@@ -35,6 +66,11 @@ name = "gast"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "0.2.2"
+
+[package.source]
+reference = "douban"
+type = "legacy"
+url = "https://pypi.doubanio.com/simple"
 
 [[package]]
 category = "main"
@@ -47,6 +83,11 @@ version = "1.20.1"
 [package.dependencies]
 six = ">=1.5.2"
 
+[package.source]
+reference = "douban"
+type = "legacy"
+url = "https://pypi.doubanio.com/simple"
+
 [[package]]
 category = "main"
 description = "Read and write HDF5 files from Python"
@@ -58,6 +99,11 @@ version = "2.9.0"
 [package.dependencies]
 numpy = ">=1.7"
 six = "*"
+
+[package.source]
+reference = "douban"
+type = "legacy"
+url = "https://pypi.doubanio.com/simple"
 
 [[package]]
 category = "main"
@@ -76,6 +122,11 @@ pyyaml = "*"
 scipy = ">=0.14"
 six = ">=1.9.0"
 
+[package.source]
+reference = "douban"
+type = "legacy"
+url = "https://pypi.doubanio.com/simple"
+
 [[package]]
 category = "main"
 description = "Reference implementations of popular deep learning models"
@@ -87,6 +138,11 @@ version = "1.0.7"
 [package.dependencies]
 h5py = "*"
 numpy = ">=1.9.1"
+
+[package.source]
+reference = "douban"
+type = "legacy"
+url = "https://pypi.doubanio.com/simple"
 
 [[package]]
 category = "main"
@@ -100,6 +156,11 @@ version = "1.0.9"
 numpy = ">=1.9.1"
 six = ">=1.9.0"
 
+[package.source]
+reference = "douban"
+type = "legacy"
+url = "https://pypi.doubanio.com/simple"
+
 [[package]]
 category = "main"
 description = "A fast implementation of the Cassowary constraint solver"
@@ -111,6 +172,11 @@ version = "1.1.0"
 [package.dependencies]
 setuptools = "*"
 
+[package.source]
+reference = "douban"
+type = "legacy"
+url = "https://pypi.doubanio.com/simple"
+
 [[package]]
 category = "main"
 description = "Python implementation of Markdown."
@@ -121,6 +187,11 @@ version = "3.1"
 
 [package.dependencies]
 setuptools = ">=36"
+
+[package.source]
+reference = "douban"
+type = "legacy"
+url = "https://pypi.doubanio.com/simple"
 
 [[package]]
 category = "main"
@@ -137,6 +208,11 @@ numpy = ">=1.10.0"
 pyparsing = ">=2.0.1,<2.0.4 || >2.0.4,<2.1.2 || >2.1.2,<2.1.6 || >2.1.6"
 python-dateutil = ">=2.1"
 
+[package.source]
+reference = "douban"
+type = "legacy"
+url = "https://pypi.doubanio.com/simple"
+
 [[package]]
 category = "main"
 description = "Rolling backport of unittest.mock for all Pythons"
@@ -148,6 +224,11 @@ version = "3.0.5"
 [package.dependencies]
 six = "*"
 
+[package.source]
+reference = "douban"
+type = "legacy"
+url = "https://pypi.doubanio.com/simple"
+
 [[package]]
 category = "main"
 description = "NumPy is the fundamental package for array computing with Python."
@@ -155,6 +236,11 @@ name = "numpy"
 optional = false
 python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*"
 version = "1.16.3"
+
+[package.source]
+reference = "douban"
+type = "legacy"
+url = "https://pypi.doubanio.com/simple"
 
 [[package]]
 category = "main"
@@ -167,13 +253,23 @@ version = "4.1.0.25"
 [package.dependencies]
 numpy = ">=1.11.1"
 
+[package.source]
+reference = "douban"
+type = "legacy"
+url = "https://pypi.doubanio.com/simple"
+
 [[package]]
 category = "main"
 description = "Python Imaging Library (Fork)"
 name = "pillow"
 optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+python-versions = "*"
 version = "6.0.0"
+
+[package.source]
+reference = "douban"
+type = "legacy"
+url = "https://pypi.doubanio.com/simple"
 
 [[package]]
 category = "main"
@@ -187,6 +283,11 @@ version = "3.7.1"
 setuptools = "*"
 six = ">=1.9"
 
+[package.source]
+reference = "douban"
+type = "legacy"
+url = "https://pypi.doubanio.com/simple"
+
 [[package]]
 category = "main"
 description = "Python parsing module"
@@ -195,6 +296,11 @@ optional = false
 python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 version = "2.4.0"
 
+[package.source]
+reference = "douban"
+type = "legacy"
+url = "https://pypi.doubanio.com/simple"
+
 [[package]]
 category = "main"
 description = "GUI SDK Launched in 2018 Actively developed and supported. Super-simple to create custom GUI's.  Python 2.7 & 3 Support. 100 Demo programs & Cookbook for rapid start. Extensive documentation. Examples using Machine Learning(GUI, OpenCV Integration,  Chatterbot), Rainmeter Style Floating Desktop Widgets, Matplotlib + Pyplot integration, add GUI to command line scripts, PDF & Image Viewer. Great for beginners as well as advanced GUI programmers"
@@ -202,6 +308,11 @@ name = "pysimplegui"
 optional = false
 python-versions = "*"
 version = "3.29.0"
+
+[package.source]
+reference = "douban"
+type = "legacy"
+url = "https://pypi.doubanio.com/simple"
 
 [[package]]
 category = "main"
@@ -214,6 +325,11 @@ version = "2.8.0"
 [package.dependencies]
 six = ">=1.5"
 
+[package.source]
+reference = "douban"
+type = "legacy"
+url = "https://pypi.doubanio.com/simple"
+
 [[package]]
 category = "main"
 description = "A package that simplifies USB/HID communications on windows"
@@ -221,6 +337,11 @@ name = "pywinusb"
 optional = false
 python-versions = "*"
 version = "0.4.2"
+
+[package.source]
+reference = "douban"
+type = "legacy"
+url = "https://pypi.doubanio.com/simple"
 
 [[package]]
 category = "main"
@@ -230,6 +351,11 @@ optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "5.1"
 
+[package.source]
+reference = "douban"
+type = "legacy"
+url = "https://pypi.doubanio.com/simple"
+
 [[package]]
 category = "main"
 description = "SciPy: Scientific Library for Python"
@@ -238,8 +364,10 @@ optional = false
 python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*"
 version = "1.2.1"
 
-[package.dependencies]
-numpy = ">=1.8.2"
+[package.source]
+reference = "douban"
+type = "legacy"
+url = "https://pypi.doubanio.com/simple"
 
 [[package]]
 category = "main"
@@ -248,6 +376,11 @@ name = "six"
 optional = false
 python-versions = ">=2.6, !=3.0.*, !=3.1.*"
 version = "1.12.0"
+
+[package.source]
+reference = "douban"
+type = "legacy"
+url = "https://pypi.doubanio.com/simple"
 
 [[package]]
 category = "main"
@@ -269,6 +402,11 @@ werkzeug = ">=0.11.15"
 [package.dependencies.wheel]
 python = ">=3"
 version = ">=0.26"
+
+[package.source]
+reference = "douban"
+type = "legacy"
+url = "https://pypi.doubanio.com/simple"
 
 [[package]]
 category = "main"
@@ -293,6 +431,11 @@ tensorflow-estimator = ">=1.13.0,<1.14.0rc0"
 termcolor = ">=1.1.0"
 wheel = ">=0.26"
 
+[package.source]
+reference = "douban"
+type = "legacy"
+url = "https://pypi.doubanio.com/simple"
+
 [[package]]
 category = "main"
 description = "TensorFlow Estimator."
@@ -307,6 +450,11 @@ mock = ">=2.0.0"
 numpy = ">=1.13.3"
 six = ">=1.10.0"
 
+[package.source]
+reference = "douban"
+type = "legacy"
+url = "https://pypi.doubanio.com/simple"
+
 [[package]]
 category = "main"
 description = "ANSII Color formatting for output in terminal."
@@ -314,6 +462,11 @@ name = "termcolor"
 optional = false
 python-versions = "*"
 version = "1.1.0"
+
+[package.source]
+reference = "douban"
+type = "legacy"
+url = "https://pypi.doubanio.com/simple"
 
 [[package]]
 category = "main"
@@ -323,6 +476,11 @@ optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "0.15.2"
 
+[package.source]
+reference = "douban"
+type = "legacy"
+url = "https://pypi.doubanio.com/simple"
+
 [[package]]
 category = "main"
 description = "A built-package format for Python."
@@ -331,38 +489,58 @@ optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "0.33.4"
 
+[package.source]
+reference = "douban"
+type = "legacy"
+url = "https://pypi.doubanio.com/simple"
+
+[[package]]
+category = "main"
+description = "A formatter for Python code."
+name = "yapf"
+optional = false
+python-versions = "*"
+version = "0.27.0"
+
+[package.source]
+reference = "douban"
+type = "legacy"
+url = "https://pypi.doubanio.com/simple"
+
 [metadata]
-content-hash = "fad799339a730194679648671613b75f91da6f3015f2fd8a37d7e53311d7231c"
+content-hash = "35651a9cea00f000f77875af00de68d244e302ab3d15117614e26208e4188643"
 python-versions = "^3.6"
 
 [metadata.hashes]
-absl-py = ["b943d1c567743ed0455878fcd60bc28ac9fae38d129d1ccfad58079da00b8951"]
-astor = ["95c30d87a6c2cf89aa628b87398466840f0ad8652f88eb173125a6df8533fb8d", "fb503b9e2fdd05609fbf557b916b4a7824171203701660f0c55bbf5a7a68713e"]
-cycler = ["1d8a5ae1ff6c5cf9b93e8811e581232ad8920aeec647c37316ceac982b08cb2d", "cd7b2d1018258d7247a71425e9f26463dfb444d411c39569972f4ce586b0c9d8"]
-gast = ["fe939df4583692f0512161ec1c880e0a10e71e6a232da045ab8edd3756fbadf0"]
-grpcio = ["0442f7d0c527ceab6a76159937ae8109941eace90ec00cb1bd08fc4f3179e52e", "051957d0f61f4dec90868a54ee969228409926a0a19fd8ed7b4a0e50388effee", "0d262794b2339770d5378a5717f8ddbfb68e409974582f0503272b90b7cc79bd", "142693dc8bd427c595d030f75bf8d01c843d9ccb659499e8507ad22da832e9cf", "18d44515a3fd3a71442abb5a1c65fc1909d859c13cda50c974cbc69742a80cea", "1d50674bdffa18ea6143e0df9a1b97cdeab583ce5dd1cabda3502ee75215065c", "3945335a5b8332995415c5f03da1a5f6e36da6ede819a611e2cbb093cf752bdd", "3a9603ff14070524f4c69634afad6b280b07ad9f8c2c346c4b2290306e1928ac", "52861aac5c1dcf4c841eb555b257cfb56d0c840a286495078382f538d0a34d6a", "53c512c7c8af9cb9e3e1cc5ce5e4a5fb2f2e7695e69219f90016bc602abe2f3b", "57ea92c9b81015e5f2cc355e53f08a4e661b78a207857311c7b8c55137a43b29", "5f8574c9e42d1917e41cdedc6312682a96e4547114c7bb0f3de125199a58b3d6", "638ff1a45dd7a226b2b9390296a111142363fe2b5503499f3987d599bce0683c", "64fe0dc897f1f19a6500948862857cb3b97247be997bc47b4dbade42f8af5f97", "67920ec7d2de89845e5232aed41271ef53e1a362c8ffb84f6a6c6e644a75ce3a", "714cddc170efeedf6312d8534ef7f52dcf20dd8f5fb7c5e425c2b6819ac1b9ec", "7edf33e929b1666ff68bfc280b9021a862ab423d0e6306889cc2bc7c907dfc27", "84eb47b1a47e206e78f453fb92a155ed0d18d2ca8747f5c67e4b50b9c37180a7", "8a6289e5c38318cba75115f0bf88be166ead40c83c10dd81ace52f1ab5dc1eab", "8bd5b8c3c8872da748dc8810b664699a5f1d49f2c9ab2b205b96ec9fe06741ad", "93e7672348d4c68ac570c499a794ff4453a1928c39cbe708472a0e1b77176411", "9d37fb214674f0f194a80df5ad0b9c9b9f2fa5c5408ceaf0fc796e57588404d9", "9de6746a749634004499bac773ad9877d84d826aca2dc14ba4ebd3cd9f64ed74", "9e530c69d6e566ca985193a63363af36a7560a23f4979df6e392bb1bdf05caed", "b37f36da8f4d0bf07d53eb34395b68f5e0dc0bcee207affde9ba29bbf6bd6ced", "cf9b57d139e44eab294ab31eb0181150d877440a8a321bb4422e2c09f6c7a7d9", "dd716aab42be3d1fde74577e42b6319b6399b07d418e49b653e0e1bcd88399bc", "dea43aa864edc3b3d8de1f6e40144119fbccdf04525b3ece4fef9392b6eed436", "e6cbd27559ff91c98991b8ec4ef19f394bf9056d6897aabb9af79568307181d3", "f58e3377da8e8e453068dffc00d17691a97ffd1c3a5a7460b890cf83a9ca6edf", "f938fdfb780a0658d04e1d727b4fb470490087c56cb31ba75cb54fb4bea515bd", "fee4accad7a113004aef226b851f0494c01fc8d281fdebd74468f19cc45354a0"]
-h5py = ["05750b91640273c69989c657eaac34b091abdd75efc8c4824c82aaf898a2da0a", "082a27208aa3a2286e7272e998e7e225b2a7d4b7821bd840aebf96d50977abbb", "08e2e8297195f9e813e894b6c63f79372582787795bba2014a2db6a2de95f713", "0dd2adeb2e9de5081eb8dcec88874e7fd35dae9a21557be3a55a3c7d491842a4", "0f94de7a10562b991967a66bbe6dda9808e18088676834c0a4dcec3fdd3bcc6f", "106e42e2e01e486a3d32eeb9ba0e3a7f65c12fa8998d63625fa41fb8bdc44cdb", "1606c66015f04719c41a9863c156fc0e6b992150de21c067444bcb82e7d75579", "1854c4beff9961e477e133143c5e5e355dac0b3ebf19c52cf7cc1b1ef757703c", "1e9fb6f1746500ea91a00193ce2361803c70c6b13f10aae9a33ad7b5bd28e800", "2cca17e80ddb151894333377675db90cd0279fa454776e0a4f74308376afd050", "30e365e8408759db3778c361f1e4e0fe8e98a875185ae46c795a85e9bafb9cdf", "3206bac900e16eda81687d787086f4ffd4f3854980d798e191a9868a6510c3ae", "3c23d72058647cee19b30452acc7895621e2de0a0bd5b8a1e34204b9ea9ed43c", "407b5f911a83daa285bbf1ef78a9909ee5957f257d3524b8606be37e8643c5f0", "4162953714a9212d373ac953c10e3329f1e830d3c7473f2a2e4f25dd6241eef0", "5fc7aba72a51b2c80605eba1c50dbf84224dcd206279d30a75c154e5652e1fe4", "713ac19307e11de4d9833af0c4bd6778bde0a3d967cafd2f0f347223711c1e31", "71b946d80ef3c3f12db157d7778b1fe74a517ca85e94809358b15580983c2ce2", "8cc4aed71e20d87e0a6f02094d718a95252f11f8ed143bc112d22167f08d4040", "9d41ca62daf36d6b6515ab8765e4c8c4388ee18e2a665701fef2b41563821002", "a744e13b000f234cd5a5b2a1f95816b819027c57f385da54ad2b7da1adace2f3", "b087ee01396c4b34e9dc41e3a6a0442158206d383c19c7d0396d52067b17c1cb", "b0f03af381d33306ce67d18275b61acb4ca111ced645381387a02c8a5ee1b796", "b9e4b8dfd587365bdd719ae178fa1b6c1231f81280b1375eef8626dfd8761bf3", "c5dd4ec75985b99166c045909e10f0534704d102848b1d9f0992720e908928e7", "d2b82f23cd862a9d05108fe99967e9edfa95c136f532a71cb3d28dc252771f50", "e58a25764472af07b7e1c4b10b0179c8ea726446c7141076286e41891bf3a563", "f3b49107fbfc77333fc2b1ef4d5de2abcd57e7ea3a1482455229494cf2da56ce"]
-keras = ["794d0c92c6c4122f1f0fcf3a7bc2f49054c6a54ddbef8d8ffafca62795d760b6", "90b610a3dbbf6d257b20a079eba3fdf2eed2158f64066a7c6f7227023fd60bc9"]
-keras-applications = ["60607b2b98868983e5153bf1cc6aa468ba73adc93bc977a90edaa4bc595e69fa", "94b8acc84fb8b1e3d752e20ed4cafa8377c9ecf6e6c1aa09942d959dc02e439a"]
-keras-preprocessing = ["0170b799a7562f80ad7931d22d56de22cf4bdd502e11c48f31a46380137a70a8", "5e3700117981c2db762e512ed6586638124fac5842170701628088a11aeb51ac"]
-kiwisolver = ["05b5b061e09f60f56244adc885c4a7867da25ca387376b02c1efc29cc16bcd0f", "26f4fbd6f5e1dabff70a9ba0d2c4bd30761086454aa30dddc5b52764ee4852b7", "3b2378ad387f49cbb328205bda569b9f87288d6bc1bf4cd683c34523a2341efe", "400599c0fe58d21522cae0e8b22318e09d9729451b17ee61ba8e1e7c0346565c", "47b8cb81a7d18dbaf4fed6a61c3cecdb5adec7b4ac292bddb0d016d57e8507d5", "53eaed412477c836e1b9522c19858a8557d6e595077830146182225613b11a75", "58e626e1f7dfbb620d08d457325a4cdac65d1809680009f46bf41eaf74ad0187", "5a52e1b006bfa5be04fe4debbcdd2688432a9af4b207a3f429c74ad625022641", "5c7ca4e449ac9f99b3b9d4693debb1d6d237d1542dd6a56b3305fe8a9620f883", "682e54f0ce8f45981878756d7203fd01e188cc6c8b2c5e2cf03675390b4534d5", "79bfb2f0bd7cbf9ea256612c9523367e5ec51d7cd616ae20ca2c90f575d839a2", "7f4dd50874177d2bb060d74769210f3bce1af87a8c7cf5b37d032ebf94f0aca3", "8944a16020c07b682df861207b7e0efcd2f46c7488619cb55f65882279119389", "8aa7009437640beb2768bfd06da049bad0df85f47ff18426261acecd1cf00897", "939f36f21a8c571686eb491acfffa9c7f1ac345087281b412d63ea39ca14ec4a", "9733b7f64bd9f807832d673355f79703f81f0b3e52bfce420fc00d8cb28c6a6c", "a02f6c3e229d0b7220bd74600e9351e18bc0c361b05f29adae0d10599ae0e326", "a0c0a9f06872330d0dd31b45607197caab3c22777600e88031bfe66799e70bb0", "acc4df99308111585121db217681f1ce0eecb48d3a828a2f9bbf9773f4937e9e", "b64916959e4ae0ac78af7c3e8cef4becee0c0e9694ad477b4c6b3a536de6a544", "d3fcf0819dc3fea58be1fd1ca390851bdb719a549850e708ed858503ff25d995", "d52e3b1868a4e8fd18b5cb15055c76820df514e26aa84cc02f593d99fef6707f", "db1a5d3cc4ae943d674718d6c47d2d82488ddd94b93b9e12d24aabdbfe48caee", "e3a21a720791712ed721c7b95d433e036134de6f18c77dbe96119eaf7aa08004", "e8bf074363ce2babeb4764d94f8e65efd22e6a7c74860a4f05a6947afc020ff2", "f16814a4a96dc04bf1da7d53ee8d5b1d6decfc1a92a63349bb15d37b6a263dd9", "f2b22153870ca5cf2ab9c940d7bc38e8e9089fa0f7e5856ea195e1cf4ff43d5a", "f790f8b3dff3d53453de6a7b7ddd173d2e020fb160baff578d578065b108a05f"]
-markdown = ["fc4a6f69a656b8d858d7503bda633f4dd63c2d70cf80abdc6eafa64c4ae8c250", "fe463ff51e679377e3624984c829022e2cfb3be5518726b06f608a07a3aad680"]
-matplotlib = ["1ae6549976b6ceb6ee426272a28c0fc9715b3e3669694d560c8f661c5b39e2c5", "4d4250bf508dd07cca3b43888097f873cadb66eec6ac63dbbfb798798ec07af2", "53af2e01d7f1700ed2b64a9091bc865360c9c4032f625451c4589a826854c787", "63e498067d32d627111cd1162cae1621f1221f9d4c6a9745dd7233f29de581b6", "7169a34971e398dd58e87e173f97366fd88a3fa80852704530433eb224a8ca57", "91c54d6bb9eeaaff965656c5ea6cbdcbf780bad8462ac99b30b451548194746f", "aeef177647bb3fccfe09065481989d7dfc5ac59e9367d6a00a3481062cf651e4", "cf8ae10559a78aee0409ede1e9d4fda03895433eeafe609dd9ed67e45f552db0", "d51d0889d1c4d51c51a9822265c0494ea3e70a52bdd88358e0863daca46fa23a", "de5ccd3500247f85fe4f9fad90f80a8bd397e4f110a4c33fabf95f07403e8372", "e1d33589e32f482d0a7d1957bf473d43341115d40d33f578dad44432e47df7b7", "e8d1939262aa6b36d0c51f50a50a43a04b9618d20db31e6c0192b1463067aeef", "e918d51b1fda82a65fdf52d2f3914b2246481cc2a9cd10e223e6be6078916ff3"]
-mock = ["83657d894c90d5681d62155c82bda9c1187827525880eda8ff5df4ec813437c3", "d157e52d4e5b938c550f39eb2fd15610db062441a9c2747d3dbfa9298211d0f8"]
-numpy = ["0e2eed77804b2a6a88741f8fcac02c5499bba3953ec9c71e8b217fad4912c56c", "1c666f04553ef70fda54adf097dbae7080645435fc273e2397f26bbf1d127bbb", "1f46532afa7b2903bfb1b79becca2954c0a04389d19e03dc73f06b039048ac40", "315fa1b1dfc16ae0f03f8fd1c55f23fd15368710f641d570236f3d78af55e340", "3d5fcea4f5ed40c3280791d54da3ad2ecf896f4c87c877b113576b8280c59441", "48241759b99d60aba63b0e590332c600fc4b46ad597c9b0a53f350b871ef0634", "4b4f2924b36d857cf302aec369caac61e43500c17eeef0d7baacad1084c0ee84", "54fe3b7ed9e7eb928bbc4318f954d133851865f062fa4bbb02ef8940bc67b5d2", "5a8f021c70e6206c317974c93eaaf9bc2b56295b6b1cacccf88846e44a1f33fc", "754a6be26d938e6ca91942804eb209307b73f806a1721176278a6038869a1686", "771147e654e8b95eea1293174a94f34e2e77d5729ad44aefb62fbf8a79747a15", "78a6f89da87eeb48014ec652a65c4ffde370c036d780a995edaeb121d3625621", "7fde5c2a3a682a9e101e61d97696687ebdba47637611378b4127fe7e47fdf2bf", "80d99399c97f646e873dd8ce87c38cfdbb668956bbc39bc1e6cac4b515bba2a0", "88a72c1e45a0ae24d1f249a529d9f71fe82e6fa6a3fd61414b829396ec585900", "a4f4460877a16ac73302a9c077ca545498d9fe64e6a81398d8e1a67e4695e3df", "a61255a765b3ac73ee4b110b28fccfbf758c985677f526c2b4b39c48cc4b509d", "ab4896a8c910b9a04c0142871d8800c76c8a2e5ff44763513e1dd9d9631ce897", "abbd6b1c2ef6199f4b7ca9f818eb6b31f17b73a6110aadc4e4298c3f00fab24e", "b16d88da290334e33ea992c56492326ea3b06233a00a1855414360b77ca72f26", "b78a1defedb0e8f6ae1eb55fa6ac74ab42acc4569c3a2eacc2a407ee5d42ebcb", "cfef82c43b8b29ca436560d51b2251d5117818a8d1fb74a8384a83c096745dad", "d160e57731fcdec2beda807ebcabf39823c47e9409485b5a3a1db3a8c6ce763e"]
-opencv-python = ["1703a296a96d3d46615e5053f224867977accb4240bcaa0fcabcb0768bf5ac13", "1777ce7535ee7a1995cae168a107a1320e9df13648b930e72a1a2c2eccd64cda", "1e5520482fb18fbd64d079e7f17ac0018f195fd75f6360a53bb82d7903106b50", "25522dcf2529614750a71112a6659759080b4bdc2323f19d47f4d895960fd796", "2af5f2842ad44c65ae2647377e0ff198719e1a1cfc9c6a19bc0c525c035d4bd8", "31ec48d7eca13fc25c287dea7cecab453976e372cad8f50d55c054a247efda21", "47cf48ff5dbd554e9f58cc9e98cf0b5de3f6a971172612bffa06bc5fb79ce872", "494f98366bb5d6c2ac7e50e6617139f353704fd97a6d12ec9d392e72817d5cb0", "4a9845870739e640e3350a8d98d511c92c087fe3d66090e83be7bf94e0ac64f7", "4ac29cc0847d948a6636899014e84e165c30cc8779d6218394d44363462a01ce", "5857ace03b7854221abf8072462d306c2c2ce4e366190b21d90ee8ee8aaf5bb4", "5b4a23d99d5a2874767034466f5a8fd37b9f93ac14955a01b1a208983c76b9ad", "734d87a5021c037064beb62133e135e66c7128e401a63b8b842b809ae2093749", "78005c1c5d15ef4e32e0f485557bd15b5b6d87f49c19db7fe3e9246a61ebe7e4", "81ae2283225c5c52fc3d72debd4241c30ccff2bb922578bf7867f9851cce3acb", "88dbf900f297fdae0f62b899d6a784d8868ec2135854c5f8a9abbad00a6f0c5b", "8c98ea7b8d327a31cd6028782a06147d0e0329ae8e829e881fb5d02f7ed8aec9", "937d4686fef6967921145290f5b50c01c00c5b5d3542a6519e8a85cd88448723", "a057958c0e362b3c4f03b9af1cbdb6d5af035fd22ecd7fd794eba8fdeb049eb8", "c41eab31fa2c641226c6187caa391a688d064c99f078d604574f1912296b771f", "cf4f7e62d1f80d1fa85a1693a3500def5cde54b2b75212b3609e552e4c25acfb", "d90d60143e18334330c149f293071c9f2f3c79c896f33dc4ec65099e58baaaa7", "db3106b7ca86999a7bd1f2fcc93e49314e5e6e451356774e421a69428df5020b", "dbaf264db56f4771dfac6624f438bc4dc670aa94f61a6138848fcab7e9e77380", "e65206c4cf651dc9cf0829962fae8bec986767c9f123d6a1ad17f9356bf7257e", "eac94ddc78c58e891cff7180274317dad2938a4ddfc6ced1c04846c7f50e77e9", "f2e828711f044a965509c862b3a59b3181e9c56c145a950cb53d43fec54e66d2"]
-pillow = ["0683e80d81e840d401b687ebc00a02bbb23d0793c34d0852a5af64cfa1589540", "09c4e81c3277199898e8dc2d85d94febad87c41251ecbd447ba7d64d94765bd8", "0ee74a23022af9baf997e3016b4e090e4ff08688d37a6f49010338ab46cfe101", "10860baedfe5da7c43cd17835b091494dcc59dda5ad176a011713fe398ea6ac2", "15c056bfa284c30a7f265a41ac4cbbc93bdbfc0dfe0613b9cb8a8581b51a9e55", "1a4e06ba4f74494ea0c58c24de2bb752818e9d504474ec95b0aa94f6b0a7e479", "1c3c707c76be43c9e99cb7e3d5f1bee1c8e5be8b8a2a5eeee665efbf8ddde91a", "1fd0b290203e3b0882d9605d807b03c0f47e3440f97824586c173eca0aadd99d", "24114e4a6e1870c5a24b1da8f60d0ba77a0b4027907860188ea82bd3508c80eb", "258d886a49b6b058cd7abb0ab4b2b85ce78669a857398e83e8b8e28b317b5abb", "2734c55f7d054b0ad889c971136cbb0a5b35a921e27beaa44fdc2436af529c6e", "2ac36ec56727a95bd5a04dfca6abce1db8042c31ee73b65796a42f31fd52d009", "2bc1002b573d107c0b172a5da0f34b4900b2ddc6c3296b82d601e966d5ac1959", "33c79b6dd6bc7f65079ab9ca5bebffb5f5d1141c689c9c6a7855776d1b09b7e8", "367385fc797b2c31564c427430c7a8630db1a00bd040555dfc1d5c52e39fcd72", "3c1884ff078fb8bf5f63d7d86921838b82ed4a7d0c027add773c2f38b3168754", "44e5240e8f4f8861d748f2a58b3f04daadab5e22bfec896bf5434745f788f33f", "46aa988e15f3ea72dddd81afe3839437b755fffddb5e173886f11460be909dce", "492e1e4df823b57f9334f591c78a1e0e65a361e92594534e0568eeeeea56bbba", "50fb9e25d25cfcb50b2e6842c4e104e4f0b424be4624e1724532bf005c67589a", "5ceadd60dbd1e56ab7faffbfee1df5ecb83c3f0420e47f652cd5306d70eb0296", "74d90d499c9c736d52dd6d9b7221af5665b9c04f1767e35f5dd8694324bd4601", "7eeac51fc37e6b19631a4b8e38b8261a074efcf7cc27fc16a6bee4697af7aaa5", "809c0a2ce9032cbcd7b5313f71af4bdc5c8c771cb86eb7559afd954cab82ebb5", "85d1ef2cdafd5507c4221d201aaf62fc9276f8b0f71bd3933363e62a33abc734", "8c3889c7681af77ecfa4431cd42a2885d093ecb811e81fbe5e203abc07e0995b", "9218d81b9fca98d2c47d35d688a0cea0c42fd473159dfd5612dcb0483c63e40b", "9319215530e236822169cbe92426cdc18d16b88c943fdf365a6309a89876e335", "96ec275c83bf839972d6a7dd7d685fdfb6a3233c3c382ecff839d04e7d53955d", "9aa4f3827992288edd37c9df345783a69ef58bd20cc02e64b36e44bcd157bbf1", "9d80f44137a70b6f84c750d11019a3419f409c944526a95219bea0ac31f4dd91", "b7ebd36128a2fe93991293f997e44be9286503c7530ace6a55b938b20be288d8", "c30857e1fbf7d4a4b79d7d376eefaf293ea4307b8293d00a62e6f517f51bfe9b", "c4c78e2c71c257c136cdd43869fd3d5e34fc2162dc22e4a5406b0ebe86958239", "c5472ea3945e8f9eb0659f37fc1f592fd06f4f725f0f03774a8999ad8c130334", "c6a842537f887be1fe115d8abb5daa9bc8cc124e455ff995830cc785624a97af", "cf0a2e040fdf5a6d95f4c286c6ef1df6b36c218b528c8a9158ec2452a804b9b8", "cfd28aad6fc61f7a5d4ee556a997dc6e5555d9381d1390c00ecaf984d57e4232", "d0fd1ec2e7c3e0aeaae999efe83f5d0f42c1160a1f8be5120d40857d20baa452", "dca5660e25932771460d4688ccbb515677caaf8595f3f3240ec16c117deff89a", "de7aedc85918c2f887886442e50f52c1b93545606317956d65f342bd81cb4fc3", "e6c0bbf8e277b74196e3140c35f9a1ae3eafd818f7f2d3a15819c49135d6c062"]
-protobuf = ["21e395d7959551e759d604940a115c51c6347d90a475c9baf471a1a86b5604a9", "57e05e16955aee9e6a0389fcbd58d8289dd2420e47df1a1096b3a232c26eb2dd", "67819e8e48a74c68d87f25cad9f40edfe2faf278cdba5ca73173211b9213b8c9", "75da7d43a2c8a13b0bc7238ab3c8ae217cbfd5979d33b01e98e1f78defb2d060", "78e08371e236f193ce947712c072542ff19d0043ab5318c2ea46bbc2aaebdca6", "7ee5b595db5abb0096e8c4755e69c20dfad38b2d0bcc9bc7bafc652d2496b471", "86260ecfe7a66c0e9d82d2c61f86a14aa974d340d159b829b26f35f710f615db", "92c77db4bd33ea4ee5f15152a835273f2338a5246b2cbb84bab5d0d7f6e9ba94", "9c7b90943e0e188394b4f068926a759e3b4f63738190d1ab3d500d53b9ce7614", "a77f217ea50b2542bae5b318f7acee50d9fc8c95dd6d3656eaeff646f7cab5ee", "ad589ed1d1f83db22df867b10e01fe445516a5a4d7cfa37fe3590a5f6cfc508b", "b06a794901bf573f4b2af87e6139e5cd36ac7c91ac85d7ae3fe5b5f6fc317513", "bd8592cc5f8b4371d0bad92543370d4658dc41a5ccaaf105597eb5524c616291", "be48e5a6248a928ec43adf2bea037073e5da692c0b3c10b34f9904793bd63138", "cc5eb13f5ccc4b1b642cc147c2cdd121a34278b341c7a4d79e91182fff425836", "cd3b0e0ad69b74ee55e7c321f52a98effed2b4f4cc9a10f3683d869de00590d5", "d6e88c4920660aa75c0c2c4b53407aef5efd9a6e0ca7d2fc84d79aba2ccbda3a", "ec3c49b6d247152e19110c3a53d9bb4cf917747882017f70796460728b02722e", "f1f5d8b8e0bc9651d81b40ad3d9fb7cdd858ea31fc116dd230393465849dbecd"]
-pyparsing = ["1873c03321fc118f4e9746baf201ff990ceb915f433f23b395f5580d1840cb2a", "9b6323ef4ab914af344ba97510e966d64ba91055d6b9afa6b30799340e89cc03"]
-pysimplegui = ["0291b44cd63067f1fb327fc23caf92a3be10597c20af943e8ac6ac20e5bb4e5d", "c0dcb957278431b35432803e1cc522554d8a6b39a7a696f9b78ec720e2ca2b02"]
-python-dateutil = ["7e6584c74aeed623791615e26efd690f29817a27c73085b78e4bad02493df2fb", "c89805f6f4d64db21ed966fda138f8a5ed7a4fdbc1a8ee329ce1b74e3c74da9e"]
-pywinusb = ["e2f5e89f7b74239ca4843721a9bda0fc99014750630c189a176ec0e1b35e86df"]
-pyyaml = ["1adecc22f88d38052fb787d959f003811ca858b799590a5eaa70e63dca50308c", "436bc774ecf7c103814098159fbb84c2715d25980175292c648f2da143909f95", "460a5a4248763f6f37ea225d19d5c205677d8d525f6a83357ca622ed541830c2", "5a22a9c84653debfbf198d02fe592c176ea548cccce47553f35f466e15cf2fd4", "7a5d3f26b89d688db27822343dfa25c599627bc92093e788956372285c6298ad", "9372b04a02080752d9e6f990179a4ab840227c6e2ce15b95e1278456664cf2ba", "a5dcbebee834eaddf3fa7366316b880ff4062e4bcc9787b78c7fbb4a26ff2dd1", "aee5bab92a176e7cd034e57f46e9df9a9862a71f8f37cad167c6fc74c65f5b4e", "c51f642898c0bacd335fc119da60baae0824f2cde95b0330b56c0553439f0673", "c68ea4d3ba1705da1e0d85da6684ac657912679a649e8868bd850d2c299cce13", "e23d0cc5299223dcc37885dae624f382297717e459ea24053709675a976a3e19"]
-scipy = ["014cb900c003b5ac81a53f2403294e8ecf37aedc315b59a6b9370dce0aa7627a", "281a34da34a5e0de42d26aed692ab710141cad9d5d218b20643a9cb538ace976", "588f9cc4bfab04c45fbd19c1354b5ade377a8124d6151d511c83730a9b6b2338", "5a10661accd36b6e2e8855addcf3d675d6222006a15795420a39c040362def66", "628f60be272512ca1123524969649a8cb5ae8b31cca349f7c6f8903daf9034d7", "6dcc43a88e25b815c2dea1c6fac7339779fc988f5df8396e1de01610604a7c38", "70e37cec0ac0fe95c85b74ca4e0620169590fd5d3f44765f3c3a532cedb0e5fd", "7274735fb6fb5d67d3789ddec2cd53ed6362539b41aa6cc0d33a06c003aaa390", "78e12972e144da47326958ac40c2bd1c1cca908edc8b01c26a36f9ffd3dce466", "790cbd3c8d09f3a6d9c47c4558841e25bac34eb7a0864a9def8f26be0b8706af", "79792c8fe8e9d06ebc50fe23266522c8c89f20aa94ac8e80472917ecdce1e5ba", "865afedf35aaef6df6344bee0de391ee5e99d6e802950a237f9fb9b13e441f91", "870fd401ec7b64a895cff8e206ee16569158db00254b2f7157b4c9a5db72c722", "963815c226b29b0176d5e3d37fc9de46e2778ce4636a5a7af11a48122ef2577c", "9726791484f08e394af0b59eb80489ad94d0a53bbb58ab1837dcad4d58489863", "9de84a71bb7979aa8c089c4fb0ea0e2ed3917df3fb2a287a41aaea54bbad7f5d", "b2c324ddc5d6dbd3f13680ad16a29425841876a84a1de23a984236d1afff4fa6", "b86ae13c597fca087cb8c193870507c8916cefb21e52e1897da320b5a35075e5", "ba0488d4dbba2af5bf9596b849873102d612e49a118c512d9d302ceafa36e01a", "d78702af4102a3a4e23bb7372cec283e78f32f5573d92091aa6aaba870370fe1", "def0e5d681dd3eb562b059d355ae8bebe27f5cc455ab7c2b6655586b63d3a8ea", "e085d1babcb419bbe58e2e805ac61924dac4ca45a07c9fa081144739e500aa3c", "e2cfcbab37c082a5087aba5ff00209999053260441caadd4f0e8f4c2d6b72088", "e742f1f5dcaf222e8471c37ee3d1fd561568a16bb52e031c25674ff1cf9702d5", "f06819b028b8ef9010281e74c59cb35483933583043091ed6b261bb1540f11cc", "f15f2d60a11c306de7700ee9f65df7e9e463848dbea9c8051e293b704038da60", "f31338ee269d201abe76083a990905473987371ff6f3fdb76a3f9073a361cf37", "f6b88c8d302c3dac8dff7766955e38d670c82e0d79edfc7eae47d6bb2c186594"]
-six = ["3350809f0555b11f552448330d0b52d5f24c91a322ea4a15ef22629740f3761c", "d16a0141ec1a18405cd4ce8b4613101da75da0e9a7aec5bdd4fa804d0e0eba73"]
-tensorboard = ["53d8f40589c903dae65f39a799c2bc49defae3703754984d90613d26ebd714a4", "b664fe7772be5670d8b04200342e681af7795a12cd752709aed565c06c0cc196"]
-tensorflow = ["0de5887495c20e1130ae4d9bcfaf80cec87f579a9c27a84141a588a46e5aa853", "0f305f3c461ed2ce5e0b65fccc7b7452f483c7935dd8a52a466d622e642fdea8", "4325f20b5a703b80a5f7a8807f07ad8735025bd2a947093ffff1c26fbdc7980b", "4c86be0e476b64cedf4ffa059d71b764e75b895effb697345687e3057929a7b5", "6b0a0a413390302ce7c22c98695983d6fb8406861cfb418b25536f57a96c0b89", "77eec2351d0a9b5312ea01ee4c78c13996f249cf1bead2e68256a65e533f45ef", "87bf719a564f11d63e4f614e933e5a612dd4e67c88266b774236e0982f5fcf69", "ba29e66331cd2a8f824e0fa937ce44bd624bc37739f2f083694e473051d89ace", "bc374f5a662b6e164cd1c4da61ccc752ec208a44893d2f9dcf47d2a0a2cef311", "bcf86966b7554e407bb7d73341f2e108df62a910d40b4cd2a914867f2a5de51c", "c3abffd51c168cfd62a557243c47a29ab48deb52a64465e6818060f20755ddb4", "c41862c65628261229db22e33f9e570d845eeb5cea66dcbaebe404405edaa69b", "d7341617aedd73c2c847755e87697e9c19eb625c73da26d6cd669220c5565119", "de0425b58cb34006e4500565239b4c3a3055b95bff132f097fa46c87d8e463c9", "f21fb65c8e874f40c654bc9b3ff3db3ec26f98f03fe64a541bc768f6f5c52ac2"]
-tensorflow-estimator = ["7cfdaa3e83e3532f31713713feb98be7ea9f3065722be4267e49b6c301271419"]
-termcolor = ["1d6d69ce66211143803fbc56652b41d73b4a400a2891d7bf7a1cdf4c02de613b"]
-werkzeug = ["0a73e8bb2ff2feecfc5d56e6f458f5b99290ef34f565ffb2665801ff7de6af7a", "7fad9770a8778f9576693f0cc29c7dcc36964df916b83734f4431c0e612a7fbc"]
-wheel = ["5e79117472686ac0c4aef5bad5172ea73a1c2d1646b808c35926bd26bdfb0c08", "62fcfa03d45b5b722539ccbc07b190e4bfff4bb9e3a4d470dd9f6a0981002565"]
+absl-py = ["md5:eb69acd0df165304210cb29481b74f9e"]
+astor = ["md5:5b2dd20c4834cd0a8e60e0aa1f6a2fbe", "md5:6bcfef07addfafa89f4f2a2ff0f6ff54"]
+cycler = ["md5:2820ec00c7dd68487bde1a7cdb165904", "md5:4cb42917ac5007d1cdff6cccfe2d016b"]
+fastdtw = ["md5:63d55d14dbc4a40d2d1ceecb756d0ee4"]
+gast = ["md5:22037d68816cd9da3eb84ffd904b9b14"]
+grpcio = ["md5:054c2d79a1166117279d87de1afeee7f", "md5:148a025a788c4543b026fae5a4d4aa7f", "md5:15be666aa587e177627ab0ee8979e077", "md5:1d52bf3c07ed59bea0642bbe2d5fa35b", "md5:35c9f7778471745be5670434d9f1a903", "md5:365b3426a77ee5e09f11bdfcf341bdfd", "md5:3f8e18889637c8b5f5655cf53d68e091", "md5:41feda3b8f4e03f050654a848f821dac", "md5:4c7c203c00a2355fc81af62a57f478f7", "md5:4e367b51cccf487ae2be7852f9273484", "md5:570b415189a4c54d5b4bdc4ba0220aba", "md5:60318d50056258ae8ce80f6e75d459a7", "md5:693694c62f6ad447279fa57ee434fe8c", "md5:69a490ffa9051084dc8920d07cfce4c9", "md5:6cacbde567e935e6152803552b96811a", "md5:75310df4b60dcc127fbf8b6763b8276a", "md5:7bc3efeab7140ee4eb85ac04c1e45928", "md5:7fb2a077284886b8c6ba868b5ebd1579", "md5:8804a5635dad5000b96abbf78511f1a5", "md5:a6384ab18c1ecd691a62ede392b28586", "md5:aabac88d1c6b066413882ef47d008415", "md5:b1319da98d118145a21f7837b81184b5", "md5:b61c610763567f2601fac8a8a1243477", "md5:bb0f61be79ecb8aee346159318890b36", "md5:c9b3dc60ca0d1730287bf0039b69c852", "md5:d1196505efef70edbbf5d7433dbbd63c", "md5:e25b5818ced055412668249a38aee484", "md5:e26168643dcde790b5a0125dacdf2289", "md5:e30dce00df00ff33bf2d0eb440998299", "md5:e64bff0c1fc1bc860fcccf4add1acc46", "md5:e7dd5b6157623400055c6835fdf56fbe", "md5:ed173e444572043fdadca91746e3871e"]
+h5py = ["md5:07efcf01d5d566731ad6c5afd98f08f6", "md5:1ed04ab371a5f0dfecddfa6b1696727f", "md5:2574f027e02f481916f520de18ed8989", "md5:2aefcac6c080ce98bc07f21347954a9e", "md5:339fc37586a288571ccbba9569519736", "md5:4f98d7389808803674e53531d8853582", "md5:51503dc2eb296b5127a84cc4c1e9869d", "md5:51ed350ef50874f1d84a4c9fda96c892", "md5:58986d5d4aac441941904156d909bbae", "md5:72bddfa94cab97ec865f0587dcb6f835", "md5:7c9333783df75d9ce68019a1dcdc1359", "md5:7f9810a675c209f4e276da2117c350f8", "md5:80d0373bc83ee5d9bc4ef36514d01831", "md5:8b30be3a684d4aa6d1f78d28d5e79ccd", "md5:8b564552beab7557bbd20e978b8eece8", "md5:a2d3a02c47bf42548a61886faa0c9e88", "md5:a90b1fd661c368cf9fedb7c35b5a9f3a", "md5:b4cfb65a8dc5cd19f5629979a41baa1f", "md5:b6a9fe4bf68d526c243cfb3954c91c53", "md5:c7304e794c8e80b15e913475f7e37779", "md5:d5cdd7248398d8f66119b27171ebf4e1", "md5:d886bf3b9c7438f0e86af56d2826557e", "md5:e7d949f8c1b78a1c09dd1440346a460f", "md5:ef0cb293b420b0c4b4eb573121709acd", "md5:f409709a981c390587130b342cff348e", "md5:f7a58402b6260c253b51f8b158cb521b", "md5:f911089795f6d69150652dbf92ffd628", "md5:fb7747e57f6f02ca02ceb176f280a191"]
+keras = ["md5:39c55e5e9d2da60ccb2387517d9b0f62", "md5:bd92aafa85de6ae7574b080d65bb1d93"]
+keras-applications = ["md5:439e161359d835d42036de7a596601f2", "md5:803fce9b4289ea3ce8973b649b733b51"]
+keras-preprocessing = ["md5:4b561f26d176045ce2f14dd2f5eb7b55", "md5:e9faba00f08f45de4bbda22a4b425cc3"]
+kiwisolver = ["md5:0d312de2edb8ef818d2d0e55d34818f6", "md5:11bdd3c9474004d5f1cbfb6e81a19095", "md5:1372053abb60dd7cbdc713a5e1cce1c9", "md5:2a767738191f17dd40f14ae7177be0c1", "md5:2fa84898e84cc5626b0c706532aec848", "md5:33e70c46552a848093418a2ddeee2713", "md5:58bc47440ff38d22c3d90a56086aa7ad", "md5:5defccf4afb1359fba280c230383a0ec", "md5:788a62bf8fef2afb4172014632cae0a7", "md5:8921cacf8d5d1f02da958d9da03d95a9", "md5:90bb7018af8d9b2af196e67855991909", "md5:91223684a6a14e51672528491587617b", "md5:979c4f6cc7a36fc8ce60360bf111ded8", "md5:9f7e50957e46c8f04bdb3c5d313a9151", "md5:a21c4a23cdd6d87fae00e110a2392382", "md5:a4d1b0c3fcb7ed80a1dd5677fca97eda", "md5:a65d78042a0ca923b4a448c2398f8d53", "md5:a76b831b1910f99c63a37899282c2bc2", "md5:aadf2f4bf111a2859729fffceda811d5", "md5:b26c4c7558d24f70f3a30122034b1181", "md5:bad68e7d0adb58f6f7f24197bf138437", "md5:bbdb9487c6b763c5c1fbb6e8197ce825", "md5:e0984ca8dec72e6847ac7c79325bb45f", "md5:eb28076767a96888d1ba702fd308f46e", "md5:f342423ab1aa96739cd57cafa398e8d2", "md5:fc8a614367f7ba0d34a02fd08c535afc", "md5:fcf1133bfe1c52f599d5f35809356bfe", "md5:fef5fa85ffc138f61bf2467a2b1622dd"]
+markdown = ["md5:3088dc39d4cb1b8284f185dce56d252f", "md5:ef00dbf71b44d60a8e75b0315eaf6944"]
+matplotlib = ["md5:0edc85d85d6722b82c7c04d2904404c1", "md5:15a82c9e06bd30ebb213c4f0015d4f1a", "md5:2088d7c24cf00b7230d6921a16eb6b06", "md5:261d9af512215c0ca7c28dd62d012674", "md5:2d399c30b05e16e1733c033a1952e133", "md5:32c3440443deb7c3a4d38fa2c001e815", "md5:344200ee6a13d10a04b07539d33e0dc9", "md5:48979d3a173f6b19b58b597788b1f6c6", "md5:4eb26dd936b36991ab00f332cd25b572", "md5:5e8c690420499a6c170b2dbb1a091940", "md5:6b8a3d1077cb6b820895a4ed5a470de3", "md5:cc5ab58aab55f3679297321569f92c7c", "md5:ee65cc9da672aec975f0099bf62db629"]
+mock = ["md5:0b273f0d265660e78e96b739c6a813b4", "md5:d834a46d9a129be3e76fdcc99751e82c"]
+numpy = ["md5:00594b150e69d1776164ffa60d7fdc01", "md5:1854757b3e127614ae01b0b814762f5c", "md5:370ec58a5fdfe9e7ffe90857577806c6", "md5:453f5996ac600c4085656e82005fb0e5", "md5:4e907ac7d841018c0a9130ca45d099ee", "md5:7039dd60e2066e8882149a8b8bd6cf2f", "md5:773f9e76235ab5edd9ef1c083e62ea9f", "md5:7add5c07a1679bfc086d5575be26ccc6", "md5:88c1e91c6bd3626278b7938f12cafbe2", "md5:91900b9172e39c039326c56cf0149e15", "md5:93a2a4b48f160ffd1bdd30023b842be2", "md5:98fb024d8d63f056ef7c82e772c4bfa0", "md5:9ba2467b05eb4471817509cabff1b9a6", "md5:b06d87509a2228c5952096cb11c8b007", "md5:b23b0727562be62ffd943c7828822da9", "md5:bd3c27deac470bce5edf6936d08966b8", "md5:c03c7365b58deefd03e3c080660d7157", "md5:c6ab529b105181fc846a8245e5e4d048", "md5:c7e8e9f9ded13b1356e72cd8506df224", "md5:cab84884fba39fbd352550896bf22bfd", "md5:d2b8da12f0855765e9cd3cc49d9885b9", "md5:ec4f2fd2180fd68647f38a0d4c331dcf", "md5:fe3421cbae83004e7feca4d90043e9df"]
+opencv-python = ["md5:032f56a8d99f6fd3cc1369a94988ad5b", "md5:1234dafb2878052477ba4f6b0ace66fb", "md5:2340ad0a51b515bfc35c256023773200", "md5:270a5889655e9f8fd5be27acd0c57f05", "md5:383a05bce747afefa65b6e2566a988ea", "md5:43ed158a460fac08ee19173cfd432f8d", "md5:59691ce1092f82c767091d216f68225e", "md5:62b072fb6a3a8f98694a43501f2fa9cd", "md5:759e0554aba5ffa1cbbd573b3da892d8", "md5:7aed5545cb73e30e454c734009fca467", "md5:8fa0c52af1c6a51cc3280c36bf013e1b", "md5:914a1877777cd02b305426069d3fe619", "md5:96909b4bd9fe8ce77c2e1fefce61632e", "md5:99963087256c17202e5f0ceda7c22962", "md5:99d0db42a2f044cd6028c21bd50f1d83", "md5:a1a9c2bfced5a5e3251ccecf55309d9f", "md5:a3523843e5a28c32def3de615910e3db", "md5:a72503488c2af9ecafdaabdd362a3051", "md5:acc72c9425cdc2f823d5d7c39e1d4fdd", "md5:ad8147bdf1ab8c6c15092e73e90d4dd2", "md5:b11b705aedc46a571ce5512af410daa0", "md5:b47cde6617f9a09ca7d48e25d7a22e55", "md5:ca2b08552ea4ccf1db117226930576b4", "md5:db872af459811a47a0e5eea1c720271a", "md5:e3a204b607fe998afc528a2cd6bdd695", "md5:e700c676e5126a42133a90450128dc91", "md5:fd4be9636462e151db558e0f3bba2c46"]
+pillow = ["md5:044049b724596fe62025c71b6b1c88a6", "md5:1a4f6f39dfbefda746780c6c8e982040", "md5:24d722b78b2a73ea2d170a731fe1eb9f", "md5:30a3758316719295caeb63367f030fde", "md5:3476d551507d2ec80c99b47af2c5f4a8", "md5:73e35f0f33bd05410215e81cf04c967e", "md5:771e33129787a7d2c03aa8ea0067e757", "md5:7902678b3ba470e06d61114ef25997e5", "md5:7b2e26fb676ef02ca5ccc83e51316f1b", "md5:910bd2521bcbb70fbf601ed68115516a", "md5:941fc9caf9865068e2afdae7cebe2ebc", "md5:9c50e7182b01458b9d649be4953f8648", "md5:9da5d2db0d7604ba553ece1ab7ca53a3", "md5:a7ba8b2604375425fa5ae9601d0b18fc", "md5:b936161097012a661d83b0524e42cec0", "md5:c358af4427350e9d8de31f3bf15aa1d7", "md5:c614130fde7338ef3f089009b29f290b", "md5:c630606d82d542c6ceae9810d2455f47", "md5:c73a645fb7f6340bb630cf351695ac89", "md5:c76f43cdab16712c498631076bc07136", "md5:cbc5756ea1d6a826f7645d4ae0b4e44c", "md5:d074036ec27e2ae3cee20adf99f9aebe", "md5:e426e5f06527e1b194cc3ca9b2ec5def", "md5:e59c6463f75ec48274d60054775a4559", "md5:f21112bf577aa0dfb0f0c713e16e76c7", "md5:fb573595113dce69b2b1a3d8839be066"]
+protobuf = ["md5:00387ecc1e71c0b21c9b0c1c2240971a", "md5:01cf56dbc2b2fc1a8ed61b1c36943553", "md5:03cfc9578b446ccb293aa96b31ca1ca9", "md5:1165e092a4a20597c39a29a4007fad71", "md5:1b04b4e00bd8421cfd1591f49b032d6a", "md5:1f076154b09417062a979df64cbd2f80", "md5:2a2d3da76c0c71a558c759bc6fa0168d", "md5:2f76489a885264e7ac52ff267fe36a7c", "md5:4b8a70b666484ccb2085af328b994ae4", "md5:627f17d7199257139897d0217a588509", "md5:7bb9a6983a226d96dd580174bef11ac1", "md5:a0905bc70cc3b2efa81fc4b8fc4866e6", "md5:a93e5e69c20ddf0d7bea56690747434d", "md5:ba4a1e4e0e881bdff007932b616309ef", "md5:c2cd2bda1bec1201025b6ab955de4aca", "md5:d3be6ebec786255c36023e23dbd9d26a", "md5:e995c85d8721411db5dde9b1a3d3915d", "md5:ec185a80cb9300328418a0457ff5a4c9"]
+pyparsing = ["md5:0a90ca524ce3ba201be4b80e21ae7c3b", "md5:e534c0ca755155823bf45fdd8d084922"]
+pysimplegui = ["md5:9282a6adadaf88a1529903883ff61725", "md5:e169c8a3001c73b394f85fda0850cb93"]
+python-dateutil = ["md5:33bfcff39e89f7c1c26a6bd9af54901c", "md5:354db28843d949f1bc3e49e8458e22df"]
+pywinusb = ["md5:89effe9a46f9a8641993a9de2fb5fb5d"]
+pyyaml = ["md5:0b7e76d06b4dc17e48e7e395aa609ecc", "md5:193b162c597796a29bad3b2f5b4f514b", "md5:1fa07df3251ab548fb49b3bec71d29fc", "md5:3b07eb596071bac75c886129de881d22", "md5:609821d6b526623cedaf8176b295b276", "md5:63614eec400c7bc2bf04e0b0a246b9e5", "md5:8de9d396c85f4d516c09afd60e48bb52", "md5:90f43037837dfb881165a843d5c30aea", "md5:a5b0eb59e136d9ae8d5eed313c82565f", "md5:c08d3d08e8772b477b140312e3c05778", "md5:d58fc84a007f476d6c78c47734da85f1"]
+scipy = ["md5:0cd66785fd9f8390494f42beb499f56a", "md5:21b29788cd2c037366d2ff5d54ae7517", "md5:23424815af8e69f945bb406a0c1be6c6", "md5:26264ebb568728065e3ef73b5419793a", "md5:27142bff898a18368032165c27c11466", "md5:379d37ae932af2096e037b4defd4cf60", "md5:3b5e8eb89a49fb7bc506cf17a54b926b", "md5:489fd885aefd07bded69a8e0452c16b0", "md5:5069317ab38e3dfbb8923341c2b23a69", "md5:5dd4c47c501c96dc0c20b72521058133", "md5:6fa013443295e55c96eb174578dcffee", "md5:7b7ae846b70e60188b3d772e9d60d3d2", "md5:84ef33013d9871f23db0ecad25552636", "md5:8e6a1fd1354428074d8457fe46cd4f7c", "md5:8faae90250009230cd2f7845ba4735f2", "md5:9500cad49b7eac9786c90cba146ad357", "md5:982810997da9daab2e512a6c27918889", "md5:a28a93cb20987666f788d43c50e2ab79", "md5:b5a5b9b146bac064a7921c5121d5e19c", "md5:c0692c60b4baaafd99fb2bf0c689bbf1", "md5:cc248fd969b11589d98bcb550330e08d", "md5:e11ce933d012481ea27fe49314b606aa", "md5:f1823b26b2afda2027f78df427791700", "md5:f82cf6834e4e2a2e4008fec5da2f4b0b", "md5:fbb79da3d5823ba0f23b0f8d50023bfd", "md5:fd637f4dc4308ae9cf7655e3e5f3a27d", "md5:fe88877767563e50078df86dadf7b1f4", "md5:fe9ba7f16e0e7f7c9cd59d39ea8e9545"]
+six = ["md5:9ae5d1feed8c0215f4ae4adcd9207fcb", "md5:b0dc15d494e2d6e6c19cbbe482e91c5d"]
+tensorboard = ["md5:7ade565cfebea521b71285a9869a76fe", "md5:e22c89c66ab3acf183ee015b2acc0821"]
+tensorflow = ["md5:0dca2b572f2cfb33ebb64ccfdb889ea3", "md5:14ea381ad494a673322b4ce3c58b5447", "md5:20cfb48ae87bbd8c613f3158ee903ce4", "md5:23c52fe1334af9d6f725c78bf30c47b7", "md5:252f2cc3e3a2d9f5c1f18131678f013f", "md5:444b81f4726b20f44e31ab0824d8bf16", "md5:4e4853d60d6c8bf68fca1f050973edda", "md5:625162ae035bfeb116d6682cbefd182c", "md5:a5aaf8923e60076218dd3f0f1d42286d", "md5:b86de7dad45003e3599a1430b00492bd", "md5:c2e196fd439e5cb011c436df7b50ae77", "md5:c6b5e03e7f16c5916dc38a7408be9f8c", "md5:d1678b7140ebe912202bb7b31b15afad", "md5:ea1890d0e58ff47d6735cf90f4d8626a", "md5:fcb2edc820be3f82b675cf6925f3a2b1"]
+tensorflow-estimator = ["md5:6c79f2365a947cb0b2800386ea96983b"]
+termcolor = ["md5:043e89644f8909d462fbbfa511c768df"]
+werkzeug = ["md5:7c02923f7d898844079f12e28e32e3f8", "md5:8bd56c066512c7ebcb08ced932618b2f"]
+wheel = ["md5:197d7aeff764238f757d222bd39605b5", "md5:5bad0479ddf8d4dbfad212724a7b1f71"]
+yapf = ["md5:7fc94c0621deb881b793b51be1867aaa", "md5:ba6600ab14b540bc6c50b56d7aba08c0"]
