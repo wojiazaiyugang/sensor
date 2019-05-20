@@ -36,6 +36,7 @@ if not os.path.exists(MODEL_DIR):
     os.makedirs(MODEL_DIR)
 # 数据的存储位置
 DATA_DIR = os.path.join(ALGORITHM_DIR, "data")
+CYCLE_FILE_DIR = os.path.join(DATA_DIR, "data0_cycle")
 assert SENSOR_DATA is None or 0 <= int(SENSOR_DATA) <= 9, "数据错误"
 
 

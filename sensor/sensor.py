@@ -99,7 +99,7 @@ class SensorManager:
             self.gyro_data_lines = get_data0_data(os.path.join(DATA_DIR, "data0", "gyrData{0}.txt".format(SENSOR_DATA)))
             self.last_data_timestamp = get_current_timestamp()
 
-    def mock_real_time_data_from_data0(self):
+    def mock_real_time_data_from_data0(self) -> bool:
         """
         使用data0中的数据模拟真实数据，做法是通过时间戳来决定读取数据的多少
         :return:
@@ -109,6 +109,9 @@ class SensorManager:
         self.acc.extend(self.acc_data_lines[self.last_data_index: current_data_index])
         self.gyro.extend(self.gyro_data_lines[self.last_data_index: current_data_index])
         self.last_data_index = current_data_index
+        if current_data_index >= min(len(self.acc_data_lines), len(self.gyro_data_lines)):
+            return False
+        return True
 
     def _validate_raw_data(self, data, threshold):
         if len(data) > 1 and abs(data[-1][1] - data[-2][1]) > threshold:

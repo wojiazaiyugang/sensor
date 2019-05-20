@@ -89,31 +89,30 @@ class DataPreProcess:
         corr_distance = []
         for i in range(len(mags) - len(self.template) + 1):
             corr_distance.append(self._corr_distance(template_mag, mags[i:i + len(self.template)]))
-        corr_distance = self._lowpass(corr_distance)
+        corr_distance = self._lowpass(numpy.array(corr_distance))
         for i in range(len(corr_distance)):
-            if i >= 2 and corr_distance[i - 1] < min(corr_distance[i - 2], corr_distance[i]) and corr_distance[
-                i - 1] < self.gait_cycle_threshold:
+            if i >= 2 and corr_distance[i - 1] < min(corr_distance[i - 2], corr_distance[i]) and corr_distance[i - 1] < self.gait_cycle_threshold:
                 cycle_index_points.append(i - 1)
                 if len(cycle_index_points) == 2:
                     # 如果找到的周期时间不够的话，就凑上下一个周期
                     cycle_duration = int(data[cycle_index_points[1]][0]) - int(data[cycle_index_points[0]][0])
                     if cycle_duration < self.expect_gait_cycle_duration[0]:
-                        logger.debug("cycle 错误1:{0}".format(cycle_duration))
+                        # logger.debug("cycle 错误1:{0}".format(cycle_duration))
                         del cycle_index_points[-1]
                         continue
                     elif cycle_duration > self.expect_gait_cycle_duration[1]:
-                        logger.debug("cycle 错误2:{0}".format(cycle_duration))
+                        # logger.debug("cycle 错误2:{0}".format(cycle_duration))
                         cycle_index_points[0] = cycle_index_points[1]
                         del cycle_index_points[-1]
                         continue
                 if len(cycle_index_points) == 3:
                     cycle_duration = int(data[cycle_index_points[2]][0]) - int(data[cycle_index_points[1]][0])
                     if cycle_duration < self.expect_gait_cycle_duration[0]:
-                        logger.debug("cycle 错误3:{0}".format(cycle_duration))
+                        # logger.debug("cycle 错误3:{0}".format(cycle_duration))
                         del cycle_index_points[-1]
                         continue
                     elif cycle_duration > self.expect_gait_cycle_duration[1]:
-                        logger.debug("cycle 错误4:{0}".format(cycle_duration))
+                        # logger.debug("cycle 错误4:{0}".format(cycle_duration))
                         cycle_index_points[0] = cycle_index_points[2]
                         del cycle_index_points[-1]
                         del cycle_index_points[-1]
@@ -121,11 +120,11 @@ class DataPreProcess:
                 if len(cycle_index_points) == 4:
                     cycle_duration = int(data[cycle_index_points[3]][0]) - int(data[cycle_index_points[2]][0])
                     if cycle_duration < self.expect_gait_cycle_duration[0]:
-                        logger.debug("cycle 错误5:{0}".format(cycle_duration))
+                        # logger.debug("cycle 错误5:{0}".format(cycle_duration))
                         del cycle_index_points[-1]
                         continue
                     elif cycle_duration > self.expect_gait_cycle_duration[1]:
-                        logger.debug("cycle 错误6:{0}".format(cycle_duration))
+                        # logger.debug("cycle 错误6:{0}".format(cycle_duration))
                         cycle_index_points[0] = cycle_index_points[3]
                         del cycle_index_points[-1]
                         del cycle_index_points[-1]
