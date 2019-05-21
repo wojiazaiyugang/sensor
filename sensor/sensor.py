@@ -6,7 +6,7 @@ import math
 from typing import Union, Tuple
 
 from numpy import short
-import pywinusb.hid as hid
+# import pywinusb.hid as hid
 
 from util import get_current_timestamp, get_data0_data
 from settings import DATA_DIR, logger

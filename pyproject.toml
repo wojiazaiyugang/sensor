@@ -17,12 +17,11 @@ pywinusb = "^0.4.2"
 Pillow = "^6.0"
 fastdtw = "^0.3.2"
 yapf = "^0.27.0"
+sklearn = "^0.0.0"
+joblib = "^0.13.2"
 
 [tool.poetry.dev-dependencies]
 
-[[tool.poetry.source]]
-name = "douban"
-url = "https://pypi.doubanio.com/simple/"
 [build-system]
 requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"

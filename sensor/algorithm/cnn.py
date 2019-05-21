@@ -1,15 +1,16 @@
 import os
 import pickle
-from typing import Tuple
+from typing import Tuple, List
 
 import numpy
 from sklearn.model_selection._split import train_test_split
 from keras.models import Model, Input
 from keras.activations import tanh, softmax
-from keras.layers import Conv2D, MaxPool2D, Dense
+from keras.layers import Conv2D, MaxPool2D, Dense, Flatten
 from keras.optimizers import RMSprop
 from keras.losses import categorical_crossentropy
 from keras.metrics import categorical_accuracy
+from keras.utils import to_categorical
 
 from sensor.algorithm.base_network import Network
 from sensor.algorithm import data_pre_process
@@ -27,7 +28,7 @@ class CnnNetwork(Network):
         self.network_name = "CNN特征提取网络"
         super().__init__()
 
-    def _load_data(self) -> Tuple[numpy.ndarray, numpy.ndarray]:
+    def _load_data(self) -> Tuple[List[numpy.ndarray],List[numpy.ndarray]]:
         """
         将data0转换生成为CNN可以使用的数据类型
         :return:
@@ -57,35 +58,32 @@ class CnnNetwork(Network):
                     if gyro_cycle is not None:
                         gyro_cycles.append(gyro_cycle)
                 for acc_cycle, gyro_cycle in zip(acc_cycles, gyro_cycles):
-                    data.append(numpy.concatenate((acc_cycle, gyro_cycle), axis=1))
+                    data.append(numpy.concatenate((acc_cycle, gyro_cycle), axis=1).T)
                     label.append(i)
                 logger.debug("生成CNN数据：{0}".format(i))
             with open(data_file_full_name, "wb") as file:
-                file.write(pickle.dumps((data, label)))
+                file.write(pickle.dumps((numpy.array(data), numpy.array(label))))
         with open(data_file_full_name, "rb") as file:
             data, label = pickle.loads(file.read())
         return data, label
 
     def _train(self) -> Model:
-        # for i in range(10):
-        #     with open(os.path.join(CYCLE_FILE_DIR, "gyro{0}".format(i)), "rb") as file_gyro, open(os.path.join(CYCLE_FILE_DIR, "acc{0}".format(i)), "rb") as file_acc:
-        #         data = pickle.loads(file_acc.read())
-        #         print("acc{0}:{1}".format(i,len([_ for _ in data  if _ is not None])))
-        #         data = pickle.loads(file_gyro.read())
-        #         print("gyro{0}:{1}".format(i, len([_ for _ in data if _ is not None])))
-        # exit(0)
         data, label = self._load_data()
         train_data, test_data, train_label, test_label = train_test_split(data, label, test_size=0.2)
-        # TODO 载入数据
-        network_input = Input(shape=(8, 200, 3))
+        train_data = numpy.reshape(train_data, train_data.shape + (1,))
+        train_label = to_categorical(train_label)
+        test_data = numpy.reshape(test_data, test_data.shape + (1,))
+        test_label = to_categorical(test_label)
+        network_input = Input(shape=(8, 200,1))
         network = Conv2D(filters=20, kernel_size=(1, 10))(network_input)
         network = Conv2D(filters=40, kernel_size=(4, 10))(network)
-        network = MaxPool2D()(network)
-        network = Dense(activation=tanh)(network)
-        network = Dense(activation=softmax)(network)
-        network = Model(inputs=[network_input], ouputs=[network])
-        network.compile(optimizer=RMSprop(lr=0.01), loss=categorical_crossentropy, metrics=[categorical_accuracy])
+        network = MaxPool2D((2,2))(network)
+        network = Flatten()(network)
+        network = Dense(units=40, activation=tanh)(network)
+        network = Dense(units=10, activation=softmax)(network)
+        network = Model(inputs=[network_input], outputs=[network])
+        network.compile(optimizer=RMSprop(), loss=categorical_crossentropy, metrics=[categorical_accuracy])
         network.summary()
-        self.train_history = network.fit()
-        self.evaluate_history = network.evaluate()
+        self.train_history = network.fit(train_data, train_label,batch_size=32,epochs=16)
+        self.evaluate_history = network.evaluate(test_data,test_label)
         return network
