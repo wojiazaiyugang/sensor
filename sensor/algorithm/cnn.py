@@ -102,6 +102,18 @@ class CnnNetwork(Network):
             print("index:{0},预测值:{1},实际值:{2},预测成功:{3}".format(index, predict_index, label[index],
                                                               bool(predict_index == label[index])))
 
+    def  get_who_you_are(self, data: numpy.ndarray) -> int:
+        """
+        识别你是谁
+        :param data:
+        :return: 0 - 9
+        """
+        if len(data.shape) == 2:
+            data = numpy.reshape(data, (1,) + data.shape + (1,))
+        if len(data.shape) == 3:
+            data = numpy.reshape(data, (1,) + data.shape)
+        return int(numpy.argmax(self.model.predict(data)))
+
     def visualize(self):
         """
         网络可视化
@@ -130,7 +142,7 @@ class CnnNetwork(Network):
         data = numpy.reshape(data, data.shape + (1,))
         activation_model = Model(inputs=[self.model.input], outputs=[layer.output for layer in self.model.layers[1:3]])
         activations = activation_model.predict(numpy.array([data[0]]))
-        plt.matshow(activations[1][0,:,:,18], cmap="viridis")
+        plt.matshow(activations[1][0, :, :, 18], cmap="viridis")
         plt.show()
 
 

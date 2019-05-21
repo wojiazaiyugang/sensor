@@ -29,14 +29,14 @@ class GuiManager:
         CANVAS_GAIT_ANG = "显示欧拉角步态数据的区域"
         CANVAS_GEI_ANG = "显示欧拉角GEI的区域"
         IMAGE_STATUS = "当前运动状态的图片"
-        TEXT_ACTIVITY = "当前运动状态"
+        TEXT_WHO_YOU_ARE = "身份识别结果"
         TEXT_IS_WALK_LIKE_DATA0 = "当前是否像data0一样"
 
     def __init__(self):
         # gui通用设置
-        sg.SetOptions(background_color="#FFFFFF", element_background_color="#FFFFFF", text_color="#FF0000")
+        sg.SetOptions(background_color="#FFFFFF", element_background_color="#FFFFFF", text_color="#000000")
         # plot manager，用于获取绘图信息
-        self.sensor_manager = SensorManager(0)
+        self.sensor_manager = SensorManager(7)
         self.algorithm_manager = AlgorithmManager(self.sensor_manager)
         self.plot_manager = PlotManager(self.sensor_manager, self.algorithm_manager)
 
@@ -70,9 +70,9 @@ class GuiManager:
                      ],
                 ]),
                 sg.Column([
-                    [sg.Image(filename=get_static_file_full_path("1.png"), key=self.KEYS.IMAGE_STATUS,
-                              size=(100, 100))],
-                    [sg.Text(text="日志", key=self.KEYS.TEXT_ACTIVITY)],
+                    [sg.Frame("身份识别结果", [
+                        [sg.Text(text="", key=self.KEYS.TEXT_WHO_YOU_ARE)],
+                    ])],
                     [sg.Text(text="data0", key=self.KEYS.TEXT_IS_WALK_LIKE_DATA0)]
                 ])
             ],
@@ -82,7 +82,7 @@ class GuiManager:
         ]
         self.window = sg.Window("demo").Layout(self.layout).Finalize()
 
-    def _update_gait_pic(self, figure, gait_canvas):
+    def _plot_pic(self, figure, gait_canvas):
         """
         在pysimplegui上绘制plot。调用这个函数必须接受返回值，不接受的话无法绘图，我也不知道为啥，辣鸡tkinter
         :param gait_canvas:
@@ -116,7 +116,7 @@ class GuiManager:
         :param gait_canvas:
         :return:
         """
-        gait = self._update_gait_pic(fig, gait_canvas)
+        gait = self._plot_pic(fig, gait_canvas)
         gei = self._update_gei_pic(fig, gei_canvas, gei)
         return gait, gei
 
@@ -126,7 +126,7 @@ class GuiManager:
             if not event:
                 break
             self.plot_manager.update_figures()
-            raw_data_pic = self._update_gait_pic(self.plot_manager.raw_data_fig.fig, self.window.FindElement(self.KEYS.CANVAS_RAW_DATA).TKCanvas,)
+            raw_data_pic = self._plot_pic(self.plot_manager.raw_data_fig.fig, self.window.FindElement(self.KEYS.CANVAS_RAW_DATA).TKCanvas)
             acc = self._update_gait_and_gei(self.plot_manager.gait_acc_fig.fig,
                                             self.window.FindElement(self.KEYS.CANVAS_GAIT_ACC).TKCanvas,
                                             self.window.FindElement(self.KEYS.CANVAS_GEI_ACC).TKCanvas, self.plot_manager.gait_acc_fig.get_gei())
@@ -138,6 +138,8 @@ class GuiManager:
             ang = self._update_gait_and_gei(self.plot_manager.gait_ang_fig.fig,
                                              self.window.FindElement(self.KEYS.CANVAS_GAIT_ANG).TKCanvas,
                                              self.window.FindElement(self.KEYS.CANVAS_GEI_ANG).TKCanvas, self.plot_manager.gait_ang_fig.get_gei())
+            # 更新身份识别
+            self.window.FindElement(self.KEYS.TEXT_WHO_YOU_ARE).Update(value = self.algorithm_manager.get_who_you_are())
             # # 更新加速度步态图像
             # figure_photo_gait_acc = self._draw_figure(self.window.FindElement(self.KEYS.CANVAS_GAIT_ACC).TKCanvas,
             #                                           self.plot_manager.fig_acc_gait)

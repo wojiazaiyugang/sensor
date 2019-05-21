@@ -23,23 +23,31 @@ class AlgorithmManager:
         self.gyro_data_pre_process = GyroDataPreProcess()
 
         self.cnn = CnnNetwork()
-
-        self.count_threshold_clear = 400  # 阈值，超过这个阈值还没有生成步态就认为数据有问题，直接清除数据
         self.fig = plt.plot([], [])
+
+        self.acc_cycles = []
+        self.gyro_cycles = []
+        self.ang_cycles = []
 
     def get_acc_gait_cycle(self) -> Union[numpy.ndarray, None]:
         new_list, cycle = self.acc_data_pre_process.get_gait_cycle(self._sensor_manager.acc)
         self._sensor_manager.acc = new_list
+        if cycle is not None:
+            self.acc_cycles.append(cycle)
         return cycle
 
     def get_gyro_gait_cycle(self) -> Union[numpy.ndarray, None]:
         new_list, cycle = self.gyro_data_pre_process.get_gait_cycle(self._sensor_manager.gyro)
         self._sensor_manager.gyro = new_list
+        if cycle is not None:
+            self.gyro_cycles.append(cycle)
         return cycle
-    
+
     def get_ang_gait_cycle(self) -> Union[numpy.ndarray, None]:
         new_list, cycle = self.gyro_data_pre_process.get_gait_cycle(self._sensor_manager.ang)
         self._sensor_manager.ang = new_list
+        if cycle is not None:
+            self.ang_cycles.append(cycle)
         return cycle
 
     def get_current_activity(self) -> int:
@@ -58,6 +66,17 @@ class AlgorithmManager:
         # else:
         #     return -1
 
+    def get_who_you_are(self):
+        """
+        判断当前是谁， 使用acc和gyro扔进CNN
+        :return:
+        """
+        if self.acc_cycles and self.gyro_cycles:
+            data = numpy.concatenate((self.acc_cycles[-1], self.gyro_cycles[-1]), axis= 1).T
+        else:
+            return -1
+        return self.cnn.get_who_you_are(data)
+
     def is_walk_like_data0(self) -> bool:
         """
         判断当前是否像data0一样行走，利用one class svm
@@ -72,5 +91,3 @@ class AlgorithmManager:
         #     return self.one_class_svm_on_data0.predict_acc(numpy.array(self._sensor_manager.acc)[p:, 1:])
         # else:
         #     return False
-
-
