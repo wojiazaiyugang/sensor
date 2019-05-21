@@ -1,6 +1,7 @@
 import os
 import pickle
 from typing import Tuple, List
+import random
 
 import numpy
 from sklearn.model_selection._split import train_test_split
@@ -15,7 +16,7 @@ from keras.utils import to_categorical
 from sensor.algorithm.base_network import Network
 from sensor.algorithm import data_pre_process
 # from sensor.algorithm import AlgorithmManager
-from settings import CYCLE_FILE_DIR, logger, DATA0_DIR
+from settings import CYCLE_FILE_DIR, logger, DATA0_DIR, plt
 from util import get_data0_data
 
 
@@ -28,7 +29,7 @@ class CnnNetwork(Network):
         self.network_name = "CNN特征提取网络"
         super().__init__()
 
-    def _load_data(self) -> Tuple[List[numpy.ndarray],List[numpy.ndarray]]:
+    def _load_data(self) -> Tuple[numpy.ndarray, numpy.ndarray]:
         """
         将data0转换生成为CNN可以使用的数据类型
         :return:
@@ -74,16 +75,65 @@ class CnnNetwork(Network):
         train_label = to_categorical(train_label)
         test_data = numpy.reshape(test_data, test_data.shape + (1,))
         test_label = to_categorical(test_label)
-        network_input = Input(shape=(8, 200,1))
+        network_input = Input(shape=(8, 200, 1))
         network = Conv2D(filters=20, kernel_size=(1, 10))(network_input)
-        network = Conv2D(filters=40, kernel_size=(4, 10))(network)
-        network = MaxPool2D((2,2))(network)
+        network = Conv2D(filters=40, kernel_size=(4, 10), activation=tanh)(network)
+        network = MaxPool2D((2, 2))(network)
         network = Flatten()(network)
         network = Dense(units=40, activation=tanh)(network)
         network = Dense(units=10, activation=softmax)(network)
         network = Model(inputs=[network_input], outputs=[network])
         network.compile(optimizer=RMSprop(), loss=categorical_crossentropy, metrics=[categorical_accuracy])
         network.summary()
-        self.train_history = network.fit(train_data, train_label,batch_size=32,epochs=16)
-        self.evaluate_history = network.evaluate(test_data,test_label)
+        self.train_history = network.fit(train_data, train_label, batch_size=32, epochs=16)
+        self.evaluate_history = network.evaluate(test_data, test_label)
         return network
+
+    def test_model(self):
+        """
+        随机挑几个数来测试模型
+        :return:
+        """
+        data, label = self._load_data()
+        data = numpy.reshape(data, data.shape + (1,))
+        for i in range(10):
+            index = random.choice(range(len(data)))
+            predict_index = numpy.argmax(self.model.predict(numpy.array([data[index]])))
+            print("index:{0},预测值:{1},实际值:{2},预测成功:{3}".format(index, predict_index, label[index],
+                                                              bool(predict_index == label[index])))
+
+    def visualize(self):
+        """
+        网络可视化
+        :return:
+        """
+        """
+        _________________________________________________________________
+        Layer (type)                 Output Shape              Param #   
+        =================================================================
+        input_1 (InputLayer)         (None, 8, 200, 1)         0         
+        _________________________________________________________________
+        conv2d_1 (Conv2D)            (None, 8, 191, 20)        220       
+        _________________________________________________________________
+        conv2d_2 (Conv2D)            (None, 5, 182, 40)        32040     
+        _________________________________________________________________
+        max_pooling2d_1 (MaxPooling2 (None, 2, 91, 40)         0         
+        _________________________________________________________________
+        flatten_1 (Flatten)          (None, 7280)              0         
+        _________________________________________________________________
+        dense_1 (Dense)              (None, 40)                291240    
+        _________________________________________________________________
+        dense_2 (Dense)              (None, 10)                410       
+        =================================================================
+        """
+        data, label = self._load_data()
+        data = numpy.reshape(data, data.shape + (1,))
+        activation_model = Model(inputs=[self.model.input], outputs=[layer.output for layer in self.model.layers[1:3]])
+        activations = activation_model.predict(numpy.array([data[0]]))
+        plt.matshow(activations[1][0,:,:,18], cmap="viridis")
+        plt.show()
+
+
+if __name__ == "__main__":
+    cnn_network = CnnNetwork()
+    cnn_network.visualize()
