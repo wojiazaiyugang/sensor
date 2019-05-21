@@ -34,6 +34,7 @@ if not os.path.exists(MODEL_DIR):
     os.makedirs(MODEL_DIR)
 # 数据的存储位置
 DATA_DIR = os.path.join(ALGORITHM_DIR, "data")
+DATA0_DIR = os.path.join(DATA_DIR, "data0")
 CYCLE_FILE_DIR = os.path.join(DATA_DIR, "data0_cycle")
 
 

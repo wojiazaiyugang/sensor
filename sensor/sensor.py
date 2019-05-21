@@ -16,6 +16,7 @@ class SensorManager:
     """
     传感器管理
     """
+
     def __init__(self, sensor_data: Union[int, None] = None):
         """
         初始化
@@ -67,7 +68,8 @@ class SensorManager:
             if data[i] == 0x55 and data[i + 1] == 0x52:
                 wxl, wxh, wyl, wyh, wzl, wzh, *_ = data[i + 2:i + 11]
                 self.gyro.append([get_current_timestamp(), (short(wxh << 8) | wxl) / 32768 * 2000 * (math.pi / 180),
-                                  (short(wyh << 8) | wyl) / 32768 * 2000 * (math.pi / 180), (short(wzh << 8) | wzl) / 32768 * 2000* (math.pi / 180)])
+                                  (short(wyh << 8) | wyl) / 32768 * 2000 * (math.pi / 180),
+                                  (short(wzh << 8) | wzl) / 32768 * 2000 * (math.pi / 180)])
                 self._validate_raw_data(self.gyro, 10)
             if data[i] == 0x55 and data[i + 1] == 0x53:
                 rol, roh, pil, pih, yal, yah, *_ = data[i + 2:i + 11]
@@ -96,14 +98,13 @@ class SensorManager:
         注册回调函数，用于生成传感器数据，根据settings中的SENSOR_DATA来决定是使用实时数据还是使用data0数据
         :return:
         """
-
         self.sensor = self._get_sensor()
         # 打开设备
         self.sensor.open()
         # 注册回调函数
         self.sensor.set_raw_data_handler(self._on_get_data)
 
-    def mock_real_time_data_from_data0(self) -> bool:
+    def _mock_real_time_data_from_data0(self) -> bool:
         """
         使用data0中的数据模拟真实数据，做法是通过时间戳来决定读取数据的多少
         :return:
@@ -125,12 +126,13 @@ class SensorManager:
         if len(data) > 1 and abs(data[-1][3] - data[-2][3]) > threshold:
             del data[-1]
 
-    def get_data(self) -> Tuple[list,list,list]:
+    def get_data(self) -> Union[Tuple[list, list, list], None]:
         """
         返回传感器数据acc gyro ang
         :return:
         """
         if self.sensor_data is not None:
-            self.mock_real_time_data_from_data0()
+            mock_result = self._mock_real_time_data_from_data0()
+            if not mock_result:
+                return None
         return self.acc, self.gyro, self.ang
-

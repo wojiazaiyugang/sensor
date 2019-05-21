@@ -298,7 +298,7 @@ class AccDataPreProcess(DataPreProcess):
         super().__init__()
 
 
-class GyoDataPreProcess(DataPreProcess):
+class GyroDataPreProcess(DataPreProcess):
     def __init__(self):
         self.data_type = "陀螺仪"
         self.gait_cycle_threshold = 1

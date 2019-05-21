@@ -4,6 +4,7 @@
 import csv
 import os
 import pickle
+from typing import Tuple
 
 import numpy
 from keras import Input, callbacks
@@ -37,46 +38,46 @@ class ActivityRecognitionNetwork(Network):
         self.REVERSED_LABEL_MAP = {self.LABEL_MAP.get(i): i for i in self.LABEL_MAP}
         super().__init__()
 
-    def _train(self):
-        def load_data():
-            acc_data_full_path = os.path.join(self.HHAR_DATA_PATH, "Watch_accelerometer")
-            if os.path.isfile(acc_data_full_path):
-                logger.info("acc data已经存在")
-            else:
-                logger.info("acc data不存在")
-                data, label = [], []
-                with open(os.path.join(self.HHAR_DATA_PATH, "Watch_accelerometer.csv"), "r") as file:
-                    tmp_data = []
-                    reader = csv.DictReader(file)
-                    last_label = None
-                    last_time = None
-                    for line in reader:
-                        cur_label = self.LABEL_MAP.get(line.get("gt"))
-                        cur_time = int(line.get("Arrival_Time"))
-                        if not last_time:
-                            last_time = cur_time
-                        elif cur_time - last_time < 20:
+    def _load_data(self) -> Tuple[numpy.ndarray, numpy.ndarray]:
+        acc_data_full_path = os.path.join(self.HHAR_DATA_PATH, "Watch_accelerometer")
+        if os.path.isfile(acc_data_full_path):
+            logger.info("acc data已经存在")
+        else:
+            logger.info("acc data不存在")
+            data, label = [], []
+            with open(os.path.join(self.HHAR_DATA_PATH, "Watch_accelerometer.csv"), "r") as file:
+                tmp_data = []
+                reader = csv.DictReader(file)
+                last_label = None
+                last_time = None
+                for line in reader:
+                    cur_label = self.LABEL_MAP.get(line.get("gt"))
+                    cur_time = int(line.get("Arrival_Time"))
+                    if not last_time:
+                        last_time = cur_time
+                    elif cur_time - last_time < 20:
+                        continue
+                    else:
+                        last_time = cur_time
+                    if cur_label == last_label:
+                        tmp_data.append([float(line.get("x")), float(line.get("y")), float(line.get("z"))])
+                    else:
+                        if not cur_label:
                             continue
-                        else:
-                            last_time = cur_time
-                        if cur_label == last_label:
-                            tmp_data.append([float(line.get("x")), float(line.get("y")), float(line.get("z"))])
-                        else:
-                            if not cur_label:
-                                continue
-                            cycles = detect_cycle(tmp_data)
-                            cycles = chazhi(cycles)
-                            data.extend(cycles)
-                            label.extend([last_label for _ in range(len(cycles))])
-                            last_label = cur_label
-                            tmp_data.clear()
-                with open(acc_data_full_path, "wb") as file:
-                    file.write(pickle.dumps((data, label)))
-            with open(acc_data_full_path, "rb") as file:
-                data = pickle.loads(file.read())
-                return numpy.array(data[0]), numpy.array(data[1])
+                        cycles = detect_cycle(tmp_data)
+                        cycles = chazhi(cycles)
+                        data.extend(cycles)
+                        label.extend([last_label for _ in range(len(cycles))])
+                        last_label = cur_label
+                        tmp_data.clear()
+            with open(acc_data_full_path, "wb") as file:
+                file.write(pickle.dumps((data, label)))
+        with open(acc_data_full_path, "rb") as file:
+            data = pickle.loads(file.read())
+            return numpy.array(data[0]), numpy.array(data[1])
 
-        data, label = load_data()
+    def _train(self):
+        data, label = self._load_data()
         train_data, train_label, validate_data, validate_label, test_data, test_label = split_data(data, label,
                                                                                                    to_categorical=True)
         network_input = Input(shape=(100, 3))

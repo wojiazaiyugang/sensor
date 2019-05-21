@@ -10,6 +10,7 @@ from scipy import interpolate
 
 
 # from keras.utils import to_categorical
+from settings import CYCLE_FILE_DIR
 
 
 def get_static_file_full_path(file_name: str) -> str:
