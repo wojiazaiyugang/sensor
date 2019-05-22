@@ -23,7 +23,6 @@ class AlgorithmManager:
         self.gyro_data_pre_process = GyroDataPreProcess()
 
         self.cnn = CnnNetwork()
-        self.fig = plt.plot([], [])
 
         self.acc_cycles = []
         self.gyro_cycles = []

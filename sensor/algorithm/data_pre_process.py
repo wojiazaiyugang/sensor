@@ -28,7 +28,6 @@ class DataPreProcess:
         self.count_threshold_clear = 400
         self.point_count_per_cycle = 200  # 插值的时候一个周期里点的个数
         self.expect_gait_cycle_duration = self.expect_gait_cycle_duration  # 步态周期的阈值，如果检测出来的步态周期的时间不在这个范围内，就认为检测出来的是有问题的，不使用
-        self.time_duration_threshold_to_clear = 3000  # 超过多长时间没有识别到成功的步态，就认为已经找到了步态但是不合格，那么就清除所有数据
 
         self.DEBUG = None  # 用于显示debug信息
         self.cycle_count = 0

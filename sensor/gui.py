@@ -7,9 +7,7 @@ from enum import Enum, unique
 import numpy
 import PySimpleGUI as sg
 from PIL import Image, ImageTk
-
 import matplotlib.backends.tkagg as tkagg
-
 from matplotlib.backends.backend_tkagg import FigureCanvasAgg
 
 from sensor.algorithm import AlgorithmManager
@@ -98,7 +96,7 @@ class GuiManager:
         tkagg.blit(photo, figure_canvas_agg.get_renderer()._renderer, colormode=2)
         return photo
 
-    def _update_gei_pic(self, fig, gei_canvas, gei):
+    def _update_gei_pic(self, gei_canvas, gei):
         """
         更新gei图像
         :return:
@@ -117,7 +115,7 @@ class GuiManager:
         :return:
         """
         gait = self._plot_pic(fig, gait_canvas)
-        gei = self._update_gei_pic(fig, gei_canvas, gei)
+        gei = self._update_gei_pic(gei_canvas, gei)
         return gait, gei
 
     def run(self):
@@ -140,14 +138,6 @@ class GuiManager:
                                              self.window.FindElement(self.KEYS.CANVAS_GEI_ANG).TKCanvas, self.plot_manager.gait_ang_fig.get_gei())
             # 更新身份识别
             self.window.FindElement(self.KEYS.TEXT_WHO_YOU_ARE).Update(value = self.algorithm_manager.get_who_you_are())
-            # # 更新加速度步态图像
-            # figure_photo_gait_acc = self._draw_figure(self.window.FindElement(self.KEYS.CANVAS_GAIT_ACC).TKCanvas,
-            #                                           self.plot_manager.fig_acc_gait)
-            # # 更新gei图像
-            # gei_pic = self._update_gei_pic(self.plot_manager.fig_acc_gait)
-            # # 更新陀螺仪步态图像
-            # figure_photo_gait_gyro = self._draw_figure(self.window.FindElement(self.KEYS.CANVAS_GAIT_GYRO).TKCanvas,
-            #                                            self.plot_manager.fig_gyro_gait)
 
             # 更新当前运动状态图
             # predict_number = self.algorithm_manager.get_current_activity()

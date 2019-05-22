@@ -18,7 +18,6 @@ class PlotManager:
         self.sensor_manager = sensor_manager
         self.algorithm_manager = algorithm_manager
 
-        self.DEBUG = None
         self.raw_data_fig = RawDataFig(sensor_manager)
         self.raw_data_acc_axes = RawDataAccAxes(self.raw_data_fig.ax_acc, sensor_manager)
         self.raw_data_gyro_axes = RawDataGyroAxes(self.raw_data_fig.ax_gyro, sensor_manager)
