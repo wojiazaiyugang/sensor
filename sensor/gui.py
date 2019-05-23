@@ -136,13 +136,14 @@ class GuiManager:
             event, values = self.window.Read(timeout=5)
             if not event:
                 break
-            self.plot_manager.update_figures()  # 基础更新
+            self.plot_manager.update_raw_data_figure()  # 基础更新
             raw_data_pic = self._plot_pic(self.plot_manager.raw_data_fig.fig,
                                           self.window.FindElement(self.KEYS.CANVAS_RAW_DATA).TKCanvas)
             # 更新步行检测
             is_walking = self.algorithm_manager.is_walk_like_data0()
             self.window.FindElement(self.KEYS.TEXT_IS_WALK_LIKE_DATA0).Update(value=is_walking)
             if is_walking:
+                self.plot_manager.update_gait_figure() # 更新步态
                 acc = self._update_gait_and_gei(self.plot_manager.gait_acc_fig.fig,
                                                 self.window.FindElement(self.KEYS.CANVAS_GAIT_ACC).TKCanvas,
                                                 self.window.FindElement(self.KEYS.CANVAS_GEI_ACC).TKCanvas,

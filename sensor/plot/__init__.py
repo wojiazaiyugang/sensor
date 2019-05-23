@@ -27,19 +27,23 @@ class PlotManager:
         self.gait_gyro_fig = GaitGyroFig(algorithm_manager)
         self.gait_ang_fig = GaitAngFig(algorithm_manager)
 
-    def update_figures(self):
+    def update_raw_data_figure(self):
         """
-        更新所有绘图区域
+        更新原始数据的图像
         :return:
         """
         # 原始数据
         if self.sensor_manager.sensor_data is not None:  # 不是实时数据的话，需要先去模拟一波数据
             self.sensor_manager.get_data()
-
         self.raw_data_acc_axes.update_raw_data()
         self.raw_data_gyro_axes.update_raw_data()
         self.raw_data_ang_axes.update_raw_data()
 
+    def update_gait_figure(self):
+        """
+        更新所有绘图区域
+        :return:
+        """
         self.gait_acc_fig.update_cycle_fig()
         self.gait_gyro_fig.update_cycle_fig()
         self.gait_ang_fig.update_cycle_fig()
