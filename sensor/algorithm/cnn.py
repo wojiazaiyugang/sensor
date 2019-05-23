@@ -27,6 +27,7 @@ class CnnNetwork(Network):
 
     def _train(self) -> Model:
         data, label = load_data0_cycle()
+        data = data.transpose((0, 2, 1))  # 数据是200 * 8的，训练需要8 * 200
         train_data, test_data, train_label, test_label = train_test_split(data, label, test_size=0.2)
         train_data = numpy.reshape(train_data, train_data.shape + (1,))
         train_label = to_categorical(train_label)

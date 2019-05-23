@@ -35,7 +35,7 @@ class GuiManager:
         # gui通用设置
         sg.SetOptions(background_color="#FFFFFF", element_background_color="#FFFFFF", text_color="#000000")
         # plot manager，用于获取绘图信息
-        self.sensor_manager = SensorManager(0)
+        self.sensor_manager = SensorManager()
         self.algorithm_manager = AlgorithmManager(self.sensor_manager)
         self.plot_manager = PlotManager(self.sensor_manager, self.algorithm_manager)
 
@@ -69,13 +69,16 @@ class GuiManager:
                      ],
                 ]),
                 sg.Column([
+                    [sg.Frame("步行检测", [
+                        [sg.Text(text="", key=self.KEYS.TEXT_IS_WALK_LIKE_DATA0)],
+                    ])],
                     [sg.Frame("身份识别结果", [
                         [sg.Text(text="", key=self.KEYS.TEXT_WHO_YOU_ARE)],
                     ])],
                     [sg.Frame("动作识别结果", [
                         [sg.Text(text="", key=self.KEYS.TEXT_ACTIVITY)],
                     ])],
-                    [sg.Text(text="data0", key=self.KEYS.TEXT_IS_WALK_LIKE_DATA0)]
+
                 ])
             ],
             # [
@@ -140,6 +143,8 @@ class GuiManager:
             ang = self._update_gait_and_gei(self.plot_manager.gait_ang_fig.fig,
                                              self.window.FindElement(self.KEYS.CANVAS_GAIT_ANG).TKCanvas,
                                              self.window.FindElement(self.KEYS.CANVAS_GEI_ANG).TKCanvas, self.plot_manager.gait_ang_fig.get_gei())
+            # 更新步行检测
+            self.window.FindElement(self.KEYS.TEXT_IS_WALK_LIKE_DATA0).Update(value = self.algorithm_manager.is_walk_like_data0())
             # 更新身份识别
             self.window.FindElement(self.KEYS.TEXT_WHO_YOU_ARE).Update(value = self.algorithm_manager.get_who_you_are())
 

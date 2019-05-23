@@ -8,7 +8,6 @@ import numpy
 from typing import List
 from scipy import interpolate
 
-
 # from keras.utils import to_categorical
 from settings import CYCLE_FILE_DIR
 
@@ -131,18 +130,6 @@ def get_current_timestamp() -> int:
     return round(time.time() * 1000)
 
 
-def get_data0_data(file_name: str) -> numpy.ndarray:
-    """
-    读data0的数据
-    :param file_name:
-    :return:
-    """
-    with open(file_name, "r", encoding="utf-8") as file:
-        lines = file.readlines()
-        lines = [[float(v) for v in line.split(" ")] for line in lines]
-        return numpy.array(lines)
-
-
 def validate_raw_data_without_timestamp(data: numpy.ndarray) -> None:
     """
     校验原始数据的格式，要求不包含timestamp列
@@ -159,4 +146,3 @@ def validate_raw_data_with_timestamp(data: numpy.ndarray) -> None:
     :return:
     """
     assert isinstance(data, numpy.ndarray) and len(data.shape) == 2 and data.shape[1] == 4, "原始数据格式错误"
-

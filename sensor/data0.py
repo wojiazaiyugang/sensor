@@ -8,7 +8,7 @@ from typing import Tuple
 from settings import CYCLE_FILE_DIR, logger
 
 
-def load_data0_cycle() -> Tuple[numpy.ndarray,numpy.ndarray]:
+def load_data0_cycle() -> Tuple[numpy.ndarray, numpy.ndarray]:
     """
     载入用data0生成的步态周期数据
     :return:
@@ -38,11 +38,24 @@ def load_data0_cycle() -> Tuple[numpy.ndarray,numpy.ndarray]:
                 if gyro_cycle is not None:
                     gyro_cycles.append(gyro_cycle)
             for acc_cycle, gyro_cycle in zip(acc_cycles, gyro_cycles):
-                data.append(numpy.concatenate((acc_cycle, gyro_cycle), axis=1).T)
+                data.append(numpy.concatenate((acc_cycle, gyro_cycle), axis=1))
                 label.append(i)
             logger.debug("生成CNN数据：{0}".format(i))
         with open(data_file_full_name, "wb") as file:
             file.write(pickle.dumps((numpy.array(data), numpy.array(label))))
     with open(data_file_full_name, "rb") as file:
         data, label = pickle.loads(file.read())
+    assert isinstance(data, numpy.ndarray) and len(data.shape) == 3 and data.shape[1] == 200 and data.shape[2] == 8
     return data, label
+
+
+def load_data0_data(file_name: str) -> numpy.ndarray:
+    """
+    读data0的数据
+    :param file_name:
+    :return:
+    """
+    with open(file_name, "r", encoding="utf-8") as file:
+        lines = file.readlines()
+        lines = [[float(v) for v in line.split(" ")] for line in lines]
+        return numpy.array(lines)

@@ -5,7 +5,6 @@ from sensor.algorithm import AlgorithmManager
 from sensor.gui import GuiManager
 from sensor.sensor import SensorManager
 from settings import DATA_DIR, logger, CYCLE_FILE_DIR
-from util import get_data0_data
 
 DEBUG = False
 

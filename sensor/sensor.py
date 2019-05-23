@@ -6,10 +6,11 @@ import math
 from typing import Union, Tuple
 
 from numpy import short
-# import pywinusb.hid as hid
+import pywinusb.hid as hid
 
-from util import get_current_timestamp, get_data0_data
+from util import get_current_timestamp
 from settings import DATA_DIR, logger
+from sensor.data0 import load_data0_data
 
 
 class SensorManager:
@@ -45,9 +46,9 @@ class SensorManager:
             self.acc_data_lines = None  # 模拟数据
             self.gyro_data_lines = None  # 模拟数据
             logger.info("载入data0加速度数据")
-            self.acc_data_lines = get_data0_data(os.path.join(DATA_DIR, "data0", "accData{0}.txt".format(sensor_data)))
+            self.acc_data_lines = load_data0_data(os.path.join(DATA_DIR, "data0", "accData{0}.txt".format(sensor_data)))
             logger.info("载入data0陀螺仪数据")
-            self.gyro_data_lines = get_data0_data(os.path.join(DATA_DIR, "data0", "gyrData{0}.txt".format(sensor_data)))
+            self.gyro_data_lines = load_data0_data(os.path.join(DATA_DIR, "data0", "gyrData{0}.txt".format(sensor_data)))
             self.last_data_timestamp = get_current_timestamp()
         else:
             self.set_handler()
