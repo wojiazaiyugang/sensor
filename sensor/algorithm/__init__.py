@@ -30,6 +30,10 @@ class AlgorithmManager:
         self.last_gyro_cycle = None
         self.last_ang_cycle = None
 
+        self.is_walking = False  # 当前是否正在步行
+        self.last_walk_detected_time = None # 上一次检测到步行的时间，用来维持一段时间内的步行状态
+        self.walk_duration = 5000 # 如果检测到了步行，那么接下来的duration时间内都认为是在步行
+
     def get_acc_gait_cycle(self) -> Union[numpy.ndarray, None]:
         self._sensor_manager.acc, self.last_acc_cycle = self.acc_data_pre_process.get_gait_cycle(self._sensor_manager.acc)
         return self.last_acc_cycle
@@ -86,4 +90,10 @@ class AlgorithmManager:
         """
         acc_predict_result = bool(self.last_acc_cycle is not None and self.acc_one_class_svm.predict(numpy.array([self.last_acc_cycle]))[0] == 1)
         gyro_predict_result = bool(self.last_gyro_cycle is not None and self.gyro_one_class_svm.predict(numpy.array([self.last_gyro_cycle]))[0] == 1)
-        return acc_predict_result or gyro_predict_result
+        is_walking = acc_predict_result or gyro_predict_result
+        if is_walking:
+            self.last_walk_detected_time = get_current_timestamp()
+        else:
+            if self.last_walk_detected_time and get_current_timestamp() - self.last_walk_detected_time < self.walk_duration:
+                is_walking = True
+        return is_walking

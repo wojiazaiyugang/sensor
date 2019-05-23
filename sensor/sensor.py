@@ -38,6 +38,8 @@ class SensorManager:
         # 角度
         self.ang = []
 
+        self.update_time = None
+
         logger.info("是否使用实时数据：{0}".format(bool(sensor_data is None)))
         if sensor_data is not None:
             assert sensor_data is None or 0 <= int(sensor_data) <= 9, "数据错误"
@@ -59,20 +61,30 @@ class SensorManager:
         :param data: 数据
         :return:
         """
-        for i in range(len(data) - 10):
-            if data[i] == 0x55 and data[i + 1] == 0x51:
+        current_time = get_current_timestamp()
+        if not self.update_time:
+            self.update_time = current_time
+        # if not self.update_time:
+        #     self.update_time = current_time
+        if (current_time - self.update_time) < 50:
+            return
+        # self.update_time = current_time
+        for i in range(len(data) - 11):
+            if not (data[i] == 0x55 and data[i + 1] & 0x50 == 0x50):
+                continue
+            if data[i] == 0x55 and data[i + 1] == 0x51 and sum(data[i:i+10]) & 255 == data[i+10]:
                 axl, axh, ayl, ayh, azl, azh, *_ = data[i + 2:i + 11]
                 self.acc.append([get_current_timestamp(), (short((axh << 8) | axl)) / 32768 * 16 * 9.8,
                                  (short((ayh << 8) | ayl)) / 32768 * 16 * 9.8,
                                  (short((azh << 8) | azl)) / 32768 * 16 * 9.8])
-                self._validate_raw_data(self.acc, 10)
-            if data[i] == 0x55 and data[i + 1] == 0x52:
+                # self._validate_raw_data(self.acc, 10)
+            if data[i] == 0x55 and data[i + 1] == 0x52 and sum(data[i:i+10]) & 255 == data[i+10]:
                 wxl, wxh, wyl, wyh, wzl, wzh, *_ = data[i + 2:i + 11]
                 self.gyro.append([get_current_timestamp(), (short(wxh << 8) | wxl) / 32768 * 2000 * (math.pi / 180),
                                   (short(wyh << 8) | wyl) / 32768 * 2000 * (math.pi / 180),
                                   (short(wzh << 8) | wzl) / 32768 * 2000 * (math.pi / 180)])
-                self._validate_raw_data(self.gyro, 10)
-            if data[i] == 0x55 and data[i + 1] == 0x53:
+                # self._validate_raw_data(self.gyro, 10)
+            if data[i] == 0x55 and data[i + 1] == 0x53 and sum(data[i:i+10]) & 255 == data[i+10]:
                 rol, roh, pil, pih, yal, yah, *_ = data[i + 2:i + 11]
                 self.ang.append([get_current_timestamp(), (short(roh << 8 | rol) / 32768 * 180),
                                  (short(pih << 8 | pil) / 32768 * 180), (short(yah << 8 | yal) / 32768 * 180)])

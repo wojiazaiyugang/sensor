@@ -50,21 +50,27 @@ class GuiManager:
                 ]),
                 sg.Column([
                     [sg.Frame("加速度步态", [
-                        [sg.Canvas(size=(self.plot_manager.gait_acc_fig.fig_gait_acc_w, self.plot_manager.gait_acc_fig.fig_gait_acc_h),
+                        [sg.Canvas(size=(
+                        self.plot_manager.gait_acc_fig.fig_gait_acc_w, self.plot_manager.gait_acc_fig.fig_gait_acc_h),
                                    key=self.KEYS.CANVAS_GAIT_ACC)],
-                        [sg.Canvas(size=(self.plot_manager.gait_acc_fig.fig_gait_acc_w, self.plot_manager.gait_acc_fig.fig_gait_acc_h),
+                        [sg.Canvas(size=(
+                        self.plot_manager.gait_acc_fig.fig_gait_acc_w, self.plot_manager.gait_acc_fig.fig_gait_acc_h),
                                    key=self.KEYS.CANVAS_GEI_ACC)]])
                      ],
                     [sg.Frame("陀螺仪步态", [
-                        [sg.Canvas(size=(self.plot_manager.gait_gyro_fig.fig_gait_acc_w,self.plot_manager.gait_gyro_fig.fig_gait_acc_h),
+                        [sg.Canvas(size=(
+                        self.plot_manager.gait_gyro_fig.fig_gait_acc_w, self.plot_manager.gait_gyro_fig.fig_gait_acc_h),
                                    key=self.KEYS.CANVAS_GAIT_GYRO)],
-                        [sg.Canvas(size=(self.plot_manager.gait_gyro_fig.fig_gait_acc_w,self.plot_manager.gait_gyro_fig.fig_gait_acc_h),
+                        [sg.Canvas(size=(
+                        self.plot_manager.gait_gyro_fig.fig_gait_acc_w, self.plot_manager.gait_gyro_fig.fig_gait_acc_h),
                                    key=self.KEYS.CANVAS_GEI_GYRO)]])
                      ],
                     [sg.Frame("欧拉角步态", [
-                        [sg.Canvas(size=(self.plot_manager.gait_ang_fig.fig_gait_acc_w, self.plot_manager.gait_ang_fig.fig_gait_acc_h),
+                        [sg.Canvas(size=(
+                        self.plot_manager.gait_ang_fig.fig_gait_acc_w, self.plot_manager.gait_ang_fig.fig_gait_acc_h),
                                    key=self.KEYS.CANVAS_GAIT_ANG)],
-                        [sg.Canvas(size=(self.plot_manager.gait_ang_fig.fig_gait_acc_w, self.plot_manager.gait_ang_fig.fig_gait_acc_h),
+                        [sg.Canvas(size=(
+                        self.plot_manager.gait_ang_fig.fig_gait_acc_w, self.plot_manager.gait_ang_fig.fig_gait_acc_h),
                                    key=self.KEYS.CANVAS_GEI_ANG)]])
                      ],
                 ]),
@@ -111,7 +117,7 @@ class GuiManager:
         if gei is None:
             return None
         figure_photo_gei = ImageTk.PhotoImage(image=Image.fromarray(gei))
-        gei_canvas.create_image(0, 0, image=figure_photo_gei,anchor=tk.NW)
+        gei_canvas.create_image(0, 0, image=figure_photo_gei, anchor=tk.NW)
         return figure_photo_gei
 
     def _update_gait_and_gei(self, fig, gait_canvas, gei_canvas, gei):
@@ -130,23 +136,30 @@ class GuiManager:
             event, values = self.window.Read(timeout=5)
             if not event:
                 break
-            self.plot_manager.update_figures()
-            raw_data_pic = self._plot_pic(self.plot_manager.raw_data_fig.fig, self.window.FindElement(self.KEYS.CANVAS_RAW_DATA).TKCanvas)
-            acc = self._update_gait_and_gei(self.plot_manager.gait_acc_fig.fig,
-                                            self.window.FindElement(self.KEYS.CANVAS_GAIT_ACC).TKCanvas,
-                                            self.window.FindElement(self.KEYS.CANVAS_GEI_ACC).TKCanvas, self.plot_manager.gait_acc_fig.get_gei())
-
-            gyro = self._update_gait_and_gei(self.plot_manager.gait_gyro_fig.fig,
-                                             self.window.FindElement(self.KEYS.CANVAS_GAIT_GYRO).TKCanvas,
-                                             self.window.FindElement(self.KEYS.CANVAS_GEI_GYRO).TKCanvas, self.plot_manager.gait_gyro_fig.get_gei())
-
-            ang = self._update_gait_and_gei(self.plot_manager.gait_ang_fig.fig,
-                                             self.window.FindElement(self.KEYS.CANVAS_GAIT_ANG).TKCanvas,
-                                             self.window.FindElement(self.KEYS.CANVAS_GEI_ANG).TKCanvas, self.plot_manager.gait_ang_fig.get_gei())
+            self.plot_manager.update_figures()  # 基础更新
+            raw_data_pic = self._plot_pic(self.plot_manager.raw_data_fig.fig,
+                                          self.window.FindElement(self.KEYS.CANVAS_RAW_DATA).TKCanvas)
             # 更新步行检测
-            self.window.FindElement(self.KEYS.TEXT_IS_WALK_LIKE_DATA0).Update(value = self.algorithm_manager.is_walk_like_data0())
-            # 更新身份识别
-            self.window.FindElement(self.KEYS.TEXT_WHO_YOU_ARE).Update(value = self.algorithm_manager.get_who_you_are())
+            is_walking = self.algorithm_manager.is_walk_like_data0()
+            self.window.FindElement(self.KEYS.TEXT_IS_WALK_LIKE_DATA0).Update(value=is_walking)
+            if is_walking:
+                acc = self._update_gait_and_gei(self.plot_manager.gait_acc_fig.fig,
+                                                self.window.FindElement(self.KEYS.CANVAS_GAIT_ACC).TKCanvas,
+                                                self.window.FindElement(self.KEYS.CANVAS_GEI_ACC).TKCanvas,
+                                                self.plot_manager.gait_acc_fig.get_gei())
+
+                gyro = self._update_gait_and_gei(self.plot_manager.gait_gyro_fig.fig,
+                                                 self.window.FindElement(self.KEYS.CANVAS_GAIT_GYRO).TKCanvas,
+                                                 self.window.FindElement(self.KEYS.CANVAS_GEI_GYRO).TKCanvas,
+                                                 self.plot_manager.gait_gyro_fig.get_gei())
+
+                ang = self._update_gait_and_gei(self.plot_manager.gait_ang_fig.fig,
+                                                self.window.FindElement(self.KEYS.CANVAS_GAIT_ANG).TKCanvas,
+                                                self.window.FindElement(self.KEYS.CANVAS_GEI_ANG).TKCanvas,
+                                                self.plot_manager.gait_ang_fig.get_gei())
+
+                # 更新身份识别
+                self.window.FindElement(self.KEYS.TEXT_WHO_YOU_ARE).Update(value=self.algorithm_manager.get_who_you_are())
 
             # 更新当前运动状态图
             # predict_number = self.algorithm_manager.get_current_activity()
