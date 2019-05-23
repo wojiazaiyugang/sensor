@@ -24,7 +24,7 @@ class ActivityRecognitionNetwork(Network):
     def __init__(self):
         self.network_name = "动作识别网络"
         self.BATCH_SIZE = 128
-        self.DATA_RATIO = [0.6, 0.2, 0.2]  # 训练、验证、测试集合的比例
+        self.DATA_RATIO = [0.8, 0, 0.2]  # 训练、验证、测试集合的比例
         self.EPOCHS = 30
         self.HHAR_DATA_PATH = os.path.join(os.path.dirname(__file__), "data", "HHAR", "Activity recognition exp")
         self.LABEL_MAP = {
@@ -41,9 +41,9 @@ class ActivityRecognitionNetwork(Network):
     def _load_data(self) -> Tuple[numpy.ndarray, numpy.ndarray]:
         acc_data_full_path = os.path.join(self.HHAR_DATA_PATH, "Watch_accelerometer")
         if os.path.isfile(acc_data_full_path):
-            logger.info("acc data已经存在")
+            logger.info("{0}训练数据已经存在".format(self.network_name))
         else:
-            logger.info("acc data不存在")
+            logger.info("{0}训练数据不存在".format(self.network_name))
             data, label = [], []
             with open(os.path.join(self.HHAR_DATA_PATH, "Watch_accelerometer.csv"), "r") as file:
                 tmp_data = []

@@ -27,6 +27,7 @@ class GuiManager:
         CANVAS_GAIT_ANG = "显示欧拉角步态数据的区域"
         CANVAS_GEI_ANG = "显示欧拉角GEI的区域"
         IMAGE_STATUS = "当前运动状态的图片"
+        TEXT_ACTIVITY = "动作识别结果"
         TEXT_WHO_YOU_ARE = "身份识别结果"
         TEXT_IS_WALK_LIKE_DATA0 = "当前是否像data0一样"
 
@@ -34,7 +35,7 @@ class GuiManager:
         # gui通用设置
         sg.SetOptions(background_color="#FFFFFF", element_background_color="#FFFFFF", text_color="#000000")
         # plot manager，用于获取绘图信息
-        self.sensor_manager = SensorManager(7)
+        self.sensor_manager = SensorManager(0)
         self.algorithm_manager = AlgorithmManager(self.sensor_manager)
         self.plot_manager = PlotManager(self.sensor_manager, self.algorithm_manager)
 
@@ -70,6 +71,9 @@ class GuiManager:
                 sg.Column([
                     [sg.Frame("身份识别结果", [
                         [sg.Text(text="", key=self.KEYS.TEXT_WHO_YOU_ARE)],
+                    ])],
+                    [sg.Frame("动作识别结果", [
+                        [sg.Text(text="", key=self.KEYS.TEXT_ACTIVITY)],
                     ])],
                     [sg.Text(text="data0", key=self.KEYS.TEXT_IS_WALK_LIKE_DATA0)]
                 ])

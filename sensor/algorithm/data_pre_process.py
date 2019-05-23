@@ -305,9 +305,9 @@ class GyroDataPreProcess(DataPreProcess):
         super().__init__()
 
 
-class AngDataPreProcess(DataPreProcess):
-    def __init__(self):
-        super().__init__()
-        self.gait_cycle_threshold = 0.4
-        self.expect_gait_cycle_duration = (800, 1400)
-        self.template = None
+# class AngDataPreProcess(DataPreProcess):
+#     def __init__(self):
+#         super().__init__()
+#         self.gait_cycle_threshold = 0.4
+#         self.expect_gait_cycle_duration = (800, 1400)
+#         self.template = None

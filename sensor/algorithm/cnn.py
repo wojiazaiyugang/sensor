@@ -1,6 +1,3 @@
-import os
-import pickle
-from typing import Tuple, List
 import random
 
 import numpy
@@ -14,10 +11,9 @@ from keras.metrics import categorical_accuracy
 from keras.utils import to_categorical
 
 from sensor.algorithm.base_network import Network
-from sensor.algorithm import data_pre_process
+from sensor.data0 import load_data0_cycle
 # from sensor.algorithm import AlgorithmManager
-from settings import CYCLE_FILE_DIR, logger, DATA0_DIR, plt
-from util import get_data0_data
+from settings import plt
 
 
 class CnnNetwork(Network):
@@ -29,47 +25,8 @@ class CnnNetwork(Network):
         self.network_name = "CNN特征提取网络"
         super().__init__()
 
-    def _load_data(self) -> Tuple[numpy.ndarray, numpy.ndarray]:
-        """
-        将data0转换生成为CNN可以使用的数据类型
-        :return:
-        """
-        data_file_full_name = os.path.join(CYCLE_FILE_DIR, "data")
-        if not os.path.exists(data_file_full_name):
-            logger.debug("{0}数组不存在，开始生成".format(self.network_name))
-            data, label = [], []
-            from sensor.sensor import SensorManager
-            from sensor.algorithm.data_pre_process import AccDataPreProcess, GyroDataPreProcess
-            acc_data_pre_process = AccDataPreProcess()
-            gyro_data_pre_process = GyroDataPreProcess()
-            for i in range(10):
-                sensor_manager = SensorManager(i)
-                acc_cycles = []
-                gyro_cycles = []
-                while True:
-                    get_data_result = sensor_manager.get_data()
-                    if not get_data_result:
-                        break
-                    sensor_manager.acc, acc_cycle = acc_data_pre_process.get_gait_cycle(
-                        sensor_manager.acc)
-                    sensor_manager.gyro, gyro_cycle = gyro_data_pre_process.get_gait_cycle(
-                        sensor_manager.gyro)
-                    if acc_cycle is not None:
-                        acc_cycles.append(acc_cycle)
-                    if gyro_cycle is not None:
-                        gyro_cycles.append(gyro_cycle)
-                for acc_cycle, gyro_cycle in zip(acc_cycles, gyro_cycles):
-                    data.append(numpy.concatenate((acc_cycle, gyro_cycle), axis=1).T)
-                    label.append(i)
-                logger.debug("生成CNN数据：{0}".format(i))
-            with open(data_file_full_name, "wb") as file:
-                file.write(pickle.dumps((numpy.array(data), numpy.array(label))))
-        with open(data_file_full_name, "rb") as file:
-            data, label = pickle.loads(file.read())
-        return data, label
-
     def _train(self) -> Model:
-        data, label = self._load_data()
+        data, label = load_data0_cycle()
         train_data, test_data, train_label, test_label = train_test_split(data, label, test_size=0.2)
         train_data = numpy.reshape(train_data, train_data.shape + (1,))
         train_label = to_categorical(train_label)
@@ -94,7 +51,7 @@ class CnnNetwork(Network):
         随机挑几个数来测试模型
         :return:
         """
-        data, label = self._load_data()
+        data, label = load_data0_cycle()
         data = numpy.reshape(data, data.shape + (1,))
         for i in range(10):
             index = random.choice(range(len(data)))
@@ -102,7 +59,7 @@ class CnnNetwork(Network):
             print("index:{0},预测值:{1},实际值:{2},预测成功:{3}".format(index, predict_index, label[index],
                                                               bool(predict_index == label[index])))
 
-    def  get_who_you_are(self, data: numpy.ndarray) -> int:
+    def get_who_you_are(self, data: numpy.ndarray) -> int:
         """
         识别你是谁
         :param data:
@@ -113,6 +70,22 @@ class CnnNetwork(Network):
         if len(data.shape) == 3:
             data = numpy.reshape(data, (1,) + data.shape)
         return int(numpy.argmax(self.model.predict(data)))
+
+    @staticmethod
+    def convert_to__image(x: numpy.ndarray):
+        """
+        把张量转换为可以显示的图片
+        :param x:
+        :return:
+        """
+        x -= x.mean()
+        x /= (x.std() + 1e-5)
+        x *= 0.1
+        x += 0.5
+        x = numpy.clip(x, 0, 1)
+        x *= 255
+        x = numpy.clip(x, 0, 255).astype('uint8')
+        return x
 
     def visualize(self):
         """
@@ -141,8 +114,9 @@ class CnnNetwork(Network):
         data, label = self._load_data()
         data = numpy.reshape(data, data.shape + (1,))
         activation_model = Model(inputs=[self.model.input], outputs=[layer.output for layer in self.model.layers[1:3]])
-        activations = activation_model.predict(numpy.array([data[0]]))
-        plt.matshow(activations[1][0, :, :, 18], cmap="viridis")
+        activations = activation_model.predict(numpy.array([data[111]]))
+        for i in range(20):
+            plt.matshow(activations[1][0, :, :, i])
         plt.show()
 
 

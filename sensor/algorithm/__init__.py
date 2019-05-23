@@ -5,8 +5,8 @@ from typing import Union, Tuple
 
 import numpy
 import matplotlib.pyplot as plt
-# from sensor.algorithm.activity_recognition import ActivityRecognitionNetwork
-# from sensor.algorithm.svm.one_class_svm import OneClassSvm
+from sensor.algorithm.activity_recognition import ActivityRecognitionNetwork
+# from sensor.algorithm.one_class_svm import OneClassSvm
 from sensor.algorithm.data_pre_process import AccDataPreProcess, GyroDataPreProcess
 from sensor.algorithm.cnn import CnnNetwork
 from sensor.sensor import SensorManager
@@ -18,11 +18,12 @@ class AlgorithmManager:
     def __init__(self, sensor_manager: SensorManager):
         self._sensor_manager = sensor_manager
         # self.activity_recognition_network = ActivityRecognitionNetwork()
-        # self.one_class_svm_on_data0 = OneClassSvm()
         self.acc_data_pre_process = AccDataPreProcess()
         self.gyro_data_pre_process = GyroDataPreProcess()
 
         self.cnn = CnnNetwork()
+        # 保证one class svm在cnn下面，因为svm会使用cnn生成的数据
+        # self.one_class_svm_on_data0 = OneClassSvm()
 
         self.acc_cycles = []
         self.gyro_cycles = []
@@ -54,16 +55,15 @@ class AlgorithmManager:
         获取当前的运动状态
         :return:
         """
-        return -1
         # 预测动作
         # TODO 预测一个数据至少需要100个点，100现在是写死的
-        # if len(self._sensor_manager.acc) >= 100:
-        #     predict_result = self.activity_recognition_network.predict(
-        #         [numpy.array(self._sensor_manager.acc)[-100:, 1:]])
-        #     predict_number = int(numpy.argmax(predict_result[0]))
-        #     return predict_number
-        # else:
-        #     return -1
+        if len(self._sensor_manager.acc) >= 100:
+            predict_result = self.activity_recognition_network.predict(
+                [numpy.array(self._sensor_manager.acc)[-100:, 1:]])
+            predict_number = int(numpy.argmax(predict_result[0]))
+            return predict_number
+        else:
+            return -1
 
     def get_who_you_are(self):
         """
