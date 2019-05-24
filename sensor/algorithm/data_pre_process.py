@@ -8,6 +8,7 @@ import math
 import matplotlib
 import numpy
 import fastdtw
+
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from scipy import signal
@@ -24,7 +25,7 @@ class DataPreProcess:
         self.template = None  # 模板
         self.last_cycle = None  # 上一个周期 用于防止周期偏移
         self.data_type = self.data_type
-        self.count_threshold_to_clear_template = 400 # 用了这么多的点的数据都没有找到步态周期，估计是模板有问题，清除
+        self.count_threshold_to_clear_template = 400  # 用了这么多的点的数据都没有找到步态周期，估计是模板有问题，清除
         self.point_count_per_cycle = 200  # 插值的时候一个周期里点的个数
         self.expect_gait_cycle_duration = self.expect_gait_cycle_duration  # 步态周期的阈值，如果检测出来的步态周期的时间不在这个范围内，就认为检测出来的是有问题的，不使用
 
@@ -83,13 +84,13 @@ class DataPreProcess:
         if self.template is None:
             return None
         cycle_index_points = []
-        template_mag = self._mag(self.template[:, 1:])
         corr_distance = []
         for i in range(len(mags) - len(self.template) + 1):
-            corr_distance.append(self._corr_distance(template_mag, mags[i:i + len(self.template)]))
+            corr_distance.append(self._corr_distance(self.template, mags[i:i + len(self.template)]))
         corr_distance = self._lowpass(numpy.array(corr_distance))
         for i in range(len(corr_distance)):
-            if i >= 2 and corr_distance[i - 1] < min(corr_distance[i - 2], corr_distance[i]) and corr_distance[i - 1] < self.gait_cycle_threshold:
+            if i >= 2 and corr_distance[i - 1] < min(corr_distance[i - 2], corr_distance[i]) and corr_distance[
+                i - 1] < self.gait_cycle_threshold:
                 cycle_index_points.append(i - 1)
                 if len(cycle_index_points) == 2:
                     # 如果找到的周期时间不够的话，就凑上下一个周期
@@ -136,7 +137,9 @@ class DataPreProcess:
                     else:
                         cycle1 = data[cycle_index_points[0]:cycle_index_points[2] + 1]
                         cycle2 = data[cycle_index_points[1]:cycle_index_points[3] + 1]
-                        if self.fast_dtw(self.last_cycle[:,3], cycle1[:, 3]) < self.fast_dtw(self.last_cycle[:,3], cycle2[:, 3]): # 使用4格 + z轴fastdtw来寻找周期
+                        if self.fast_dtw(self.last_cycle[:, 3], cycle1[:, 3]) < self.fast_dtw(self.last_cycle[:, 3],
+                                                                                              cycle2[:,
+                                                                                              3]):  # 使用4格 + z轴fastdtw来寻找周期
                             cycle = cycle1
                             if self.DEBUG:
                                 use_first_cycle = True
@@ -194,7 +197,7 @@ class DataPreProcess:
                     end += 1
                 if start < 0 or end >= len(data):
                     continue
-                return data[start:end]
+                return self._mag(data[start:end][:, 1:])
         return None
 
     def interpolate(self, data: numpy.ndarray) -> numpy.ndarray:
@@ -243,7 +246,7 @@ class DataPreProcess:
         """
         if len(cycle) < len(self.template):
             return self.template
-        return 0.8 * self.template + 0.2 * cycle[:len(self.template)]
+        return 0.8 * self.template + 0.2 * self._mag(cycle[:len(self.template)][:, 1:])
 
     def _update_last_cycle(self, cycle: numpy.ndarray) -> numpy.ndarray:
         """
@@ -285,7 +288,7 @@ class DataPreProcess:
         if self.DEBUG:
             logger.debug("{0}:CYCYLE INDEX:{1}".format(self.data_type, self.cycle_count))
         return numpy.concatenate((numpy.array([self._mag(interpolated_cycle_without_transform[:, 1:])]).T,
-                                             interpolated_cycle_without_transform[:, 1:]), axis=1)
+                                  interpolated_cycle_without_transform[:, 1:]), axis=1)
 
 
 class AccDataPreProcess(DataPreProcess):
@@ -304,9 +307,9 @@ class GyroDataPreProcess(DataPreProcess):
         super().__init__()
 
 
-# class AngDataPreProcess(DataPreProcess):
-#     def __init__(self):
-#         super().__init__()
-#         self.gait_cycle_threshold = 0.4
-#         self.expect_gait_cycle_duration = (800, 1400)
-#         self.template = None
+class AngDataPreProcess(DataPreProcess):
+    def __init__(self):
+        self.data_type = "欧拉角"
+        self.gait_cycle_threshold = 1
+        self.expect_gait_cycle_duration = (400, 700)
+        super().__init__()

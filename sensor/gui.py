@@ -33,7 +33,7 @@ class GuiManager:
         # gui通用设置
         sg.SetOptions(background_color="#FFFFFF", element_background_color="#FFFFFF", text_color="#000000")
         # plot manager，用于获取绘图信息
-        self.sensor_manager = SensorManager(0)
+        self.sensor_manager = SensorManager()
         self.algorithm_manager = AlgorithmManager(self.sensor_manager)
         self.plot_manager = PlotManager(self.sensor_manager, self.algorithm_manager)
 
@@ -153,7 +153,9 @@ class GuiManager:
         # 更新原始display图像
         self.plot_manager.update_display_raw_data_fig()
         # 更新模板图像
-        self.plot_manager.update_template_fig()
+        self.plot_manager.gait_acc_fig.update_template_fig()
+        self.plot_manager.gait_gyro_fig.update_template_fig()
+        self.plot_manager.gait_ang_fig.update_template_fig()
         # 更新步态周期图像
         self.plot_manager.gait_acc_fig.update_cycle_fig()
         self.plot_manager.gait_gyro_fig.update_cycle_fig()

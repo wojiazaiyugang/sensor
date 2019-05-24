@@ -1,7 +1,10 @@
-from enum import Enum, unique
-@unique
-class A(Enum):
-    aaa = 1
-    aaa1= 1
+a = 11
 
-print(type(A.aaa))
+class A:
+    def __init__(self):
+        self.bbb = a
+        print(id(self.bbb))
+
+b =A()
+a = 33
+print(id(a))

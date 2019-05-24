@@ -46,4 +46,4 @@ class PlotManager:
         self.gait_ang_fig.update_cycle_fig()
 
     def update_template_fig(self):
-        pass
+        self.gait_acc_fig.update_template_fig()

@@ -6,7 +6,7 @@ from typing import Union
 import numpy
 from sensor.algorithm.activity_recognition import ActivityRecognitionNetwork
 # from sensor.algorithm.one_class_svm import AccOneClassSvm, GyroOneClassSvm
-from sensor.algorithm.data_pre_process import AccDataPreProcess, GyroDataPreProcess
+from sensor.algorithm.data_pre_process import AccDataPreProcess, GyroDataPreProcess, AngDataPreProcess
 from sensor.algorithm.cnn import CnnNetwork
 from sensor.sensor import SensorManager
 
@@ -17,6 +17,7 @@ class AlgorithmManager:
         # self.activity_recognition_network = ActivityRecognitionNetwork()
         self.acc_data_pre_process = AccDataPreProcess()
         self.gyro_data_pre_process = GyroDataPreProcess()
+        self.ang_data_pre_process = AngDataPreProcess()
 
         self.cnn = CnnNetwork()
         # 保证one class svm在cnn下面，因为svm会使用cnn生成的数据
