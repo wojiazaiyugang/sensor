@@ -40,14 +40,14 @@ class GaitFig:
 
 class GaitAccFig(GaitFig):
     def get_gait_cycle(self):
-        return self.algorithm_manager.get_acc_gait_cycle()
+        return self.algorithm_manager.last_acc_cycle
 
 
 class GaitGyroFig(GaitFig):
     def get_gait_cycle(self):
-        return self.algorithm_manager.get_gyro_gait_cycle()
+        return self.algorithm_manager.last_gyro_cycle
 
 
 class GaitAngFig(GaitFig):
     def get_gait_cycle(self):
-        return self.algorithm_manager.get_ang_gait_cycle()
+        return self.algorithm_manager.last_ang_cycle

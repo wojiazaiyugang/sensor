@@ -29,7 +29,7 @@ def load_data0_cycle() -> Tuple[numpy.ndarray, numpy.ndarray]:
             acc_cycles = []
             gyro_cycles = []
             while True:
-                get_data_result = sensor_manager.get_data()
+                get_data_result = sensor_manager.update_display_raw_data()
                 if not get_data_result:
                     break
                 sensor_manager.acc_to_display, acc_cycle = acc_data_pre_process.get_gait_cycle(

@@ -33,21 +33,24 @@ class AlgorithmManager:
 
         self.reserved_data_count = 5 # 如果检测到了步态周期，那么用于检测的数据并不会完全清除，这样会破坏周期左边缘的检测，而是保留一定数量的点
 
-    def get_acc_gait_cycle(self) -> Union[numpy.ndarray, None]:
+        self.is_walking = False
+        self.who_you_are = None # 身份识别
+
+    def _update_acc_gait_cycle(self) -> Union[numpy.ndarray, None]:
         self.last_acc_cycle = self.acc_data_pre_process.get_gait_cycle(self._sensor_manager.acc_to_detect_cycle)
         if self.last_acc_cycle is not None:
             self.last_validate_acc_cycle = self.last_acc_cycle
             self._sensor_manager.acc_to_detect_cycle = self._sensor_manager.acc_to_detect_cycle[-self.reserved_data_count:]
         return self.last_acc_cycle
 
-    def get_gyro_gait_cycle(self) -> Union[numpy.ndarray, None]:
+    def _update_gyro_gait_cycle(self) -> Union[numpy.ndarray, None]:
         self.last_gyro_cycle = self.gyro_data_pre_process.get_gait_cycle(self._sensor_manager.gyro_to_detect_cycle)
         if self.last_gyro_cycle is not None:
             self.last_validate_gyro_cycle = self.last_gyro_cycle
             self._sensor_manager.gyro_to_detect_cycle = self._sensor_manager.gyro_to_detect_cycle[-self.reserved_data_count:]
         return self.last_gyro_cycle
 
-    def get_ang_gait_cycle(self) -> Union[numpy.ndarray, None]:
+    def _update_ang_gait_cycle(self) -> Union[numpy.ndarray, None]:
         self.last_ang_cycle = self.gyro_data_pre_process.get_gait_cycle(self._sensor_manager.ang_to_detect_cycle)
         if self.last_ang_cycle is not None:
             self.last_validate_ang_cycle = self.last_ang_cycle
@@ -80,7 +83,7 @@ class AlgorithmManager:
         else:
             return None
 
-    def is_walking(self) -> bool:
+    def _is_walking(self) -> bool:
         """
         判断当前在行走，直接阈值判断
         :return:
@@ -94,3 +97,19 @@ class AlgorithmManager:
         if not is_walking: # 没在走路的话去清空数据
             self._sensor_manager.clear_data_to_detect_cycle()
         return is_walking
+
+    def update_data(self):
+        """
+        更新所有算法的所有结果值
+        :return:
+        """
+        # 更新是否在走路
+        self.is_walking = self._is_walking()
+        # 更新步态
+        self._update_acc_gait_cycle()
+        self._update_gyro_gait_cycle()
+        self._update_ang_gait_cycle()
+
+        self.who_you_are = self.get_who_you_are()
+
+

@@ -129,7 +129,7 @@ class SensorManager:
         使用data0中的数据模拟真实数据
         :return:
         """
-        mock_data_count = 1
+        mock_data_count = 20
         current_data_index = self.last_data_index + mock_data_count
         acc_mock_data = self.acc_data_lines[self.last_data_index: current_data_index]
         self.acc_to_display.extend(acc_mock_data)
@@ -143,16 +143,15 @@ class SensorManager:
             return False
         return True
 
-    def get_data(self) -> Union[Tuple[list, list, list], None]:
+    def update_display_raw_data(self) -> bool:
         """
-        返回传感器数据acc gyro ang
+        更新传感器原始数据。返回是否更新成功。如果是模拟数据并且使用完了就会返回失败,如果是实时数据就会一直成功
         :return:
         """
         if self.sensor_data is not None:
-            mock_result = self._mock_real_time_data_from_data0()
-            if not mock_result:
-                return None
-        return self.acc_to_display, self.gyro_to_display, self.ang_to_display
+            return self._mock_real_time_data_from_data0()
+        else:
+            return True
 
     def clear_data_to_detect_cycle(self):
         """
@@ -166,7 +165,6 @@ class SensorManager:
     def fix_data_count(self):
         """
         限制原始数据最大值，否则一直append就崩了
-        # TODO 记得来看看这个函数有没有用 输出一下len看看
         :return:
         """
         self.acc_to_display = self.acc_to_display[-self.ACC_POINT_COUNT:]
