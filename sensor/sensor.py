@@ -2,15 +2,15 @@
 传感器数据相关支持
 """
 import os
+from typing import Union
+
 import math
-from typing import Union, Tuple
-
+import pywinusb.hid as hid
 from numpy import short
-# import pywinusb.hid as hid
 
-from util import get_current_timestamp
-from settings import DATA_DIR, logger
 from sensor.data0 import load_data0_data
+from settings import DATA_DIR, logger
+from util import get_current_timestamp
 
 
 class SensorManager:

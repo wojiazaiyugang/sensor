@@ -151,11 +151,14 @@ class GuiManager:
         :return:
         """
         # 更新原始display图像
-        self.plot_manager.update_display_raw_data()
+        self.plot_manager.update_display_raw_data_fig()
+        # 更新模板图像
+        self.plot_manager.update_template_fig()
         # 更新步态周期图像
         self.plot_manager.gait_acc_fig.update_cycle_fig()
         self.plot_manager.gait_gyro_fig.update_cycle_fig()
         self.plot_manager.gait_ang_fig.update_cycle_fig()
+
 
     def update_gui(self):
         """
@@ -165,21 +168,22 @@ class GuiManager:
         # 更新原始display图像
         raw_data_pic = self._plot_pic(self.plot_manager.raw_data_fig.fig,
                                       self.window.FindElement(self.KEYS.CANVAS_RAW_DATA).TKCanvas)
+        # 当前是否在步行
         self.window.FindElement(self.KEYS.TEXT_IS_WALK_LIKE_DATA0).Update(value=self.algorithm_manager.is_walking)
-
+        # 步态周期图
         acc_gait_and_gei_pic = self._update_gait_and_gei(self.plot_manager.gait_acc_fig.fig,
-                                        self.window.FindElement(self.KEYS.CANVAS_GAIT_ACC).TKCanvas,
-                                        self.window.FindElement(self.KEYS.CANVAS_GEI_ACC).TKCanvas,
-                                        self.plot_manager.gait_acc_fig.get_gei())
+                                                         self.window.FindElement(self.KEYS.CANVAS_GAIT_ACC).TKCanvas,
+                                                         self.window.FindElement(self.KEYS.CANVAS_GEI_ACC).TKCanvas,
+                                                         self.plot_manager.gait_acc_fig.get_gei())
         gyro_gait_and_gei_pic = self._update_gait_and_gei(self.plot_manager.gait_gyro_fig.fig,
-                                         self.window.FindElement(self.KEYS.CANVAS_GAIT_GYRO).TKCanvas,
-                                         self.window.FindElement(self.KEYS.CANVAS_GEI_GYRO).TKCanvas,
-                                         self.plot_manager.gait_gyro_fig.get_gei())
-
+                                                          self.window.FindElement(self.KEYS.CANVAS_GAIT_GYRO).TKCanvas,
+                                                          self.window.FindElement(self.KEYS.CANVAS_GEI_GYRO).TKCanvas,
+                                                          self.plot_manager.gait_gyro_fig.get_gei())
         ang_gait_and_gei_pic = self._update_gait_and_gei(self.plot_manager.gait_ang_fig.fig,
-                                        self.window.FindElement(self.KEYS.CANVAS_GAIT_ANG).TKCanvas,
-                                        self.window.FindElement(self.KEYS.CANVAS_GEI_ANG).TKCanvas,
-                                        self.plot_manager.gait_ang_fig.get_gei())
+                                                         self.window.FindElement(self.KEYS.CANVAS_GAIT_ANG).TKCanvas,
+                                                         self.window.FindElement(self.KEYS.CANVAS_GEI_ANG).TKCanvas,
+                                                         self.plot_manager.gait_ang_fig.get_gei())
+        # 身份识别
         self.window.FindElement(self.KEYS.TEXT_WHO_YOU_ARE).Update(value=self.algorithm_manager.who_you_are)
         return raw_data_pic, acc_gait_and_gei_pic, gyro_gait_and_gei_pic, ang_gait_and_gei_pic
 
@@ -191,5 +195,3 @@ class GuiManager:
             self.update_data()
             self.update_fig()
             gui = self.update_gui()
-
-
