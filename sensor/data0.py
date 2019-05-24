@@ -32,10 +32,10 @@ def load_data0_cycle() -> Tuple[numpy.ndarray, numpy.ndarray]:
                 get_data_result = sensor_manager.get_data()
                 if not get_data_result:
                     break
-                sensor_manager.acc, acc_cycle = acc_data_pre_process.get_gait_cycle(
-                    sensor_manager.acc)
-                sensor_manager.gyro, gyro_cycle = gyro_data_pre_process.get_gait_cycle(
-                    sensor_manager.gyro)
+                sensor_manager.acc_to_display, acc_cycle = acc_data_pre_process.get_gait_cycle(
+                    sensor_manager.acc_to_display)
+                sensor_manager.gyro_to_display, gyro_cycle = gyro_data_pre_process.get_gait_cycle(
+                    sensor_manager.gyro_to_display)
                 if acc_cycle is not None:
                     acc_cycles.append(acc_cycle)
                 if gyro_cycle is not None:

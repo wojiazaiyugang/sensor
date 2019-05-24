@@ -140,7 +140,7 @@ class GuiManager:
             raw_data_pic = self._plot_pic(self.plot_manager.raw_data_fig.fig,
                                           self.window.FindElement(self.KEYS.CANVAS_RAW_DATA).TKCanvas)
             # 更新步行检测
-            is_walking = self.algorithm_manager.is_walk_like_data0()
+            is_walking = self.algorithm_manager.is_walking()
             self.window.FindElement(self.KEYS.TEXT_IS_WALK_LIKE_DATA0).Update(value=is_walking)
             if is_walking:
                 # TODO 搞一个raw_to_display 用来显示原始数据 再搞一个数据用来存储需要进行处理的

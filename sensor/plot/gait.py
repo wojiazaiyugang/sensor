@@ -19,7 +19,7 @@ class GaitFig:
         self.gei_count_to_generate_geis = 30  # 使用多少张gei来生成geis
 
     def get_gait_cycle(self):
-        pass
+        raise NotImplementedError
 
     def update_cycle_fig(self):
         gait_cycle = self.get_gait_cycle()

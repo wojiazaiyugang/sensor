@@ -26,20 +26,20 @@ class _RawDataAxes:
         ax.legend(loc="upper right")
 
     def get_raw_data(self):
-        pass
+        raise NotImplementedError
 
     def update_raw_data(self):
         """
         更新曲线数据
         :return:
         """
-        acc_data = numpy.array(self.get_raw_data()[-400:])
-        if acc_data.any():
-            validate_raw_data_with_timestamp(acc_data)
-            t = list(range(len(acc_data)))
-            self.line_x.set_data(t, acc_data[:, 1])
-            self.line_y.set_data(t, acc_data[:, 2])
-            self.line_z.set_data(t, acc_data[:, 3])
+        data = numpy.array(self.get_raw_data())
+        if data.any():
+            validate_raw_data_with_timestamp(data)
+            t = list(range(len(data)))
+            self.line_x.set_data(t, data[:, 1])
+            self.line_y.set_data(t, data[:, 2])
+            self.line_z.set_data(t, data[:, 3])
 
 
 class RawDataAccAxes(_RawDataAxes):
@@ -49,7 +49,7 @@ class RawDataAccAxes(_RawDataAxes):
         super().__init__(ax, sensor_manager)
 
     def get_raw_data(self):
-        return self.sensor_manager.acc
+        return self.sensor_manager.acc_to_display
 
 
 class RawDataGyroAxes(_RawDataAxes):
@@ -59,7 +59,7 @@ class RawDataGyroAxes(_RawDataAxes):
         super().__init__(ax, sensor_manager)
 
     def get_raw_data(self):
-        return self.sensor_manager.gyro
+        return self.sensor_manager.gyro_to_display
 
 
 class RawDataAngAxes(_RawDataAxes):
@@ -69,4 +69,4 @@ class RawDataAngAxes(_RawDataAxes):
         super().__init__(ax, sensor_manager)
 
     def get_raw_data(self):
-        return self.sensor_manager.ang
+        return self.sensor_manager.ang_to_display

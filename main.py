@@ -17,8 +17,8 @@ if __name__ == "__main__":
     algorithm_manager.gyro_data_pre_process.DEBUG = True
     while True:
         sensor_manager._mock_real_time_data_from_data0()
-        sensor_manager.gyro, cycle = algorithm_manager.gyro_data_pre_process.get_gait_cycle(
-            sensor_manager.gyro)
+        sensor_manager.gyro_to_display, cycle = algorithm_manager.gyro_data_pre_process.get_gait_cycle(
+            sensor_manager.gyro_to_display)
 
 
 

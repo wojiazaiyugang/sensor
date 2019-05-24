@@ -31,12 +31,14 @@ class SensorManager:
         self.ACC_POINT_COUNT = 400
         self.GYRO_POINT_COUNT = 400
         self.ANG_POINT_COUNT = 400
-        # 加速度数据
-        self.acc = []
-        # 陀螺仪数据
-        self.gyro = []
-        # 角度
-        self.ang = []
+        # 原始数据，显示使用
+        self.acc_to_display = []
+        self.gyro_to_display = []
+        self.ang_to_display = []
+        # 用于检测步态的数据
+        self.acc_to_detect_cycle = []
+        self.gyro_to_detect_cycle = []
+        self.ang_to_detect_cycle = []
 
         logger.info("是否使用实时数据：{0}".format(bool(sensor_data is None)))
         if sensor_data is not None:
@@ -48,7 +50,8 @@ class SensorManager:
             logger.info("载入data0加速度数据")
             self.acc_data_lines = load_data0_data(os.path.join(DATA_DIR, "data0", "accData{0}.txt".format(sensor_data)))
             logger.info("载入data0陀螺仪数据")
-            self.gyro_data_lines = load_data0_data(os.path.join(DATA_DIR, "data0", "gyrData{0}.txt".format(sensor_data)))
+            self.gyro_data_lines = load_data0_data(
+                os.path.join(DATA_DIR, "data0", "gyrData{0}.txt".format(sensor_data)))
             self.last_data_timestamp = get_current_timestamp()
         else:
             self.set_handler()
@@ -62,20 +65,37 @@ class SensorManager:
         for i in range(len(data) - 11):
             if not (data[i] == 0x55 and data[i + 1] & 0x50 == 0x50):
                 continue
-            if data[i] == 0x55 and data[i + 1] == 0x51 and sum(data[i:i+10]) & 255 == data[i+10]:
+            if data[i] == 0x55 and data[i + 1] == 0x51 and sum(data[i:i + 10]) & 255 == data[i + 10]:
                 axl, axh, ayl, ayh, azl, azh, *_ = data[i + 2:i + 11]
-                self.acc.append([get_current_timestamp(), (short((axh << 8) | axl)) / 32768 * 16 * 9.8,
-                                 (short((ayh << 8) | ayl)) / 32768 * 16 * 9.8,
-                                 (short((azh << 8) | azl)) / 32768 * 16 * 9.8])
-            if data[i] == 0x55 and data[i + 1] == 0x52 and sum(data[i:i+10]) & 255 == data[i+10]:
+                sensor_data = [
+                    get_current_timestamp(),
+                    (short((axh << 8) | axl)) / 32768 * 16 * 9.8,
+                    (short((ayh << 8) | ayl)) / 32768 * 16 * 9.8,
+                    (short((azh << 8) | azl)) / 32768 * 16 * 9.8
+                ]
+                self.acc_to_display.append(sensor_data)
+                self.acc_to_detect_cycle.append(sensor_data)
+            if data[i] == 0x55 and data[i + 1] == 0x52 and sum(data[i:i + 10]) & 255 == data[i + 10]:
                 wxl, wxh, wyl, wyh, wzl, wzh, *_ = data[i + 2:i + 11]
-                self.gyro.append([get_current_timestamp(), (short(wxh << 8) | wxl) / 32768 * 2000 * (math.pi / 180),
-                                  (short(wyh << 8) | wyl) / 32768 * 2000 * (math.pi / 180),
-                                  (short(wzh << 8) | wzl) / 32768 * 2000 * (math.pi / 180)])
-            if data[i] == 0x55 and data[i + 1] == 0x53 and sum(data[i:i+10]) & 255 == data[i+10]:
+                sensor_data = [
+                    get_current_timestamp(),
+                    (short(wxh << 8) | wxl) / 32768 * 2000 * (math.pi / 180),
+                    (short(wyh << 8) | wyl) / 32768 * 2000 * (math.pi / 180),
+                    (short(wzh << 8) | wzl) / 32768 * 2000 * (math.pi / 180)
+                ]
+                self.gyro_to_display.append(sensor_data)
+                self.gyro_to_detect_cycle.append(sensor_data)
+            if data[i] == 0x55 and data[i + 1] == 0x53 and sum(data[i:i + 10]) & 255 == data[i + 10]:
                 rol, roh, pil, pih, yal, yah, *_ = data[i + 2:i + 11]
-                self.ang.append([get_current_timestamp(), (short(roh << 8 | rol) / 32768 * 180),
-                                 (short(pih << 8 | pil) / 32768 * 180), (short(yah << 8 | yal) / 32768 * 180)])
+                sensor_data = [
+                    get_current_timestamp(),
+                    (short(roh << 8 | rol) / 32768 * 180),
+                    (short(pih << 8 | pil) / 32768 * 180),
+                    (short(yah << 8 | yal) / 32768 * 180)
+                ]
+                self.ang_to_display.append(sensor_data)
+                self.acc_to_detect_cycle.append(sensor_data)
+        self.fix_data_count()
 
     @staticmethod
     def _get_sensor():
@@ -106,14 +126,19 @@ class SensorManager:
 
     def _mock_real_time_data_from_data0(self) -> bool:
         """
-        使用data0中的数据模拟真实数据，做法是通过时间戳来决定读取数据的多少
+        使用data0中的数据模拟真实数据
         :return:
         """
-        mock_data_count = 20
+        mock_data_count = 1
         current_data_index = self.last_data_index + mock_data_count
-        self.acc.extend(self.acc_data_lines[self.last_data_index: current_data_index])
-        self.gyro.extend(self.gyro_data_lines[self.last_data_index: current_data_index])
+        acc_mock_data = self.acc_data_lines[self.last_data_index: current_data_index]
+        self.acc_to_display.extend(acc_mock_data)
+        self.acc_to_detect_cycle.extend(acc_mock_data)
+        gyro_mock_data = self.gyro_data_lines[self.last_data_index: current_data_index]
+        self.gyro_to_display.extend(gyro_mock_data)
+        self.gyro_to_detect_cycle.extend(gyro_mock_data)
         self.last_data_index = current_data_index
+        self.fix_data_count()
         if current_data_index >= min(len(self.acc_data_lines), len(self.gyro_data_lines)):
             return False
         return True
@@ -127,4 +152,26 @@ class SensorManager:
             mock_result = self._mock_real_time_data_from_data0()
             if not mock_result:
                 return None
-        return self.acc, self.gyro, self.ang
+        return self.acc_to_display, self.gyro_to_display, self.ang_to_display
+
+    def clear_data_to_detect_cycle(self):
+        """
+        未检测到步行的时候，用于检测步态的数据进行清零
+        :return:
+        """
+        self.acc_to_detect_cycle.clear()
+        self.gyro_to_detect_cycle.clear()
+        self.ang_to_detect_cycle.clear()
+
+    def fix_data_count(self):
+        """
+        限制原始数据最大值，否则一直append就崩了
+        # TODO 记得来看看这个函数有没有用 输出一下len看看
+        :return:
+        """
+        self.acc_to_display = self.acc_to_display[-self.ACC_POINT_COUNT:]
+        self.acc_to_detect_cycle = self.acc_to_detect_cycle[-self.ACC_POINT_COUNT:]
+        self.gyro_to_display = self.gyro_to_display[-self.GYRO_POINT_COUNT:]
+        self.gyro_to_detect_cycle = self.gyro_to_detect_cycle[-self.GYRO_POINT_COUNT:]
+        self.ang_to_display = self.ang_to_display[-self.ANG_POINT_COUNT:]
+        self.ang_to_detect_cycle = self.ang_to_detect_cycle[-self.ANG_POINT_COUNT:]

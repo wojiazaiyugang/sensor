@@ -4,11 +4,10 @@
 from typing import Tuple, Union
 
 import math
-# TODO: 这两句是为了兼容mac
+# 这两句是为了兼容mac
 import matplotlib
 import numpy
 import fastdtw
-
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from scipy import signal
@@ -25,7 +24,7 @@ class DataPreProcess:
         self.template = None  # 模板
         self.last_cycle = None  # 上一个周期 用于防止周期偏移
         self.data_type = self.data_type
-        self.count_threshold_clear = 400
+        self.count_threshold_to_clear_template = 400 # 用了这么多的点的数据都没有找到步态周期，估计是模板有问题，清除
         self.point_count_per_cycle = 200  # 插值的时候一个周期里点的个数
         self.expect_gait_cycle_duration = self.expect_gait_cycle_duration  # 步态周期的阈值，如果检测出来的步态周期的时间不在这个范围内，就认为检测出来的是有问题的，不使用
 
@@ -256,20 +255,20 @@ class DataPreProcess:
             return self.last_cycle
         return 0.5 * self.last_cycle + 0.5 * cycle[:len(self.last_cycle)]
 
-    def get_gait_cycle(self, data: list) -> Tuple[list, Union[numpy.ndarray, None]]:
+    def get_gait_cycle(self, data: list) -> Union[numpy.ndarray, None]:
         """
         获取步态周期
-        :return: 原始数据使用之后修改成的新的list，步态周期
+        :return: 步态周期
         """
         if len(data) == 0:
-            return [], None
+            return None
         validate_raw_data_with_timestamp(numpy.array(data))
         first_cycle = self._find_first_gait_cycle(numpy.array(data))
         if first_cycle is None:
-            if len(data) > self.count_threshold_clear:
-                data = []
+            # TODO count_threshold_to_clear_template 必须保证比sensor中存的最大的点数要小，不然一直无法清除模板，这里暂时都是400，没有限制
+            if len(data) >= self.count_threshold_to_clear_template:
                 self.template = None
-            return data, None
+            return None
         # transformed_cycle = self.transform(first_cycle)
         # if len(transformed_cycle) < 4:  # 点的数量太少无法插值
         #     return [], None
@@ -285,7 +284,7 @@ class DataPreProcess:
             plt.show()
         if self.DEBUG:
             logger.debug("{0}:CYCYLE INDEX:{1}".format(self.data_type, self.cycle_count))
-        return data[-5:], numpy.concatenate((numpy.array([self._mag(interpolated_cycle_without_transform[:, 1:])]).T,
+        return numpy.concatenate((numpy.array([self._mag(interpolated_cycle_without_transform[:, 1:])]).T,
                                              interpolated_cycle_without_transform[:, 1:]), axis=1)
 
 
