@@ -6,7 +6,7 @@ from typing import Union, Tuple
 import numpy
 import matplotlib.pyplot as plt
 from sensor.algorithm.activity_recognition import ActivityRecognitionNetwork
-from sensor.algorithm.one_class_svm import AccOneClassSvm, GyroOneClassSvm
+# from sensor.algorithm.one_class_svm import AccOneClassSvm, GyroOneClassSvm
 from sensor.algorithm.data_pre_process import AccDataPreProcess, GyroDataPreProcess
 from sensor.algorithm.cnn import CnnNetwork
 from sensor.sensor import SensorManager
@@ -23,8 +23,8 @@ class AlgorithmManager:
 
         self.cnn = CnnNetwork()
         # 保证one class svm在cnn下面，因为svm会使用cnn生成的数据
-        self.acc_one_class_svm = AccOneClassSvm()
-        self.gyro_one_class_svm = GyroOneClassSvm()
+        # self.acc_one_class_svm = AccOneClassSvm()
+        # self.gyro_one_class_svm = GyroOneClassSvm()
         # 最新的一组cycle，用来确定当前是否在走路
         self.last_acc_cycle = None
         self.last_gyro_cycle = None
@@ -87,7 +87,11 @@ class AlgorithmManager:
         判断当前是否像data0一样行走，利用one class svm
         :return:
         """
-        return True
+        mag_interval = (20, 300)
+        if not self._sensor_manager.acc:
+            return False
+        mag = [d[1] * d[1] + d[2] * d[2] + d[3] * d[3] for d in self._sensor_manager.acc]
+        return min(mag) >= mag_interval[0] and max(mag) <= mag_interval[1]
         # acc_predict_result = bool(self.last_acc_cycle is not None and self.acc_one_class_svm.predict(numpy.array([self.last_acc_cycle]))[0] == 1)
         # gyro_predict_result = bool(self.last_gyro_cycle is not None and self.gyro_one_class_svm.predict(numpy.array([self.last_gyro_cycle]))[0] == 1)
         # is_walking = acc_predict_result or gyro_predict_result

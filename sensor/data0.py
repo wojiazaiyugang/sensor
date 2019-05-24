@@ -3,9 +3,12 @@
 """
 import os
 import pickle
-import numpy
 from typing import Tuple
-from settings import CYCLE_FILE_DIR, logger
+
+import numpy
+import matplotlib.pyplot as plt
+
+from settings import CYCLE_FILE_DIR, logger, DATA0_DIR
 
 
 def load_data0_cycle() -> Tuple[numpy.ndarray, numpy.ndarray]:
@@ -59,3 +62,10 @@ def load_data0_data(file_name: str) -> numpy.ndarray:
         lines = file.readlines()
         lines = [[float(v) for v in line.split(" ")] for line in lines]
         return numpy.array(lines)
+
+
+if __name__ == "__main__":
+    data = load_data0_data(os.path.join(DATA0_DIR, "accData2.txt"))
+    mag = [d[1] * d[1] + d[2] * d[2] + d[3] * d[3] for d in data]
+    plt.plot(mag)
+    plt.show()

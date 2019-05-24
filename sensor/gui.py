@@ -35,7 +35,7 @@ class GuiManager:
         # gui通用设置
         sg.SetOptions(background_color="#FFFFFF", element_background_color="#FFFFFF", text_color="#000000")
         # plot manager，用于获取绘图信息
-        self.sensor_manager = SensorManager()
+        self.sensor_manager = SensorManager(0)
         self.algorithm_manager = AlgorithmManager(self.sensor_manager)
         self.plot_manager = PlotManager(self.sensor_manager, self.algorithm_manager)
 
@@ -143,6 +143,7 @@ class GuiManager:
             is_walking = self.algorithm_manager.is_walk_like_data0()
             self.window.FindElement(self.KEYS.TEXT_IS_WALK_LIKE_DATA0).Update(value=is_walking)
             if is_walking:
+                # TODO 搞一个raw_to_display 用来显示原始数据 再搞一个数据用来存储需要进行处理的
                 self.plot_manager.update_gait_figure() # 更新步态
                 acc = self._update_gait_and_gei(self.plot_manager.gait_acc_fig.fig,
                                                 self.window.FindElement(self.KEYS.CANVAS_GAIT_ACC).TKCanvas,
@@ -175,3 +176,6 @@ class GuiManager:
             # self.window.FindElement(self.KEYS.IMAGE_STATUS).UpdateAnimation(
             #     get_static_file_full_path("{0}.gif".format(status)))
             # self.window.FindElement(self.KEYS.TEXT_IS_WALK_LIKE_DATA0).Update(value = self.algorithm_manager.is_walk_like_data0())
+
+if __name__ == "__main__":
+    print(GuiManager)
