@@ -14,6 +14,7 @@ from scipy import signal
 from scipy import interpolate
 
 from settings import logger, np
+np.set_printoptions(suppress=True)
 from util import validate_raw_data_with_timestamp, validate_raw_data_without_timestamp
 
 
@@ -80,7 +81,7 @@ class DataPreProcess:
         mags = self._mag(data[:, 1:])
         if self.template is None:
             self.template = self._find_new_template(data)
-            print("template", self.template)
+            # print("template", self.template)
             # if self.template is not None:
             #     print(len(self.template))
         if self.template is None:
@@ -199,7 +200,7 @@ class DataPreProcess:
                     continue
                 # TODO 实时数据acc有问题是因为这里模板找的太长了 100
                 # print(end - start)
-                print("start end", data[start:end+1])
+                # print("start end", data[start:end+1])
                 # print(end - start + 1)
                 return self._mag(data[start:end][:, 1:])
         return None

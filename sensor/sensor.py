@@ -73,7 +73,7 @@ class SensorManager:
                     (np.short((ayh << 8) | ayl)) / 32768 * 16 * 9.8,
                     (np.short((azh << 8) | azl)) / 32768 * 16 * 9.8
                 ]
-                print(sensor_data)
+                # print(sensor_data)
                 self.acc_to_display.append(sensor_data)
                 self.acc_to_detect_cycle.append(sensor_data)
             if data[i] == 0x55 and data[i + 1] == 0x52 and sum(data[i:i + 10]) & 255 == data[i + 10]:
@@ -95,7 +95,7 @@ class SensorManager:
                     (np.short(yah << 8 | yal) / 32768 * 180)
                 ]
                 self.ang_to_display.append(sensor_data)
-                self.acc_to_detect_cycle.append(sensor_data)
+                self.ang_to_detect_cycle.append(sensor_data)
         self.fix_data_count()
 
     @staticmethod
