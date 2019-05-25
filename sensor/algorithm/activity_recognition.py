@@ -6,7 +6,6 @@ import os
 import pickle
 from typing import Tuple
 
-import numpy
 from keras import Input, callbacks
 from keras.activations import softmax
 from keras.layers import LSTM, Dense
@@ -17,7 +16,7 @@ from keras.optimizers import RMSprop
 
 from sensor.algorithm.base_network import Network
 from util import detect_cycle, chazhi, split_data
-from settings import logger
+from settings import logger, np
 
 
 class ActivityRecognitionNetwork(Network):
@@ -38,7 +37,7 @@ class ActivityRecognitionNetwork(Network):
         self.REVERSED_LABEL_MAP = {self.LABEL_MAP.get(i): i for i in self.LABEL_MAP}
         super().__init__()
 
-    def _load_data(self) -> Tuple[numpy.ndarray, numpy.ndarray]:
+    def _load_data(self) -> Tuple[np.ndarray, np.ndarray]:
         acc_data_full_path = os.path.join(self.HHAR_DATA_PATH, "Watch_accelerometer")
         if os.path.isfile(acc_data_full_path):
             logger.info("{0}训练数据已经存在".format(self.network_name))
@@ -74,7 +73,7 @@ class ActivityRecognitionNetwork(Network):
                 file.write(pickle.dumps((data, label)))
         with open(acc_data_full_path, "rb") as file:
             data = pickle.loads(file.read())
-            return numpy.array(data[0]), numpy.array(data[1])
+            return np.array(data[0]), np.array(data[1])
 
     def _train(self):
         data, label = self._load_data()

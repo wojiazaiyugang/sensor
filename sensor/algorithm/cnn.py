@@ -1,6 +1,5 @@
 import random
 
-import numpy
 from sklearn.model_selection._split import train_test_split
 from keras.models import Model, Input
 from keras.activations import tanh, softmax
@@ -13,7 +12,7 @@ from keras.utils import to_categorical
 from sensor.algorithm.base_network import Network
 from sensor.data0 import load_data0_cycle
 # from sensor.algorithm import AlgorithmManager
-from settings import plt
+from settings import plt, np
 
 
 class CnnNetwork(Network):
@@ -29,9 +28,9 @@ class CnnNetwork(Network):
         data, label = load_data0_cycle()
         data = data.transpose((0, 2, 1))  # 数据是200 * 8的，训练需要8 * 200
         train_data, test_data, train_label, test_label = train_test_split(data, label, test_size=0.2)
-        train_data = numpy.reshape(train_data, train_data.shape + (1,))
+        train_data = np.reshape(train_data, train_data.shape + (1,))
         train_label = to_categorical(train_label)
-        test_data = numpy.reshape(test_data, test_data.shape + (1,))
+        test_data = np.reshape(test_data, test_data.shape + (1,))
         test_label = to_categorical(test_label)
         network_input = Input(shape=(8, 200, 1))
         network = Conv2D(filters=20, kernel_size=(1, 10))(network_input)
@@ -53,27 +52,27 @@ class CnnNetwork(Network):
         :return:
         """
         data, label = load_data0_cycle()
-        data = numpy.reshape(data, data.shape + (1,))
+        data = np.reshape(data, data.shape + (1,))
         for i in range(10):
             index = random.choice(range(len(data)))
-            predict_index = numpy.argmax(self.model.predict(numpy.array([data[index]])))
+            predict_index = np.argmax(self.model.predict(np.array([data[index]])))
             print("index:{0},预测值:{1},实际值:{2},预测成功:{3}".format(index, predict_index, label[index],
                                                               bool(predict_index == label[index])))
 
-    def get_who_you_are(self, data: numpy.ndarray) -> int:
+    def get_who_you_are(self, data: np.ndarray) -> int:
         """
         识别你是谁
         :param data:
         :return: 0 - 9
         """
         if len(data.shape) == 2:
-            data = numpy.reshape(data, (1,) + data.shape + (1,))
+            data = np.reshape(data, (1,) + data.shape + (1,))
         if len(data.shape) == 3:
-            data = numpy.reshape(data, (1,) + data.shape)
-        return int(numpy.argmax(self.model.predict(data)))
+            data = np.reshape(data, (1,) + data.shape)
+        return int(np.argmax(self.model.predict(data)))
 
     @staticmethod
-    def convert_to__image(x: numpy.ndarray):
+    def convert_to__image(x: np.ndarray):
         """
         把张量转换为可以显示的图片
         :param x:
@@ -83,9 +82,9 @@ class CnnNetwork(Network):
         x /= (x.std() + 1e-5)
         x *= 0.1
         x += 0.5
-        x = numpy.clip(x, 0, 1)
+        x = np.clip(x, 0, 1)
         x *= 255
-        x = numpy.clip(x, 0, 255).astype('uint8')
+        x = np.clip(x, 0, 255).astype('uint8')
         return x
 
     def visualize(self):
@@ -113,9 +112,9 @@ class CnnNetwork(Network):
         =================================================================
         """
         data, label = self._load_data()
-        data = numpy.reshape(data, data.shape + (1,))
+        data = np.reshape(data, data.shape + (1,))
         activation_model = Model(inputs=[self.model.input], outputs=[layer.output for layer in self.model.layers[1:3]])
-        activations = activation_model.predict(numpy.array([data[111]]))
+        activations = activation_model.predict(np.array([data[111]]))
         for i in range(20):
             plt.matshow(activations[1][0, :, :, i])
         plt.show()

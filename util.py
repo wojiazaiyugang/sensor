@@ -4,12 +4,10 @@
 import os
 import time
 import math
-import numpy
 from typing import List
 from scipy import interpolate
-
 # from keras.utils import to_categorical
-from settings import CYCLE_FILE_DIR
+from settings import CYCLE_FILE_DIR, np
 
 
 def get_static_file_full_path(file_name: str) -> str:
@@ -22,7 +20,7 @@ def get_static_file_full_path(file_name: str) -> str:
     return os.path.join(os.path.dirname(__file__), "sensor", "static", file_name)
 
 
-def detect_cycle(data: List[List[float]]) -> List[numpy.ndarray]:
+def detect_cycle(data: List[List[float]]) -> List[np.ndarray]:
     """
     周期检测
     :param data: 一个list，里面n个[x,y,z]
@@ -50,12 +48,12 @@ def detect_cycle(data: List[List[float]]) -> List[numpy.ndarray]:
         if dis[i] < dis[i - 1] and dis[i] < dis[i + 1]:
             count = (count + 1) % 2
             if count == 0:
-                result.append(numpy.array(temp))
+                result.append(np.array(temp))
                 temp = []
     return result
 
 
-def chazhi(data: list, point_number_per_cycle=100) -> numpy.ndarray:
+def chazhi(data: list, point_number_per_cycle=100) -> np.ndarray:
     """
     对数据进行插值
     :param point_number_per_cycle: 插值之后每个周期内的数据点个数
@@ -63,21 +61,21 @@ def chazhi(data: list, point_number_per_cycle=100) -> numpy.ndarray:
     :return: 一个list，里面是n个list，每个list里面是:POINT_NUMBER_PER_CYCLE个插值完的[x,y,z]
     """
     for i, data_i in enumerate(data):
-        data_i = numpy.array(data_i)
+        data_i = np.array(data_i)
         x_old, y_old, z_old = data_i[:, 0], data_i[:, 1], data_i[:, 2]
-        x = numpy.linspace(0, len(data_i), len(data_i))
-        x_index = numpy.linspace(0, len(data_i), point_number_per_cycle)
+        x = np.linspace(0, len(data_i), len(data_i))
+        x_index = np.linspace(0, len(data_i), point_number_per_cycle)
         new_x = interpolate.interp1d(x, x_old, kind="quadratic")(x_index)
         new_y = interpolate.interp1d(x, y_old, kind="quadratic")(x_index)
         new_z = interpolate.interp1d(x, z_old, kind="quadratic")(x_index)
         temp = []
         for j in range(len(new_x)):
             temp.append((new_x[j], new_y[j], new_z[j]))
-        data[i] = numpy.array(temp)
-    return numpy.array(data)
+        data[i] = np.array(temp)
+    return np.array(data)
 
 
-def pop_timestamp(data: numpy.ndarray) -> List[numpy.ndarray]:
+def pop_timestamp(data: np.ndarray) -> List[np.ndarray]:
     """
     把传感器数据中的时间数据去除
     :param data:
@@ -89,7 +87,7 @@ def pop_timestamp(data: numpy.ndarray) -> List[numpy.ndarray]:
     return list(data)
 
 
-def split_data(data: numpy.ndarray, label: numpy.ndarray, ratio: tuple = (0.8, 0, 0.2), **kwargs):
+def split_data(data: np.ndarray, label: np.ndarray, ratio: tuple = (0.8, 0, 0.2), **kwargs):
     """
     把数据和标签分为训练集、验证集和测试集
     :param data:
@@ -99,15 +97,15 @@ def split_data(data: numpy.ndarray, label: numpy.ndarray, ratio: tuple = (0.8, 0
     :return:
     """
     data = pop_timestamp(data)
-    data = numpy.array(data)
-    label = numpy.array(label)
+    data = np.array(data)
+    label = np.array(label)
     if "normalization" in kwargs:
         mean = data.mean()
         data = data - mean
         std = data.std()
         data = data / std
-    index = numpy.arange(len(data))
-    numpy.random.shuffle(index)
+    index = np.arange(len(data))
+    np.random.shuffle(index)
     data = data[index]
     label = label[index]
     if "to_categorical" in kwargs:
@@ -127,22 +125,22 @@ def get_current_timestamp() -> int:
     获取当前时间戳
     :return:
     """
-    return round(time.time() * 1000)
+    return int(time.time() * 1000)
 
 
-def validate_raw_data_without_timestamp(data: numpy.ndarray) -> None:
+def validate_raw_data_without_timestamp(data: np.ndarray) -> None:
     """
     校验原始数据的格式，要求不包含timestamp列
     :param data:
     :return:
     """
-    assert isinstance(data, numpy.ndarray) and len(data.shape) == 2 and data.shape[1] == 3, "原始数据格式错误"
+    assert isinstance(data, np.ndarray) and len(data.shape) == 2 and data.shape[1] == 3, "原始数据格式错误"
 
 
-def validate_raw_data_with_timestamp(data: numpy.ndarray) -> None:
+def validate_raw_data_with_timestamp(data: np.ndarray) -> None:
     """
     校验原始数据的格式，要求包含timestamp列
     :param data:
     :return:
     """
-    assert isinstance(data, numpy.ndarray) and len(data.shape) == 2 and data.shape[1] == 4, "原始数据格式错误"
+    assert isinstance(data, np.ndarray) and len(data.shape) == 2 and data.shape[1] == 4, "原始数据格式错误"

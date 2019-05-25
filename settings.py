@@ -11,6 +11,10 @@ import matplotlib.pyplot as plt
 plt.rcParams["font.sans-serif"] = ['SimHei']  # 用来正常显示中文标签
 plt.rcParams["axes.unicode_minus"] = False  # 用来正常显示负号
 
+import numpy as np
+np.set_printoptions(suppress=True, threshold=np.nan)
+
+
 # 项目目录
 PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
 # 配置日志配置同时输出到屏幕和日志文件

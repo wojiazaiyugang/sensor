@@ -6,10 +6,10 @@ from typing import Union
 
 import math
 import pywinusb.hid as hid
-from numpy import short
 
 from sensor.data0 import load_data0_data
 from settings import DATA_DIR, logger
+from settings import np
 from util import get_current_timestamp
 
 
@@ -69,19 +69,20 @@ class SensorManager:
                 axl, axh, ayl, ayh, azl, azh, *_ = data[i + 2:i + 11]
                 sensor_data = [
                     get_current_timestamp(),
-                    (short((axh << 8) | axl)) / 32768 * 16 * 9.8,
-                    (short((ayh << 8) | ayl)) / 32768 * 16 * 9.8,
-                    (short((azh << 8) | azl)) / 32768 * 16 * 9.8
+                    (np.short((axh << 8) | axl)) / 32768 * 16 * 9.8,
+                    (np.short((ayh << 8) | ayl)) / 32768 * 16 * 9.8,
+                    (np.short((azh << 8) | azl)) / 32768 * 16 * 9.8
                 ]
+                print(sensor_data)
                 self.acc_to_display.append(sensor_data)
                 self.acc_to_detect_cycle.append(sensor_data)
             if data[i] == 0x55 and data[i + 1] == 0x52 and sum(data[i:i + 10]) & 255 == data[i + 10]:
                 wxl, wxh, wyl, wyh, wzl, wzh, *_ = data[i + 2:i + 11]
                 sensor_data = [
                     get_current_timestamp(),
-                    (short(wxh << 8) | wxl) / 32768 * 2000 * (math.pi / 180),
-                    (short(wyh << 8) | wyl) / 32768 * 2000 * (math.pi / 180),
-                    (short(wzh << 8) | wzl) / 32768 * 2000 * (math.pi / 180)
+                    (np.short(wxh << 8) | wxl) / 32768 * 2000 * (math.pi / 180),
+                    (np.short(wyh << 8) | wyl) / 32768 * 2000 * (math.pi / 180),
+                    (np.short(wzh << 8) | wzl) / 32768 * 2000 * (math.pi / 180)
                 ]
                 self.gyro_to_display.append(sensor_data)
                 self.gyro_to_detect_cycle.append(sensor_data)
@@ -89,9 +90,9 @@ class SensorManager:
                 rol, roh, pil, pih, yal, yah, *_ = data[i + 2:i + 11]
                 sensor_data = [
                     get_current_timestamp(),
-                    (short(roh << 8 | rol) / 32768 * 180),
-                    (short(pih << 8 | pil) / 32768 * 180),
-                    (short(yah << 8 | yal) / 32768 * 180)
+                    (np.short(roh << 8 | rol) / 32768 * 180),
+                    (np.short(pih << 8 | pil) / 32768 * 180),
+                    (np.short(yah << 8 | yal) / 32768 * 180)
                 ]
                 self.ang_to_display.append(sensor_data)
                 self.acc_to_detect_cycle.append(sensor_data)
@@ -129,7 +130,7 @@ class SensorManager:
         使用data0中的数据模拟真实数据
         :return:
         """
-        mock_data_count = 20
+        mock_data_count = 5
         current_data_index = self.last_data_index + mock_data_count
         acc_mock_data = self.acc_data_lines[self.last_data_index: current_data_index]
         self.acc_to_display.extend(acc_mock_data)

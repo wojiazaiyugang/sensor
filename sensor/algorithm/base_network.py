@@ -5,8 +5,7 @@
 import os
 from typing import Union
 
-import numpy
-from settings import logger, MODEL_DIR
+from settings import logger, MODEL_DIR, np
 from keras.models import load_model, save_model, Model
 
 
@@ -34,7 +33,7 @@ class Network:
             logger.info("模型{0}.h5保存成功".format(self.network_name))
             return self.model
 
-    def _load_data(self) -> Union[numpy.ndarray, numpy.ndarray]:
+    def _load_data(self) -> Union[np.ndarray, np.ndarray]:
         raise NotImplementedError
 
     def _train(self) -> Model:
@@ -43,7 +42,7 @@ class Network:
         raise NotImplementedError
 
     def predict(self, data: list):
-        data = numpy.array(data)
+        data = np.array(data)
         return self.model.predict(data)
 
     def _log(self):

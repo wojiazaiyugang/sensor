@@ -2,8 +2,9 @@
 DTW实现类
 """
 
-import numpy
 import fastdtw
+
+from settings import np
 
 
 class Dtw:
@@ -11,7 +12,7 @@ class Dtw:
         # 距离函数,None表示使用abs
         self._dist = None
 
-    def dtw(self, a: numpy.ndarray, b: numpy.ndarray) -> float:
+    def dtw(self, a: np.ndarray, b: np.ndarray) -> float:
         """
         计算两个向量的dtw距离
         :param a:
@@ -21,7 +22,7 @@ class Dtw:
         distance, _ = fastdtw.dtw(a, b, dist=self._dist)
         return distance
 
-    def fast_dtw(self, a: numpy.ndarray, b: numpy.ndarray) -> float:
+    def fast_dtw(self, a: np.ndarray, b: np.ndarray) -> float:
         distance, _ = fastdtw.fastdtw(a, b, dist=self._dist)
         return distance
 

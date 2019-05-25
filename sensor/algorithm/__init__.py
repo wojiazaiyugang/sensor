@@ -3,13 +3,12 @@
 """
 from typing import Union
 
-import numpy
 from sensor.algorithm.activity_recognition import ActivityRecognitionNetwork
 # from sensor.algorithm.one_class_svm import AccOneClassSvm, GyroOneClassSvm
 from sensor.algorithm.data_pre_process import AccDataPreProcess, GyroDataPreProcess, AngDataPreProcess
 from sensor.algorithm.cnn import CnnNetwork
 from sensor.sensor import SensorManager
-
+from settings import np
 
 class AlgorithmManager:
     def __init__(self, sensor_manager: SensorManager):
@@ -37,7 +36,7 @@ class AlgorithmManager:
         self.is_walking = False
         self.who_you_are = None  # 身份识别
 
-    def _update_acc_gait_cycle(self) -> Union[numpy.ndarray, None]:
+    def _update_acc_gait_cycle(self) -> Union[np.ndarray, None]:
         self.last_acc_cycle = self.acc_data_pre_process.get_gait_cycle(self._sensor_manager.acc_to_detect_cycle)
         if self.last_acc_cycle is not None:
             self.last_validate_acc_cycle = self.last_acc_cycle
@@ -45,7 +44,7 @@ class AlgorithmManager:
                                                        -self.reserved_data_count:]
         return self.last_acc_cycle
 
-    def _update_gyro_gait_cycle(self) -> Union[numpy.ndarray, None]:
+    def _update_gyro_gait_cycle(self) -> Union[np.ndarray, None]:
         self.last_gyro_cycle = self.gyro_data_pre_process.get_gait_cycle(self._sensor_manager.gyro_to_detect_cycle)
         if self.last_gyro_cycle is not None:
             self.last_validate_gyro_cycle = self.last_gyro_cycle
@@ -53,7 +52,7 @@ class AlgorithmManager:
                                                         -self.reserved_data_count:]
         return self.last_gyro_cycle
 
-    def _update_ang_gait_cycle(self) -> Union[numpy.ndarray, None]:
+    def _update_ang_gait_cycle(self) -> Union[np.ndarray, None]:
         self.last_ang_cycle = self.gyro_data_pre_process.get_gait_cycle(self._sensor_manager.ang_to_detect_cycle)
         if self.last_ang_cycle is not None:
             self.last_validate_ang_cycle = self.last_ang_cycle
@@ -70,8 +69,8 @@ class AlgorithmManager:
         # 预测动作
         # if len(self._sensor_manager.acc) >= 100:
         #     predict_result = self.activity_recognition_network.predict(
-        #         [numpy.array(self._sensor_manager.acc)[-100:, 1:]])
-        #     predict_number = int(numpy.argmax(predict_result[0]))
+        #         [np.array(self._sensor_manager.acc)[-100:, 1:]])
+        #     predict_number = int(np.argmax(predict_result[0]))
         #     return predict_number
         # else:
         #     return -1
@@ -83,7 +82,7 @@ class AlgorithmManager:
         """
         if self.last_validate_acc_cycle is not None and self.last_validate_gyro_cycle is not None:
             return self.cnn.get_who_you_are(
-                numpy.concatenate((self.last_validate_acc_cycle, self.last_validate_gyro_cycle), axis=1).T)
+                np.concatenate((self.last_validate_acc_cycle, self.last_validate_gyro_cycle), axis=1).T)
         else:
             return None
 
@@ -93,13 +92,16 @@ class AlgorithmManager:
         :return:
         """
         mag_interval = (20, 900)
-        test_data = numpy.array(self._sensor_manager.acc_to_display[-80:])
+        test_data = np.array(self._sensor_manager.acc_to_display[-80:])
         if not len(test_data):
             return False
         mag = [d[1] * d[1] + d[2] * d[2] + d[3] * d[3] for d in test_data]
         is_mag_ok = min(mag) >= mag_interval[0] and max(mag) <= mag_interval[1]
-        is_x_ok = max(test_data[:, 1]) - min(test_data[:, 1]) > 5
-        is_walking = is_mag_ok and is_x_ok
+        ok_threshold = 5
+        is_x_ok = max(test_data[:, 1]) - min(test_data[:, 1]) > ok_threshold
+        is_y_ok = max(test_data[:, 2]) - min(test_data[:, 2]) > ok_threshold
+        is_z_ok = max(test_data[:, 3]) - min(test_data[:, 3]) > ok_threshold
+        is_walking = is_mag_ok and (is_x_ok or is_y_ok or is_z_ok)
         if not is_walking:  # 没在走路的话去清空数据
             self._sensor_manager.clear_data_to_detect_cycle()
         return is_walking
@@ -121,3 +123,6 @@ class AlgorithmManager:
         else:
             self.who_you_are = ""
             self._sensor_manager.clear_data_to_detect_cycle()
+            self.acc_data_pre_process.clear_template()
+            self.gyro_data_pre_process.clear_template()
+            self.ang_data_pre_process.clear_template()

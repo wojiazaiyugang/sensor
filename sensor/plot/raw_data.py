@@ -1,8 +1,6 @@
-import numpy
-
 from sensor.sensor import SensorManager
 from util import validate_raw_data_with_timestamp
-from settings import plt
+from settings import plt, np
 
 
 class RawDataFig:
@@ -33,7 +31,7 @@ class _RawDataAxes:
         更新曲线数据
         :return:
         """
-        data = numpy.array(self.get_raw_data())
+        data = np.array(self.get_raw_data())
         if data.any():
             validate_raw_data_with_timestamp(data)
             t = list(range(len(data)))
