@@ -13,6 +13,7 @@ DEBUG = False
 if __name__ == "__main__":
     if not DEBUG:
         GuiManager().run()
+    exit(0)
     sensor_manager = SensorManager()
     algorithm_manager = AlgorithmManager(sensor_manager)
     algorithm_manager.gyro_data_pre_process.DEBUG = True

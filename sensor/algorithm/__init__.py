@@ -53,7 +53,7 @@ class AlgorithmManager:
         return self.last_gyro_cycle
 
     def _update_ang_gait_cycle(self) -> Union[np.ndarray, None]:
-        self.last_ang_cycle = self.gyro_data_pre_process.get_gait_cycle(self._sensor_manager.ang_to_detect_cycle)
+        self.last_ang_cycle = self.ang_data_pre_process.get_gait_cycle(self._sensor_manager.ang_to_detect_cycle)
         if self.last_ang_cycle is not None:
             self.last_validate_ang_cycle = self.last_ang_cycle
             self._sensor_manager.ang_to_detect_cycle = self._sensor_manager.ang_to_detect_cycle[

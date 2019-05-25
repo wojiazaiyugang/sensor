@@ -21,16 +21,14 @@ class GaitFig:
 
     def update_cycle_fig(self):
         gait_cycle = self._get_gait_cycle()
-        axs = self.axs[1:]
-        for ax in axs:
-            ax.cla()
         if gait_cycle is not None:
-            for index, ax in enumerate(axs):
+            for index, ax in enumerate(self.axs[1:]):
+                ax.cla()
                 ax.plot(gait_cycle[:, index], color="black", linewidth=3)
-            self.fig.canvas.draw()
             gei = np.fromstring(self.fig.canvas.tostring_rgb(), dtype=np.uint8, sep="").reshape(
                 self.fig.canvas.get_width_height()[::-1] + (3,))
             self.gait_cycles.append(gei)
+        # self.fig.canvas.draw()
 
     def _get_template(self) -> np.ndarray:
         raise NotImplementedError
@@ -41,9 +39,8 @@ class GaitFig:
         :return:
         """
         template = self._get_template()
-        self.axs[0].cla()
         if template is not None:
-            # print("is not None")
+            self.axs[0].cla()
             self.axs[0].plot(template)
 
     def get_gei(self):
