@@ -1,6 +1,7 @@
 from sensor.algorithm import AlgorithmManager
 from sensor.plot.gait import GaitAccFig, GaitGyroFig, GaitAngFig
 from sensor.plot.raw_data import RawDataFig, RawDataAccAxes, RawDataGyroAxes, RawDataAngAxes
+from sensor.plot.stability import FigStability
 from sensor.sensor import SensorManager
 
 
@@ -27,6 +28,8 @@ class PlotManager:
         self.gait_gyro_fig = GaitGyroFig(algorithm_manager)
         self.gait_ang_fig = GaitAngFig(algorithm_manager)
 
+        self.fig_stability = FigStability(algorithm_manager)
+
     def update_display_raw_data_fig(self):
         """
         更新原始数据的图像
@@ -49,3 +52,6 @@ class PlotManager:
         self.gait_acc_fig.update_template_fig()
         self.gait_gyro_fig.update_template_fig()
         self.gait_ang_fig.update_template_fig()
+
+    def update_stability_fig(self):
+        self.fig_stability.ax.plot([1, 2, 3])

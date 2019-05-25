@@ -92,7 +92,7 @@ class AlgorithmManager:
         :return:
         """
         mag_interval = (20, 900)
-        test_data = np.array(self._sensor_manager.acc_to_display[-80:])
+        test_data = np.array(self._sensor_manager.acc_to_display[-100:])
         if not len(test_data):
             return False
         mag = [d[1] * d[1] + d[2] * d[2] + d[3] * d[3] for d in test_data]
