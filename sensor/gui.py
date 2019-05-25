@@ -12,7 +12,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasAgg
 from sensor.algorithm import AlgorithmManager
 from sensor.plot import PlotManager
 from sensor.sensor import SensorManager
-
+from settings import plt
 
 class GuiManager:
     @unique
@@ -33,7 +33,7 @@ class GuiManager:
         # gui通用设置
         sg.SetOptions(background_color="#FFFFFF", element_background_color="#FFFFFF", text_color="#000000")
         # plot manager，用于获取绘图信息
-        self.sensor_manager = SensorManager()
+        self.sensor_manager = SensorManager(1)
         self.algorithm_manager = AlgorithmManager(self.sensor_manager)
         self.plot_manager = PlotManager(self.sensor_manager, self.algorithm_manager)
 

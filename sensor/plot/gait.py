@@ -14,7 +14,7 @@ class GaitFig:
             ax.get_yaxis().set_visible(False)
             ax.get_xaxis().set_visible(False)
 
-        self.gei_count_to_generate_geis = 30  # 使用多少张gei来生成geis
+        self.gei_count_to_generate_geis = 10  # 使用多少张gei来生成geis
 
     def _get_gait_cycle(self):
         raise NotImplementedError
@@ -25,10 +25,10 @@ class GaitFig:
             for index, ax in enumerate(self.axs[1:]):
                 ax.cla()
                 ax.plot(gait_cycle[:, index], color="black", linewidth=3)
+            self.fig.canvas.draw()
             gei = np.fromstring(self.fig.canvas.tostring_rgb(), dtype=np.uint8, sep="").reshape(
                 self.fig.canvas.get_width_height()[::-1] + (3,))
             self.gait_cycles.append(gei)
-        # self.fig.canvas.draw()
 
     def _get_template(self) -> np.ndarray:
         raise NotImplementedError

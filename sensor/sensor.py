@@ -139,7 +139,7 @@ class SensorManager:
         使用data0中的数据模拟真实数据
         :return:
         """
-        mock_data_count = 5
+        mock_data_count = 10
         current_data_index = self.last_data_index + mock_data_count
         acc_mock_data = self.acc_data_lines[self.last_data_index: current_data_index]
         self.acc_to_display.extend(acc_mock_data)
