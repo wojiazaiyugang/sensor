@@ -62,6 +62,10 @@ class SensorManager:
         :param data: 数据
         :return:
         """
+        # 每一次回调，每种类型的数据最多只取一次，防止出现抖动
+        acc_data_found = False
+        gyro_data_found = False
+        ang_data_found = False
         for i in range(len(data) - 11):
             if not (data[i] == 0x55 and data[i + 1] & 0x50 == 0x50):
                 continue
@@ -73,9 +77,10 @@ class SensorManager:
                     (np.short((ayh << 8) | ayl)) / 32768 * 16 * 9.8,
                     (np.short((azh << 8) | azl)) / 32768 * 16 * 9.8
                 ]
-                # print(sensor_data)
-                self.acc_to_display.append(sensor_data)
-                self.acc_to_detect_cycle.append(sensor_data)
+                if not acc_data_found:
+                    acc_data_found = True
+                    self.acc_to_display.append(sensor_data)
+                    self.acc_to_detect_cycle.append(sensor_data)
             if data[i] == 0x55 and data[i + 1] == 0x52 and sum(data[i:i + 10]) & 255 == data[i + 10]:
                 wxl, wxh, wyl, wyh, wzl, wzh, *_ = data[i + 2:i + 11]
                 sensor_data = [
@@ -84,8 +89,10 @@ class SensorManager:
                     (np.short(wyh << 8) | wyl) / 32768 * 2000 * (math.pi / 180),
                     (np.short(wzh << 8) | wzl) / 32768 * 2000 * (math.pi / 180)
                 ]
-                self.gyro_to_display.append(sensor_data)
-                self.gyro_to_detect_cycle.append(sensor_data)
+                if not gyro_data_found:
+                    gyro_data_found = True
+                    self.gyro_to_display.append(sensor_data)
+                    self.gyro_to_detect_cycle.append(sensor_data)
             if data[i] == 0x55 and data[i + 1] == 0x53 and sum(data[i:i + 10]) & 255 == data[i + 10]:
                 rol, roh, pil, pih, yal, yah, *_ = data[i + 2:i + 11]
                 sensor_data = [
@@ -94,8 +101,10 @@ class SensorManager:
                     (np.short(pih << 8 | pil) / 32768 * 180),
                     (np.short(yah << 8 | yal) / 32768 * 180)
                 ]
-                self.ang_to_display.append(sensor_data)
-                self.ang_to_detect_cycle.append(sensor_data)
+                if not ang_data_found:
+                    ang_data_found = True
+                    self.ang_to_display.append(sensor_data)
+                    self.ang_to_detect_cycle.append(sensor_data)
         self.fix_data_count()
 
     @staticmethod

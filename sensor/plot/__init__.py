@@ -47,3 +47,5 @@ class PlotManager:
 
     def update_template_fig(self):
         self.gait_acc_fig.update_template_fig()
+        self.gait_gyro_fig.update_template_fig()
+        self.gait_ang_fig.update_template_fig()

@@ -21,9 +21,11 @@ class GaitFig:
 
     def update_cycle_fig(self):
         gait_cycle = self._get_gait_cycle()
+        axs = self.axs[1:]
+        for ax in axs:
+            ax.cla()
         if gait_cycle is not None:
-            for index, ax in enumerate(self.axs[1:]):
-                ax.cla()
+            for index, ax in enumerate(axs):
                 ax.plot(gait_cycle[:, index], color="black", linewidth=3)
             self.fig.canvas.draw()
             gei = np.fromstring(self.fig.canvas.tostring_rgb(), dtype=np.uint8, sep="").reshape(

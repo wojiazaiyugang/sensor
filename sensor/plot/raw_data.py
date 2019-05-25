@@ -17,7 +17,6 @@ class _RawDataAxes:
         self.data_type = self.data_type
         self.sensor_manager = sensor_manager
         ax.get_xaxis().set_visible(False)
-        ax.set_xlim(0, 400)
         self.line_x = ax.plot([], [], "b-", label="{0}_x".format(self.data_type))[0]
         self.line_y = ax.plot([], [], "g-", label="{0}_y".format(self.data_type))[0]
         self.line_z = ax.plot([], [], "r-", label="{0}_z".format(self.data_type))[0]
@@ -43,6 +42,7 @@ class _RawDataAxes:
 class RawDataAccAxes(_RawDataAxes):
     def __init__(self, ax, sensor_manager):
         self.data_type = "acc"
+        ax.set_xlim(0, sensor_manager.ACC_POINT_COUNT)
         ax.set_ylim(-15, 15)
         super().__init__(ax, sensor_manager)
 
@@ -53,7 +53,8 @@ class RawDataAccAxes(_RawDataAxes):
 class RawDataGyroAxes(_RawDataAxes):
     def __init__(self, ax, sensor_manager):
         self.data_type = "gyro"
-        ax.set_ylim(-15, 15)
+        ax.set_xlim(0, sensor_manager.GYRO_POINT_COUNT)
+        ax.set_ylim(-10, 10)
         super().__init__(ax, sensor_manager)
 
     def get_raw_data(self):
@@ -63,6 +64,7 @@ class RawDataGyroAxes(_RawDataAxes):
 class RawDataAngAxes(_RawDataAxes):
     def __init__(self, ax, sensor_manager):
         self.data_type = "ang"
+        ax.set_xlim(0, sensor_manager.ANG_POINT_COUNT)
         ax.set_ylim(-180, 180)
         super().__init__(ax, sensor_manager)
 
