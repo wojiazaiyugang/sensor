@@ -12,6 +12,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasAgg
 from sensor.algorithm import AlgorithmManager
 from sensor.plot import PlotManager
 from sensor.sensor import SensorManager
+from sensor.algorithm import CycleDetectResult
 from settings import plt
 
 class GuiManager:
@@ -29,6 +30,7 @@ class GuiManager:
         TEXT_ACTIVITY = "动作识别结果"
         TEXT_WHO_YOU_ARE = "身份识别结果"
         TEXT_IS_WALK_LIKE_DATA0 = "当前是否像data0一样"
+        TEXT_CYCLE_DETECT_HISTORY = "步态周期的检测历史"
 
     def __init__(self):
         # gui通用设置
@@ -96,7 +98,9 @@ class GuiManager:
                     [sg.Frame("动作识别结果", [
                         [sg.Text(text="", key=self.KEYS.TEXT_ACTIVITY)],
                     ])],
-
+                    [sg.Frame("步态周期历史", [
+                        [sg.Text(text=" "* 100, key=self.KEYS.TEXT_CYCLE_DETECT_HISTORY)]
+                    ])]
                 ])
             ],
         ]
@@ -173,7 +177,7 @@ class GuiManager:
         self.plot_manager.gait_gyro_fig.update_cycle_fig()
         self.plot_manager.gait_ang_fig.update_cycle_fig()
         # 步态稳定性
-        self.plot_manager.update_stability_fig()
+        self.plot_manager.fig_stability.update()
 
     def update_gui(self):
         """
@@ -201,6 +205,7 @@ class GuiManager:
         # 身份识别
         self._get_element(self.KEYS.TEXT_WHO_YOU_ARE).Update(value=self.algorithm_manager.who_you_are)
         gui_gait_stability = self._plot_pic(self.plot_manager.fig_stability.fig, self._get_element(self.KEYS.CANVAS_STABILITY).TKCanvas)
+        self._get_element(self.KEYS.TEXT_CYCLE_DETECT_HISTORY).Update(value=" ".join(["{0}:{1}".format(cycle_detect_result.value[0], self.algorithm_manager.cycle_detect_history[cycle_detect_result]) for cycle_detect_result in CycleDetectResult]))
         return raw_data_pic, acc_gait_and_gei_pic, gyro_gait_and_gei_pic, ang_gait_and_gei_pic, gui_gait_stability
 
     def run(self):

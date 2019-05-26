@@ -2,6 +2,7 @@
 算法manager
 """
 from typing import Union
+from enum import Enum
 
 from sensor.algorithm.activity_recognition import ActivityRecognitionNetwork
 # from sensor.algorithm.one_class_svm import AccOneClassSvm, GyroOneClassSvm
@@ -9,6 +10,13 @@ from sensor.algorithm.data_pre_process import AccDataPreProcess, GyroDataPreProc
 from sensor.algorithm.cnn import CnnNetwork
 from sensor.sensor import SensorManager
 from settings import np
+
+
+class CycleDetectResult(Enum):
+    NOT_WALKING = "非步行",
+    WALK_BUT_NO_CYCLE = "步行未稳定",
+    CYCLE_DETECTED = "步行稳定",
+
 
 class AlgorithmManager:
     def __init__(self, sensor_manager: SensorManager):
@@ -35,6 +43,8 @@ class AlgorithmManager:
 
         self.is_walking = False
         self.who_you_are = None  # 身份识别
+
+        self.cycle_detect_history = {cycle_detect_result: 0 for cycle_detect_result in CycleDetectResult} # 周期检测的历史纪录，用于记录次数
 
     def _update_acc_gait_cycle(self) -> Union[np.ndarray, None]:
         self.last_acc_cycle = self.acc_data_pre_process.get_gait_cycle(self._sensor_manager.acc_to_detect_cycle)
@@ -120,9 +130,23 @@ class AlgorithmManager:
             self._update_ang_gait_cycle()
             # 更新身份识别
             self.who_you_are = self.get_who_you_are()
+            # 更新稳定性
+            if self.last_acc_cycle is not None or self.last_gyro_cycle is not None:
+                self.cycle_detect_history[CycleDetectResult.CYCLE_DETECTED] += 1
+            else:
+                self.cycle_detect_history[CycleDetectResult.WALK_BUT_NO_CYCLE] += 1
         else:
             self.who_you_are = ""
             self._sensor_manager.clear_data_to_detect_cycle()
             self.acc_data_pre_process.clear_template()
             self.gyro_data_pre_process.clear_template()
             self.ang_data_pre_process.clear_template()
+            self.cycle_detect_history[CycleDetectResult.NOT_WALKING] += 1
+
+        # if self.algorithm_manager.is_walking:
+        #     if self.algorithm_manager.last_acc_cycle is not None or self.algorithm_manager.last_gyro_cycle is not None:
+        #         self.walk_stability.append(StabilityLevel.WALK_BUT_NO_CYCLE.value[0])
+        #     else:
+        #         self.walk_stability.append(StabilityLevel.CYCLE_DETECTED.value[0])
+        # else:
+        #     self.walk_stability.append(StabilityLevel.NOT_WALKING.value[0])

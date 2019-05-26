@@ -54,4 +54,4 @@ class PlotManager:
         self.gait_ang_fig.update_template_fig()
 
     def update_stability_fig(self):
-        self.fig_stability.ax.plot([1, 2, 3])
+        self.fig_stability.update()

@@ -1,5 +1,8 @@
-from settings import plt
+from enum import IntEnum
+class StabilityLevel(IntEnum):
+    NOT_WALKING = 1,
+    WALK_BUT_NO_CYCLE = 2,
+    CYCLE_DETECTED = 3,
 
-plt.plot([0,0,0,1,1,1,1,1,2,2,2,2,1,1,1,1,2,2,0,0])
-plt.axhline(1.5)
-plt.show()
+for i in StabilityLevel:
+    print(i)

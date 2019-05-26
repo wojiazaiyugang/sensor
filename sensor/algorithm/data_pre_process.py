@@ -307,10 +307,6 @@ class AccDataPreProcess(DataPreProcess):
         self.expect_gait_cycle_duration = (400, 700)
         super().__init__()
 
-    # def get_gait_cycle(self, data: list) -> Union[np.ndarray, None]:
-    #     print(len(data))
-    #     return super().get_gait_cycle(data)
-
 
 class GyroDataPreProcess(DataPreProcess):
     def __init__(self):
