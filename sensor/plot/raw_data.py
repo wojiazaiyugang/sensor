@@ -25,7 +25,7 @@ class _RawDataAxes:
     def get_raw_data(self):
         raise NotImplementedError
 
-    def update_raw_data(self):
+    def update(self):
         """
         更新曲线数据
         :return:

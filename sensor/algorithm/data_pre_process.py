@@ -4,31 +4,33 @@
 from typing import Tuple, Union
 
 import math
-# 这两句是为了兼容mac
 import matplotlib
 import fastdtw
-
-matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from scipy import signal
 from scipy import interpolate
 
 from settings import logger, np
-np.set_printoptions(suppress=True)
 from util import validate_raw_data_with_timestamp, validate_raw_data_without_timestamp
+from sensor.sensor import SensorManager
+
+matplotlib.use('TkAgg')  # 兼容mac
 
 
 class DataPreProcess:
-    def __init__(self):
+    def __init__(self, sensor_manager: SensorManager):
+        self.sensor_manager = sensor_manager
         self.template_duration = 1000  # 模板的长度，单位ms
         self.gait_cycle_threshold = self.gait_cycle_threshold
         self.template = None  # 模板
-        self.last_cycle = None  # 上一个周期 用于防止周期偏移
+        self.last_cycle = None
+        self.last_validate_cycle = None
+        self.last_cycle_to_locate = None  # 上一个周期 用于防止周期偏移
         self.data_type = self.data_type
         self.count_threshold_to_clear_template = 400  # 用了这么多的点的数据都没有找到步态周期，估计是模板有问题，清除
         self.point_count_per_cycle = 200  # 插值的时候一个周期里点的个数
         self.expect_gait_cycle_duration = self.expect_gait_cycle_duration  # 步态周期的阈值，如果检测出来的步态周期的时间不在这个范围内，就认为检测出来的是有问题的，不使用
-
+        self.reserved_data_count = 5  # 如果检测到了步态周期，那么用于检测的数据并不会完全清除，这样会破坏周期左边缘的检测，而是保留一定数量的点
         self.DEBUG = None  # 用于显示debug信息
         self.cycle_count = 0
 
@@ -92,28 +94,25 @@ class DataPreProcess:
             corr_distance.append(self._corr_distance(self.template, mags[i:i + len(self.template)]))
         corr_distance = self._lowpass(np.array(corr_distance))
         for i in range(len(corr_distance)):
-            if i >= 2 and corr_distance[i - 1] < min(corr_distance[i - 2], corr_distance[i]) and corr_distance[i - 1] < self.gait_cycle_threshold:
+            if i >= 2 and corr_distance[i - 1] < min(corr_distance[i - 2], corr_distance[i]) and corr_distance[
+                i - 1] < self.gait_cycle_threshold:
                 cycle_index_points.append(i - 1)
                 if len(cycle_index_points) == 2:
                     # 如果找到的周期时间不够的话，就凑上下一个周期
                     cycle_duration = int(data[cycle_index_points[1]][0]) - int(data[cycle_index_points[0]][0])
                     if cycle_duration < self.expect_gait_cycle_duration[0]:
-                        # logger.debug("cycle 错误1:{0}".format(cycle_duration))
                         del cycle_index_points[-1]
                         continue
                     elif cycle_duration > self.expect_gait_cycle_duration[1]:
-                        # logger.debug("cycle 错误2:{0}".format(cycle_duration))
                         cycle_index_points[0] = cycle_index_points[1]
                         del cycle_index_points[-1]
                         continue
                 if len(cycle_index_points) == 3:
                     cycle_duration = int(data[cycle_index_points[2]][0]) - int(data[cycle_index_points[1]][0])
                     if cycle_duration < self.expect_gait_cycle_duration[0]:
-                        # logger.debug("cycle 错误3:{0}".format(cycle_duration))
                         del cycle_index_points[-1]
                         continue
                     elif cycle_duration > self.expect_gait_cycle_duration[1]:
-                        # logger.debug("cycle 错误4:{0}".format(cycle_duration))
                         cycle_index_points[0] = cycle_index_points[2]
                         del cycle_index_points[-1]
                         del cycle_index_points[-1]
@@ -121,27 +120,24 @@ class DataPreProcess:
                 if len(cycle_index_points) == 4:
                     cycle_duration = int(data[cycle_index_points[3]][0]) - int(data[cycle_index_points[2]][0])
                     if cycle_duration < self.expect_gait_cycle_duration[0]:
-                        # logger.debug("cycle 错误5:{0}".format(cycle_duration))
                         del cycle_index_points[-1]
                         continue
                     elif cycle_duration > self.expect_gait_cycle_duration[1]:
-                        # logger.debug("cycle 错误6:{0}".format(cycle_duration))
                         cycle_index_points[0] = cycle_index_points[3]
                         del cycle_index_points[-1]
                         del cycle_index_points[-1]
                         del cycle_index_points[-1]
                         continue
-                    if self.last_cycle is None:
+                    if self.last_cycle_to_locate is None:
                         cycle = data[cycle_index_points[0]:cycle_index_points[2] + 1]
-                        self.last_cycle = cycle
+                        self.last_cycle_to_locate = cycle
                         if self.DEBUG:
                             use_first_cycle = True
                     else:
                         cycle1 = data[cycle_index_points[0]:cycle_index_points[2] + 1]
                         cycle2 = data[cycle_index_points[1]:cycle_index_points[3] + 1]
-                        if self.fast_dtw(self.last_cycle[:, 3], cycle1[:, 3]) < self.fast_dtw(self.last_cycle[:, 3],
-                                                                                              cycle2[:,
-                                                                                              3]):  # 使用4格 + z轴fastdtw来寻找周期
+                        if self.fast_dtw(self.last_cycle_to_locate[:, 3], cycle1[:, 3]) < self.fast_dtw(
+                                self.last_cycle_to_locate[:, 3], cycle2[:, 3]):  # 使用4格 + z轴fastdtw来寻找周期
                             cycle = cycle1
                             if self.DEBUG:
                                 use_first_cycle = True
@@ -149,7 +145,7 @@ class DataPreProcess:
                             cycle = cycle2
                             if self.DEBUG:
                                 use_first_cycle = False
-                        self.last_cycle = self._update_last_cycle(cycle)
+                        self.last_cycle_to_locate = self._update_last_cycle(cycle)
                     if self.DEBUG:
                         plt.cla()
                         plt.plot(data[:, 1], "r", label="x")
@@ -164,7 +160,7 @@ class DataPreProcess:
                         plt.legend()
                         plt.title("search cycle")
                         plt.show()
-                    self.template = self._updata_template(cycle)
+                    self.template = self._update_template(cycle)
                     return cycle
         return None
 
@@ -246,7 +242,7 @@ class DataPreProcess:
         vector_a_n3 = np.dot(matrix_a, vector_n3)
         return np.array([self._mag(matrix_a), vector_a_n1, vector_a_n2, vector_a_n3]).T
 
-    def _updata_template(self, cycle: np.ndarray) -> np.ndarray:
+    def _update_template(self, cycle: np.ndarray) -> np.ndarray:
         """
         更新模板
         :param cycle:
@@ -262,9 +258,9 @@ class DataPreProcess:
         :param cycle:
         :return:
         """
-        if len(cycle) < len(self.last_cycle):
-            return self.last_cycle
-        return 0.5 * self.last_cycle + 0.5 * cycle[:len(self.last_cycle)]
+        if len(cycle) < len(self.last_cycle_to_locate):
+            return self.last_cycle_to_locate
+        return 0.5 * self.last_cycle_to_locate + 0.5 * cycle[:len(self.last_cycle_to_locate)]
 
     def get_gait_cycle(self, data: list) -> Union[np.ndarray, None]:
         """
@@ -297,28 +293,71 @@ class DataPreProcess:
         if self.DEBUG:
             logger.debug("{0}:CYCYLE INDEX:{1}".format(self.data_type, self.cycle_count))
         return np.concatenate((np.array([self._mag(interpolated_cycle_without_transform[:, 1:])]).T,
-                                  interpolated_cycle_without_transform[:, 1:]), axis=1)
+                               interpolated_cycle_without_transform[:, 1:]), axis=1)
+
+    def update_gait_cycle(self) -> Union[np.ndarray, None]:
+        data = self.get_data()
+        self.last_cycle = self.get_gait_cycle(data)
+        if self.last_cycle is not None:
+            self.last_validate_cycle = self.last_cycle
+            self.update_data_to_detect()
+        return self.last_cycle
+
+    def get_data(self) -> list:
+        """
+        获取用于检测周期的原始数据，从data_to_detect中获得
+        :return:
+        """
+        raise NotImplementedError
+
+    def update_data_to_detect(self):
+        """
+        更新data_to_detect
+        :return:
+        """
+        raise NotImplementedError
 
 
 class AccDataPreProcess(DataPreProcess):
-    def __init__(self):
+
+    def __init__(self, sensor_manager: SensorManager):
         self.data_type = "加速度"
         self.gait_cycle_threshold = 1
         self.expect_gait_cycle_duration = (400, 700)
-        super().__init__()
+        super().__init__(sensor_manager)
+
+    def get_data(self):
+        return self.sensor_manager.acc_to_detect_cycle
+
+    def update_data_to_detect(self):
+        self.sensor_manager.acc_to_detect_cycle = self.sensor_manager.acc_to_detect_cycle[-self.reserved_data_count:]
 
 
 class GyroDataPreProcess(DataPreProcess):
-    def __init__(self):
+
+    def __init__(self, sensor_manager: SensorManager):
         self.data_type = "陀螺仪"
         self.gait_cycle_threshold = 1
         self.expect_gait_cycle_duration = (400, 700)
-        super().__init__()
+        super().__init__(sensor_manager)
+
+    def get_data(self):
+        return self.sensor_manager.gyro_to_detect_cycle
+
+    def update_data_to_detect(self):
+        self.sensor_manager.gyro_to_detect_cycle = self.sensor_manager.gyro_to_detect_cycle[-self.reserved_data_count:]
 
 
 class AngDataPreProcess(DataPreProcess):
-    def __init__(self):
+
+    def __init__(self, sensor_manager: SensorManager):
         self.data_type = "欧拉角"
         self.gait_cycle_threshold = 1
         self.expect_gait_cycle_duration = (400, 700)
-        super().__init__()
+        super().__init__(sensor_manager)
+
+    def get_data(self):
+        return self.sensor_manager.ang_to_detect_cycle
+
+    def update_data_to_detect(self):
+        self.sensor_manager.ang_to_detect_cycle = self.sensor_manager.ang_to_detect_cycle[-self.reserved_data_count:]

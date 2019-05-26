@@ -5,15 +5,15 @@ import tkinter as tk
 from enum import Enum, unique
 
 import PySimpleGUI as sg
-from PIL import Image, ImageTk
 import matplotlib.backends.tkagg as tkagg
+from PIL import Image, ImageTk
 from matplotlib.backends.backend_tkagg import FigureCanvasAgg
 
 from sensor.algorithm import AlgorithmManager
+from sensor.algorithm import CycleDetectResult
 from sensor.plot import PlotManager
 from sensor.sensor import SensorManager
-from sensor.algorithm import CycleDetectResult
-from settings import plt
+from settings import SENSOR_DATA
 
 class GuiManager:
     @unique
@@ -36,7 +36,7 @@ class GuiManager:
         # gui通用设置
         sg.SetOptions(background_color="#FFFFFF", element_background_color="#FFFFFF", text_color="#000000")
         # plot manager，用于获取绘图信息
-        self.sensor_manager = SensorManager(1)
+        self.sensor_manager = SensorManager(SENSOR_DATA)
         self.algorithm_manager = AlgorithmManager(self.sensor_manager)
         self.plot_manager = PlotManager(self.sensor_manager, self.algorithm_manager)
 
@@ -45,47 +45,47 @@ class GuiManager:
             [
                 sg.Column([
                     [sg.Frame("原始数据", [
-                        [sg.Canvas(size=(self.plot_manager.raw_data_fig.width, self.plot_manager.raw_data_fig.height),
+                        [sg.Canvas(size=(self.plot_manager.fig_raw_data.width, self.plot_manager.fig_raw_data.height),
                                    key=self.KEYS.CANVAS_RAW_DATA)]
                     ])]
                 ]),
                 sg.Column([
                     [sg.Frame("加速度步态", [
                         [sg.Canvas(size=(
-                            self.plot_manager.gait_acc_fig.fig_gait_acc_w,
-                            self.plot_manager.gait_acc_fig.fig_gait_acc_h),
+                            self.plot_manager.fig_gait_acc.fig_width,
+                            self.plot_manager.fig_gait_acc.fig_height),
                             key=self.KEYS.CANVAS_GAIT_ACC)],
                         [sg.Canvas(size=(
-                            self.plot_manager.gait_acc_fig.fig_gait_acc_w,
-                            self.plot_manager.gait_acc_fig.fig_gait_acc_h),
+                            self.plot_manager.fig_gait_acc.fig_width,
+                            self.plot_manager.fig_gait_acc.fig_height),
                             key=self.KEYS.CANVAS_GEI_ACC)]])
                      ],
                     [sg.Frame("陀螺仪步态", [
                         [sg.Canvas(size=(
-                            self.plot_manager.gait_gyro_fig.fig_gait_acc_w,
-                            self.plot_manager.gait_gyro_fig.fig_gait_acc_h),
+                            self.plot_manager.fig_gait_gyro.fig_width,
+                            self.plot_manager.fig_gait_gyro.fig_height),
                             key=self.KEYS.CANVAS_GAIT_GYRO)],
                         [sg.Canvas(size=(
-                            self.plot_manager.gait_gyro_fig.fig_gait_acc_w,
-                            self.plot_manager.gait_gyro_fig.fig_gait_acc_h),
+                            self.plot_manager.fig_gait_gyro.fig_width,
+                            self.plot_manager.fig_gait_gyro.fig_height),
                             key=self.KEYS.CANVAS_GEI_GYRO)]])
                      ],
                     [sg.Frame("欧拉角步态", [
                         [sg.Canvas(size=(
-                            self.plot_manager.gait_ang_fig.fig_gait_acc_w,
-                            self.plot_manager.gait_ang_fig.fig_gait_acc_h),
+                            self.plot_manager.fig_gait_ang.fig_width,
+                            self.plot_manager.fig_gait_ang.fig_height),
                             key=self.KEYS.CANVAS_GAIT_ANG)],
                         [sg.Canvas(size=(
-                            self.plot_manager.gait_ang_fig.fig_gait_acc_w,
-                            self.plot_manager.gait_ang_fig.fig_gait_acc_h),
+                            self.plot_manager.fig_gait_ang.fig_width,
+                            self.plot_manager.fig_gait_ang.fig_height),
                             key=self.KEYS.CANVAS_GEI_ANG)]])
                      ],
                 ]),
                 sg.Column([
                     [sg.Frame("步态稳定性", [
                         [sg.Canvas(size=(
-                            self.plot_manager.fig_stability.fig_w,
-                            self.plot_manager.fig_stability.fig_h),
+                            self.plot_manager.fig_stability.fig_width,
+                            self.plot_manager.fig_stability.fig_height),
                             key=self.KEYS.CANVAS_STABILITY
                         )]
                     ])],
@@ -99,7 +99,7 @@ class GuiManager:
                         [sg.Text(text="", key=self.KEYS.TEXT_ACTIVITY)],
                     ])],
                     [sg.Frame("步态周期历史", [
-                        [sg.Text(text=" "* 100, key=self.KEYS.TEXT_CYCLE_DETECT_HISTORY)]
+                        [sg.Text(text=" " * 100, key=self.KEYS.TEXT_CYCLE_DETECT_HISTORY)]  # 100是为了搞个长的长度，不然显示不全
                     ])]
                 ])
             ],
@@ -129,7 +129,8 @@ class GuiManager:
         tkagg.blit(photo, figure_canvas_agg.get_renderer()._renderer, colormode=2)
         return photo
 
-    def _update_gei_pic(self, gei_canvas, gei):
+    @staticmethod
+    def _update_gei_pic(gei_canvas, gei):
         """
         更新gei图像
         :return:
@@ -168,16 +169,10 @@ class GuiManager:
         """
         # 更新原始display图像
         self.plot_manager.update_display_raw_data_fig()
-        # 更新模板图像
-        self.plot_manager.gait_acc_fig.update_template_fig()
-        self.plot_manager.gait_gyro_fig.update_template_fig()
-        self.plot_manager.gait_ang_fig.update_template_fig()
         # 更新步态周期图像
-        self.plot_manager.gait_acc_fig.update_cycle_fig()
-        self.plot_manager.gait_gyro_fig.update_cycle_fig()
-        self.plot_manager.gait_ang_fig.update_cycle_fig()
+        self.plot_manager.update_gait_figure()
         # 步态稳定性
-        self.plot_manager.fig_stability.update()
+        # self.plot_manager.fig_stability.update()
 
     def update_gui(self):
         """
@@ -185,27 +180,31 @@ class GuiManager:
         :return:
         """
         # 更新原始display图像
-        raw_data_pic = self._plot_pic(self.plot_manager.raw_data_fig.fig,
+        raw_data_pic = self._plot_pic(self.plot_manager.fig_raw_data.fig,
                                       self._get_element(self.KEYS.CANVAS_RAW_DATA).TKCanvas)
         # 当前是否在步行
         self._get_element(self.KEYS.TEXT_IS_WALK_LIKE_DATA0).Update(value=self.algorithm_manager.is_walking)
         # 步态周期图
-        acc_gait_and_gei_pic = self._update_gait_and_gei(self.plot_manager.gait_acc_fig.fig,
+        acc_gait_and_gei_pic = self._update_gait_and_gei(self.plot_manager.fig_gait_acc.fig,
                                                          self._get_element(self.KEYS.CANVAS_GAIT_ACC).TKCanvas,
                                                          self._get_element(self.KEYS.CANVAS_GEI_ACC).TKCanvas,
-                                                         self.plot_manager.gait_acc_fig.get_gei())
-        gyro_gait_and_gei_pic = self._update_gait_and_gei(self.plot_manager.gait_gyro_fig.fig,
+                                                         self.plot_manager.fig_gait_acc.get_gei())
+        gyro_gait_and_gei_pic = self._update_gait_and_gei(self.plot_manager.fig_gait_gyro.fig,
                                                           self._get_element(self.KEYS.CANVAS_GAIT_GYRO).TKCanvas,
                                                           self._get_element(self.KEYS.CANVAS_GEI_GYRO).TKCanvas,
-                                                          self.plot_manager.gait_gyro_fig.get_gei())
-        ang_gait_and_gei_pic = self._update_gait_and_gei(self.plot_manager.gait_ang_fig.fig,
+                                                          self.plot_manager.fig_gait_gyro.get_gei())
+        ang_gait_and_gei_pic = self._update_gait_and_gei(self.plot_manager.fig_gait_ang.fig,
                                                          self._get_element(self.KEYS.CANVAS_GAIT_ANG).TKCanvas,
                                                          self._get_element(self.KEYS.CANVAS_GEI_ANG).TKCanvas,
-                                                         self.plot_manager.gait_ang_fig.get_gei())
+                                                         self.plot_manager.fig_gait_ang.get_gei())
         # 身份识别
         self._get_element(self.KEYS.TEXT_WHO_YOU_ARE).Update(value=self.algorithm_manager.who_you_are)
-        gui_gait_stability = self._plot_pic(self.plot_manager.fig_stability.fig, self._get_element(self.KEYS.CANVAS_STABILITY).TKCanvas)
-        self._get_element(self.KEYS.TEXT_CYCLE_DETECT_HISTORY).Update(value=" ".join(["{0}:{1}".format(cycle_detect_result.value[0], self.algorithm_manager.cycle_detect_history[cycle_detect_result]) for cycle_detect_result in CycleDetectResult]))
+        gui_gait_stability = self._plot_pic(self.plot_manager.fig_stability.fig,
+                                            self._get_element(self.KEYS.CANVAS_STABILITY).TKCanvas)
+        self._get_element(self.KEYS.TEXT_CYCLE_DETECT_HISTORY).Update(value=" ".join(["{0}:{1}".format(
+            cycle_detect_result.value[0], self.algorithm_manager.cycle_detect_history[cycle_detect_result])
+            for cycle_detect_result in
+            CycleDetectResult]))
         return raw_data_pic, acc_gait_and_gei_pic, gyro_gait_and_gei_pic, ang_gait_and_gei_pic, gui_gait_stability
 
     def run(self):

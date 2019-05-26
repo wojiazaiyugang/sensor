@@ -61,10 +61,3 @@ def load_data0_data(file_name: str) -> np.ndarray:
         lines = file.readlines()
         lines = [[float(v) for v in line.split(" ")] for line in lines]
         return np.array(lines)
-
-
-if __name__ == "__main__":
-    data = load_data0_data(os.path.join(DATA0_DIR, "accData2.txt"))
-    mag = [d[1] * d[1] + d[2] * d[2] + d[3] * d[3] for d in data]
-    plt.plot(mag)
-    plt.show()
