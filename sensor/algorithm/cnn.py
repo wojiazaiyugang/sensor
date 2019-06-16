@@ -1,4 +1,5 @@
 import random
+from typing import Union, Tuple
 
 from sklearn.model_selection._split import train_test_split
 from keras.models import Model, Input
@@ -26,13 +27,13 @@ class CnnNetwork(Network):
 
     def _train(self) -> Model:
         data, label = load_data0_cycle()
-        data = data.transpose((0, 2, 1))  # 数据是200 * 8的，训练需要8 * 200
         train_data, test_data, train_label, test_label = train_test_split(data, label, test_size=0.2)
         train_data = np.reshape(train_data, train_data.shape + (1,))
         train_label = to_categorical(train_label)
         test_data = np.reshape(test_data, test_data.shape + (1,))
         test_label = to_categorical(test_label)
         network_input = Input(shape=(8, 200, 1))
+        # 如果这里修改了网络结构，记得去下面修改可视化函数里的参数
         network = Conv2D(filters=20, kernel_size=(1, 10))(network_input)
         network = Conv2D(filters=40, kernel_size=(4, 10), activation=tanh)(network)
         network = MaxPool2D((2, 2))(network)
@@ -87,6 +88,9 @@ class CnnNetwork(Network):
         x = np.clip(x, 0, 255).astype('uint8')
         return x
 
+    def _load_data(self) -> Tuple[np.ndarray, np.ndarray]:
+        return load_data0_cycle()
+
     def visualize(self):
         """
         网络可视化
@@ -114,9 +118,25 @@ class CnnNetwork(Network):
         data, label = self._load_data()
         data = np.reshape(data, data.shape + (1,))
         activation_model = Model(inputs=[self.model.input], outputs=[layer.output for layer in self.model.layers[1:3]])
-        activations = activation_model.predict(np.array([data[111]]))
-        for i in range(20):
-            plt.matshow(activations[1][0, :, :, i])
+        activations = activation_model.predict(np.array([data[3]]))
+        """
+        >>> len(activations)
+        2    # 两层
+        >>> activations[0].shape
+        (1, 8, 191, 20) 
+        """
+        filter_count = 20
+        display_layer = 1  # 展示的第几层
+        display_mat = np.zeros((filter_count * activations[display_layer][0].shape[0], activations[display_layer][0].shape[1]))
+        for i in range(filter_count):
+            channel_image = activations[display_layer][0,:,:,i]
+            channel_image -= channel_image.mean()
+            channel_image /= channel_image.std()
+            channel_image *= 64
+            channel_image += 128
+            channel_image = np.clip(channel_image,0,255).astype("uint8")
+            display_mat[i * activations[display_layer][0].shape[0]:(i + 1) * activations[display_layer][0].shape[0], : activations[display_layer][0].shape[1]] = channel_image
+        plt.matshow(display_mat)
         plt.show()
 
 

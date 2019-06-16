@@ -1,7 +1,7 @@
 from sensor.algorithm import AlgorithmManager
 from sensor.plot.gait import GaitAccFig, GaitGyroFig
 from sensor.plot.raw_data import RawDataFig, RawDataAccAxes, RawDataGyroAxes
-from sensor.plot.stability import FigStability
+from sensor.plot.cnn_feature import FigCnnFeature
 from sensor.sensor import SensorManager
 
 
@@ -26,7 +26,7 @@ class PlotManager:
         self.fig_gait_acc = GaitAccFig(algorithm_manager)
         self.fig_gait_gyro = GaitGyroFig(algorithm_manager)
 
-        self.fig_stability = FigStability(algorithm_manager)
+        self.fig_stability = FigCnnFeature(algorithm_manager)
 
     def update_display_raw_data_fig(self):
         """

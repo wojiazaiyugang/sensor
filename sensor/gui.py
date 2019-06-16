@@ -15,6 +15,7 @@ from sensor.plot import PlotManager
 from sensor.sensor import SensorManager
 from settings import SENSOR_DATA
 
+
 class GuiManager:
     @unique
     class KEYS(Enum):
@@ -29,6 +30,8 @@ class GuiManager:
         TEXT_WHO_YOU_ARE = "身份识别结果"
         TEXT_IS_WALK_LIKE_DATA0 = "当前是否像data0一样"
         TEXT_CYCLE_DETECT_HISTORY = "步态周期的检测历史"
+        TEXT_ACC_CYCLE_FEATURE = "加速度周期的特征"
+        TEXT_GYRO_CYCLE_FEATURE = "陀螺仪周期的特征"
 
     def __init__(self):
         # gui通用设置
@@ -37,6 +40,7 @@ class GuiManager:
         self.sensor_manager = SensorManager(SENSOR_DATA)
         self.algorithm_manager = AlgorithmManager(self.sensor_manager)
         self.plot_manager = PlotManager(self.sensor_manager, self.algorithm_manager)
+        self.text_init_placeholder = " " * 100
 
         # 构建gui
         self.layout = [
@@ -56,7 +60,8 @@ class GuiManager:
                         [sg.Canvas(size=(
                             self.plot_manager.fig_gait_acc.fig_width,
                             self.plot_manager.fig_gait_acc.fig_height),
-                            key=self.KEYS.CANVAS_GEI_ACC)]])
+                            key=self.KEYS.CANVAS_GEI_ACC)],
+                        [sg.Text(text=self.algorithm_manager.acc_data_pre_process.get_cycle_feature_for_gui, key=self.KEYS.TEXT_ACC_CYCLE_FEATURE)]])
                      ],
                     [sg.Frame("陀螺仪步态", [
                         [sg.Canvas(size=(
@@ -66,7 +71,8 @@ class GuiManager:
                         [sg.Canvas(size=(
                             self.plot_manager.fig_gait_gyro.fig_width,
                             self.plot_manager.fig_gait_gyro.fig_height),
-                            key=self.KEYS.CANVAS_GEI_GYRO)]])
+                            key=self.KEYS.CANVAS_GEI_GYRO)],
+                        [sg.Text(text=self.algorithm_manager.gyro_data_pre_process.get_cycle_feature_for_gui, key=self.KEYS.TEXT_GYRO_CYCLE_FEATURE)]])
                      ]
                 ]),
                 sg.Column([
@@ -189,6 +195,12 @@ class GuiManager:
             cycle_detect_result.value[0], self.algorithm_manager.cycle_detect_history[cycle_detect_result])
             for cycle_detect_result in
             CycleDetectResult]))
+        if self.algorithm_manager.acc_data_pre_process.last_cycle is not None:
+            self._get_element(self.KEYS.TEXT_ACC_CYCLE_FEATURE) \
+                .Update(value=self.algorithm_manager.acc_data_pre_process.get_cycle_feature_for_gui)
+        if self.algorithm_manager.gyro_data_pre_process.last_cycle is not None:
+            self._get_element(self.KEYS.TEXT_GYRO_CYCLE_FEATURE) \
+                .Update(value=self.algorithm_manager.gyro_data_pre_process.get_cycle_feature_for_gui)
         return raw_data_pic, acc_gait_and_gei_pic, gyro_gait_and_gei_pic, gui_gait_stability
 
     def run(self):

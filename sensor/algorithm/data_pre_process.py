@@ -26,6 +26,7 @@ class DataPreProcess:
         self.last_cycle = None
         self.last_validate_cycle = None
         self.last_cycle_to_locate = None  # 上一个周期 用于防止周期偏移
+        self.cycle_duration = 0  # 上一个周期的时长
         self.data_type = self.data_type
         self.count_threshold_to_clear_template = 400  # 用了这么多的点的数据都没有找到步态周期，估计是模板有问题，清除
         self.point_count_per_cycle = 200  # 插值的时候一个周期里点的个数
@@ -94,35 +95,35 @@ class DataPreProcess:
             corr_distance.append(self._corr_distance(self.template, mags[i:i + len(self.template)]))
         corr_distance = self._lowpass(np.array(corr_distance))
         for i in range(len(corr_distance)):
-            if i >= 2 and corr_distance[i - 1] < min(corr_distance[i - 2], corr_distance[i]) and corr_distance[
-                i - 1] < self.gait_cycle_threshold:
+            if i >= 2 and corr_distance[i - 1] < min(corr_distance[i - 2], corr_distance[i]) and \
+                    corr_distance[i - 1] < self.gait_cycle_threshold:
                 cycle_index_points.append(i - 1)
                 if len(cycle_index_points) == 2:
                     # 如果找到的周期时间不够的话，就凑上下一个周期
-                    cycle_duration = int(data[cycle_index_points[1]][0]) - int(data[cycle_index_points[0]][0])
-                    if cycle_duration < self.expect_gait_cycle_duration[0]:
+                    self.cycle_duration = int(data[cycle_index_points[1]][0]) - int(data[cycle_index_points[0]][0])
+                    if self.cycle_duration < self.expect_gait_cycle_duration[0]:
                         del cycle_index_points[-1]
                         continue
-                    elif cycle_duration > self.expect_gait_cycle_duration[1]:
+                    elif self.cycle_duration > self.expect_gait_cycle_duration[1]:
                         cycle_index_points[0] = cycle_index_points[1]
                         del cycle_index_points[-1]
                         continue
                 if len(cycle_index_points) == 3:
-                    cycle_duration = int(data[cycle_index_points[2]][0]) - int(data[cycle_index_points[1]][0])
-                    if cycle_duration < self.expect_gait_cycle_duration[0]:
+                    self.cycle_duration = int(data[cycle_index_points[2]][0]) - int(data[cycle_index_points[1]][0])
+                    if self.cycle_duration < self.expect_gait_cycle_duration[0]:
                         del cycle_index_points[-1]
                         continue
-                    elif cycle_duration > self.expect_gait_cycle_duration[1]:
+                    elif self.cycle_duration > self.expect_gait_cycle_duration[1]:
                         cycle_index_points[0] = cycle_index_points[2]
                         del cycle_index_points[-1]
                         del cycle_index_points[-1]
                         continue
                 if len(cycle_index_points) == 4:
-                    cycle_duration = int(data[cycle_index_points[3]][0]) - int(data[cycle_index_points[2]][0])
-                    if cycle_duration < self.expect_gait_cycle_duration[0]:
+                    self.cycle_duration = int(data[cycle_index_points[3]][0]) - int(data[cycle_index_points[2]][0])
+                    if self.cycle_duration < self.expect_gait_cycle_duration[0]:
                         del cycle_index_points[-1]
                         continue
-                    elif cycle_duration > self.expect_gait_cycle_duration[1]:
+                    elif self.cycle_duration > self.expect_gait_cycle_duration[1]:
                         cycle_index_points[0] = cycle_index_points[3]
                         del cycle_index_points[-1]
                         del cycle_index_points[-1]
@@ -163,6 +164,28 @@ class DataPreProcess:
                     self.template = self._update_template(cycle)
                     return cycle
         return None
+
+    @property
+    def get_cycle_feature_for_gui(self) -> str:
+        """
+        计算出步态周期之后，计算周期的若干特征，显示在GUI上
+        :return:
+        """
+        gait_cycle_feature_text_template = "【周期时长】{0} \n" \
+                                           "【X均值】 {1} 【Y均值】 {2} 【Z均值】 {3}\n" \
+                                           "【X最大值】 {4} 【Y最大值】 {5} 【Z最大值】 {6}\n" \
+                                           "【X标准差】 {7} 【Y标准差】 {8} 【Z标准差】 {9}"
+        return gait_cycle_feature_text_template.format(
+            self.cycle_duration * 2,
+            round(self.last_cycle[:, 1].mean(), 2),
+            round(self.last_cycle[:, 2].mean(), 2),
+            round(self.last_cycle[:, 3].mean(), 2),
+            round(self.last_cycle[:, 1].max(), 2),
+            round(self.last_cycle[:, 2].max(), 2),
+            round(self.last_cycle[:, 3].max(), 2),
+            round(self.last_cycle[:, 1].std(ddof=1), 2),
+            round(self.last_cycle[:, 2].std(ddof=1), 2),
+            round(self.last_cycle[:, 3].std(ddof=1), 2)) if self.last_cycle is not None else gait_cycle_feature_text_template
 
     def _find_new_template(self, data) -> Union[np.ndarray, None]:
         """
@@ -346,4 +369,3 @@ class GyroDataPreProcess(DataPreProcess):
 
     def update_data_to_detect(self):
         self.sensor_manager.gyro_to_detect_cycle = self.sensor_manager.gyro_to_detect_cycle[-self.reserved_data_count:]
-

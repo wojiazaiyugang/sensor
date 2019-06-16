@@ -21,10 +21,10 @@ def load_data0_cycle() -> Tuple[np.ndarray, np.ndarray]:
         data, label = [], []
         from sensor.sensor import SensorManager
         from sensor.algorithm.data_pre_process import AccDataPreProcess, GyroDataPreProcess
-        acc_data_pre_process = AccDataPreProcess()
-        gyro_data_pre_process = GyroDataPreProcess()
         for i in range(10):
             sensor_manager = SensorManager(i)
+            acc_data_pre_process = AccDataPreProcess(sensor_manager)
+            gyro_data_pre_process = GyroDataPreProcess(sensor_manager)
             acc_cycles = []
             gyro_cycles = []
             while True:
@@ -48,7 +48,7 @@ def load_data0_cycle() -> Tuple[np.ndarray, np.ndarray]:
     with open(data_file_full_name, "rb") as file:
         data, label = pickle.loads(file.read())
     assert isinstance(data, np.ndarray) and len(data.shape) == 3 and data.shape[1] == 200 and data.shape[2] == 8
-    return data, label
+    return data.transpose((0, 2, 1)) , label  # 数据是200 * 8的，训练需要8 * 200
 
 
 def load_data0_data(file_name: str) -> np.ndarray:
