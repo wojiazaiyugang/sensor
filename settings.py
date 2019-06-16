@@ -6,13 +6,14 @@ import logging
 import matplotlib.pyplot as plt
 import numpy as np  # 别删老子
 
+
 np.set_printoptions(suppress=True)
 WRITE_LOG_FILE = False  # 是否把日志写入文件
+SENSOR_DATA = 0  # 使用哪个数据 0 - 9或者是None
 
 # 支持中文
 plt.rcParams["font.sans-serif"] = ['SimHei']  # 用来正常显示中文标签
 plt.rcParams["axes.unicode_minus"] = False  # 用来正常显示负号
-SENSOR_DATA = 0  # 使用哪个数据 0 - 9或者是None
 # 项目目录
 PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
 # 配置日志配置同时输出到屏幕和日志文件

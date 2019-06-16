@@ -30,15 +30,12 @@ class SensorManager:
         # 最多保存的数据点的个数
         self.ACC_POINT_COUNT = 400
         self.GYRO_POINT_COUNT = 400
-        self.ANG_POINT_COUNT = 400
         # 原始数据，显示使用
         self.acc_to_display = []
         self.gyro_to_display = []
-        self.ang_to_display = []
         # 用于检测步态的数据
         self.acc_to_detect_cycle = []
         self.gyro_to_detect_cycle = []
-        self.ang_to_detect_cycle = []
 
         logger.info("是否使用实时数据：{0}".format(bool(sensor_data is None)))
         if sensor_data is not None:
@@ -65,7 +62,6 @@ class SensorManager:
         # 每一次回调，每种类型的数据最多只取一次，防止出现抖动
         acc_data_found = False
         gyro_data_found = False
-        ang_data_found = False
         for i in range(len(data) - 11):
             if not (data[i] == 0x55 and data[i + 1] & 0x50 == 0x50):
                 continue
@@ -93,18 +89,6 @@ class SensorManager:
                     gyro_data_found = True
                     self.gyro_to_display.append(sensor_data)
                     self.gyro_to_detect_cycle.append(sensor_data)
-            if data[i] == 0x55 and data[i + 1] == 0x53 and sum(data[i:i + 10]) & 255 == data[i + 10]:
-                rol, roh, pil, pih, yal, yah, *_ = data[i + 2:i + 11]
-                sensor_data = [
-                    get_current_timestamp(),
-                    (np.short(roh << 8 | rol) / 32768 * 180),
-                    (np.short(pih << 8 | pil) / 32768 * 180),
-                    (np.short(yah << 8 | yal) / 32768 * 180)
-                ]
-                if not ang_data_found:
-                    ang_data_found = True
-                    self.ang_to_display.append(sensor_data)
-                    self.ang_to_detect_cycle.append(sensor_data)
         self.fix_data_count()
 
     @staticmethod
@@ -170,7 +154,6 @@ class SensorManager:
         """
         self.acc_to_detect_cycle.clear()
         self.gyro_to_detect_cycle.clear()
-        self.ang_to_detect_cycle.clear()
 
     def fix_data_count(self):
         """
@@ -181,5 +164,3 @@ class SensorManager:
         self.acc_to_detect_cycle = self.acc_to_detect_cycle[-self.ACC_POINT_COUNT:]
         self.gyro_to_display = self.gyro_to_display[-self.GYRO_POINT_COUNT:]
         self.gyro_to_detect_cycle = self.gyro_to_detect_cycle[-self.GYRO_POINT_COUNT:]
-        self.ang_to_display = self.ang_to_display[-self.ANG_POINT_COUNT:]
-        self.ang_to_detect_cycle = self.ang_to_detect_cycle[-self.ANG_POINT_COUNT:]

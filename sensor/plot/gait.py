@@ -70,10 +70,3 @@ class GaitGyroFig(GaitFig):
     def _get_gait_cycle(self):
         return self.algorithm_manager.gyro_data_pre_process.last_cycle
 
-
-class GaitAngFig(GaitFig):
-    def _get_template(self) -> np.ndarray:
-        return self.algorithm_manager.ang_data_pre_process.template
-
-    def _get_gait_cycle(self):
-        return self.algorithm_manager.ang_data_pre_process.last_cycle

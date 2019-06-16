@@ -347,17 +347,3 @@ class GyroDataPreProcess(DataPreProcess):
     def update_data_to_detect(self):
         self.sensor_manager.gyro_to_detect_cycle = self.sensor_manager.gyro_to_detect_cycle[-self.reserved_data_count:]
 
-
-class AngDataPreProcess(DataPreProcess):
-
-    def __init__(self, sensor_manager: SensorManager):
-        self.data_type = "欧拉角"
-        self.gait_cycle_threshold = 1
-        self.expect_gait_cycle_duration = (400, 700)
-        super().__init__(sensor_manager)
-
-    def get_data(self):
-        return self.sensor_manager.ang_to_detect_cycle
-
-    def update_data_to_detect(self):
-        self.sensor_manager.ang_to_detect_cycle = self.sensor_manager.ang_to_detect_cycle[-self.reserved_data_count:]

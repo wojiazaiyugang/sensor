@@ -1,5 +1,3 @@
-from enum import Enum
-
 from sensor.algorithm import AlgorithmManager
 from settings import plt
 
