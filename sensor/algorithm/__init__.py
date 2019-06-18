@@ -32,16 +32,21 @@ class AlgorithmManager:
         self.is_walking = False
         self.who_you_are = None  # 身份识别
 
-        self.cycle_detect_history = {cycle_detect_result: 0 for cycle_detect_result in CycleDetectResult} # 周期检测的历史纪录，用于记录次数
+        self.cycle_detect_history = {cycle_detect_result: 0 for cycle_detect_result in
+                                     CycleDetectResult}  # 周期检测的历史纪录，用于记录次数
+
+        self.stability = []  # 步态稳定性
 
     def get_who_you_are(self) -> Union[int, None]:
         """
         判断当前是谁， 使用acc和gyro扔进CNN
         :return:
         """
-        if self.acc_data_pre_process.last_validate_cycle is not None and self.gyro_data_pre_process.last_validate_cycle is not None:
+        if self.acc_data_pre_process.validate_cycles and self.gyro_data_pre_process.validate_cycles:
             return self.cnn.get_who_you_are(
-                np.concatenate((self.acc_data_pre_process.last_validate_cycle, self.gyro_data_pre_process.last_validate_cycle), axis=1).T)
+                np.concatenate(
+                    (self.acc_data_pre_process.validate_cycles[-1], self.gyro_data_pre_process.validate_cycles[-1]),
+                    axis=1).T)
         else:
             return None
 
@@ -72,6 +77,8 @@ class AlgorithmManager:
         """
         # 更新是否在走路
         self.is_walking = self._is_walking()
+        # 更新步态稳定性
+        self.stability.append(self._get_stability())
         self.update_cycle_detect_result(self.is_walking)
         if self.is_walking:
             # 更新步态
@@ -84,6 +91,17 @@ class AlgorithmManager:
             self._sensor_manager.clear_data_to_detect_cycle()
             self.acc_data_pre_process.clear_template()
             self.gyro_data_pre_process.clear_template()
+
+    def _get_stability(self) -> int:
+        """
+        计算一下步态的稳定性
+        :return:
+        """
+        if not self.is_walking:
+            return 0
+        if self.acc_data_pre_process.last_cycle is None:
+            return 1
+        return 2
 
     def update_cycle_detect_result(self, is_walking):
         """

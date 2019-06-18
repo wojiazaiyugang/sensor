@@ -24,7 +24,7 @@ class DataPreProcess:
         self.gait_cycle_threshold = self.gait_cycle_threshold
         self.template = None  # 模板
         self.last_cycle = None
-        self.last_validate_cycle = None
+        self.validate_cycles = []
         self.last_cycle_to_locate = None  # 上一个周期 用于防止周期偏移
         self.cycle_duration = 0  # 上一个周期的时长
         self.data_type = self.data_type
@@ -165,27 +165,28 @@ class DataPreProcess:
                     return cycle
         return None
 
-    @property
     def get_cycle_feature_for_gui(self) -> str:
         """
         计算出步态周期之后，计算周期的若干特征，显示在GUI上
         :return:
         """
-        gait_cycle_feature_text_template = "【周期时长】{0} \n" \
-                                           "【X均值】 {1} 【Y均值】 {2} 【Z均值】 {3}\n" \
-                                           "【X最大值】 {4} 【Y最大值】 {5} 【Z最大值】 {6}\n" \
-                                           "【X标准差】 {7} 【Y标准差】 {8} 【Z标准差】 {9}"
-        return gait_cycle_feature_text_template.format(
-            self.cycle_duration * 2,
-            round(self.last_cycle[:, 1].mean(), 2),
-            round(self.last_cycle[:, 2].mean(), 2),
-            round(self.last_cycle[:, 3].mean(), 2),
-            round(self.last_cycle[:, 1].max(), 2),
-            round(self.last_cycle[:, 2].max(), 2),
-            round(self.last_cycle[:, 3].max(), 2),
-            round(self.last_cycle[:, 1].std(ddof=1), 2),
-            round(self.last_cycle[:, 2].std(ddof=1), 2),
-            round(self.last_cycle[:, 3].std(ddof=1), 2)) if self.last_cycle is not None else gait_cycle_feature_text_template
+        gait_cycle_feature_text_template = "{0} \n" \
+                                           "{1}{2}{3}\n" \
+                                           "{4}{5}{6}\n" \
+                                           "{7}{8}{9}"
+        if self.last_cycle is not None:
+            return gait_cycle_feature_text_template.format(
+                "【周期时长：{0:<10}】".format(self.cycle_duration * 2),
+                "【X平均值:{0:7.2f}】".format(self.last_cycle[:, 1].mean(), 2),
+                "【Y平均值:{0:7.2f}】".format(self.last_cycle[:, 2].mean(), 2),
+                "【Z平均值:{0:7.2f}】".format(self.last_cycle[:, 3].mean(), 2),
+                "【X最大值:{0:7.2f}】".format(self.last_cycle[:, 1].max(), 2),
+                "【Y最大值:{0:7.2f}】".format(self.last_cycle[:, 2].max(), 2),
+                "【Z最大值:{0:7.2f}】".format(self.last_cycle[:, 3].max(), 2),
+                "【X标准差:{0:7.2f}】".format(self.last_cycle[:, 1].std(ddof=1), 2),
+                "【Y标准差:{0:7.2f}】".format(self.last_cycle[:, 2].std(ddof=1), 2),
+                "【Z标准差:{0:7.2f}】".format(self.last_cycle[:, 3].std(ddof=1), 2))
+        return gait_cycle_feature_text_template.format(*[" " * 40 for _ in range(10)])
 
     def _find_new_template(self, data) -> Union[np.ndarray, None]:
         """
@@ -322,7 +323,7 @@ class DataPreProcess:
         data = self.get_data()
         self.last_cycle = self.get_gait_cycle(data)
         if self.last_cycle is not None:
-            self.last_validate_cycle = self.last_cycle
+            self.validate_cycles.append(self.last_cycle)
             self.update_data_to_detect()
         return self.last_cycle
 

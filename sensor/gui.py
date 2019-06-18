@@ -61,7 +61,7 @@ class GuiManager:
                             self.plot_manager.fig_gait_acc.fig_width,
                             self.plot_manager.fig_gait_acc.fig_height),
                             key=self.KEYS.CANVAS_GEI_ACC)],
-                        [sg.Text(text=self.algorithm_manager.acc_data_pre_process.get_cycle_feature_for_gui, key=self.KEYS.TEXT_ACC_CYCLE_FEATURE)]])
+                        [sg.Text(text=self.algorithm_manager.acc_data_pre_process.get_cycle_feature_for_gui(), key=self.KEYS.TEXT_ACC_CYCLE_FEATURE)]])
                      ],
                     [sg.Frame("陀螺仪步态", [
                         [sg.Canvas(size=(
@@ -72,7 +72,7 @@ class GuiManager:
                             self.plot_manager.fig_gait_gyro.fig_width,
                             self.plot_manager.fig_gait_gyro.fig_height),
                             key=self.KEYS.CANVAS_GEI_GYRO)],
-                        [sg.Text(text=self.algorithm_manager.gyro_data_pre_process.get_cycle_feature_for_gui, key=self.KEYS.TEXT_GYRO_CYCLE_FEATURE)]])
+                        [sg.Text(text=self.algorithm_manager.gyro_data_pre_process.get_cycle_feature_for_gui(), key=self.KEYS.TEXT_GYRO_CYCLE_FEATURE)]])
                      ]
                 ]),
                 sg.Column([
@@ -182,11 +182,11 @@ class GuiManager:
         acc_gait_and_gei_pic = self._update_gait_and_gei(self.plot_manager.fig_gait_acc.fig,
                                                          self._get_element(self.KEYS.CANVAS_GAIT_ACC).TKCanvas,
                                                          self._get_element(self.KEYS.CANVAS_GEI_ACC).TKCanvas,
-                                                         self.plot_manager.fig_gait_acc.get_gei())
+                                                         self.plot_manager.fig_gait_acc.gei)
         gyro_gait_and_gei_pic = self._update_gait_and_gei(self.plot_manager.fig_gait_gyro.fig,
                                                           self._get_element(self.KEYS.CANVAS_GAIT_GYRO).TKCanvas,
                                                           self._get_element(self.KEYS.CANVAS_GEI_GYRO).TKCanvas,
-                                                          self.plot_manager.fig_gait_gyro.get_gei())
+                                                          self.plot_manager.fig_gait_gyro.gei)
         # 身份识别
         self._get_element(self.KEYS.TEXT_WHO_YOU_ARE).Update(value=self.algorithm_manager.who_you_are)
         gui_gait_stability = self._plot_pic(self.plot_manager.fig_stability.fig,
@@ -197,10 +197,10 @@ class GuiManager:
             CycleDetectResult]))
         if self.algorithm_manager.acc_data_pre_process.last_cycle is not None:
             self._get_element(self.KEYS.TEXT_ACC_CYCLE_FEATURE) \
-                .Update(value=self.algorithm_manager.acc_data_pre_process.get_cycle_feature_for_gui)
+                .Update(value=self.algorithm_manager.acc_data_pre_process.get_cycle_feature_for_gui())
         if self.algorithm_manager.gyro_data_pre_process.last_cycle is not None:
             self._get_element(self.KEYS.TEXT_GYRO_CYCLE_FEATURE) \
-                .Update(value=self.algorithm_manager.gyro_data_pre_process.get_cycle_feature_for_gui)
+                .Update(value=self.algorithm_manager.gyro_data_pre_process.get_cycle_feature_for_gui())
         return raw_data_pic, acc_gait_and_gei_pic, gyro_gait_and_gei_pic, gui_gait_stability
 
     def run(self):
