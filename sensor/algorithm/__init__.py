@@ -5,7 +5,7 @@ from typing import Union
 from enum import Enum
 
 from sensor.algorithm.activity_recognition import ActivityRecognitionNetwork
-# from sensor.algorithm.one_class_svm import AccOneClassSvm, GyroOneClassSvm
+from sensor.algorithm.one_class_svm import AccOneClassSvm, GyroOneClassSvm
 from sensor.algorithm.data_pre_process import AccDataPreProcess, GyroDataPreProcess
 from sensor.algorithm.cnn import CnnNetwork
 from sensor.sensor import SensorManager
@@ -27,8 +27,8 @@ class AlgorithmManager:
 
         self.cnn = CnnNetwork()
         # 保证one class svm在cnn下面，因为svm会使用cnn生成的数据
-        # self.acc_one_class_svm = AccOneClassSvm()
-        # self.gyro_one_class_svm = GyroOneClassSvm()
+        self.acc_one_class_svm = AccOneClassSvm()
+        self.gyro_one_class_svm = GyroOneClassSvm()
         self.is_walking = False
         self.who_you_are = None  # 身份识别
 
@@ -109,6 +109,8 @@ class AlgorithmManager:
         :param is_walking:
         :return:
         """
+        if self.acc_data_pre_process.last_cycle is not None:
+            print(self.acc_one_class_svm.predict(np.array([self.acc_data_pre_process.last_cycle])))
         if is_walking:
             if self.acc_data_pre_process.last_cycle is not None or self.gyro_data_pre_process.last_cycle is not None:
                 self.cycle_detect_history[CycleDetectResult.CYCLE_DETECTED] += 1

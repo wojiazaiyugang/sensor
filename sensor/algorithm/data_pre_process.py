@@ -14,7 +14,7 @@ from settings import logger, np
 from util import validate_raw_data_with_timestamp, validate_raw_data_without_timestamp
 from sensor.sensor import SensorManager
 
-matplotlib.use('TkAgg')  # 兼容mac
+
 
 
 class DataPreProcess:
