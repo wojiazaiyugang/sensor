@@ -7,7 +7,7 @@ class RawDataFig:
     def __init__(self, sensor_manager: SensorManager):
         self.sensor_manager = sensor_manager
         # 数据图
-        self.fig, (self.ax_acc, self.ax_gyro) = plt.subplots(nrows=2, ncols=1, figsize=(3, 6))
+        self.fig, (self.ax_acc, self.ax_gyro, self.ax_ang) = plt.subplots(nrows=3, ncols=1, figsize=(4, 6))
         self.fig.subplots_adjust(left=0.1, bottom=0.005, right=1, top=1, hspace=0.1)
         self._, self._, self.width, self.height = [int(i) for i in self.fig.bbox.bounds]
 
@@ -60,3 +60,13 @@ class RawDataGyroAxes(_RawDataAxes):
     def get_raw_data(self):
         return self.sensor_manager.gyro_to_display
 
+
+class RawDataAngAxes(_RawDataAxes):
+    def __init__(self, ax, sensor_manager):
+        self.data_type = "ang"
+        ax.set_xlim(0, sensor_manager.ANG_POINT_COUNT)
+        ax.set_ylim(-180, 180)
+        super().__init__(ax, sensor_manager)
+
+    def get_raw_data(self):
+        return self.sensor_manager.ang_to_display

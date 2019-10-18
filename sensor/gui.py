@@ -24,6 +24,8 @@ class GuiManager:
         CANVAS_GEI_ACC = "显示加速度GEI的区域"
         CANVAS_GAIT_GYRO = "显示陀螺仪步态数据的区域"
         CANVAS_GEI_GYRO = "显示陀螺仪GEI的区域"
+        CANVAS_GAIT_ANG = "显示欧拉角步态数据的区域"
+        CANVAS_GEI_ANG = "显示欧拉角GEI的区域"
         CANVAS_STABILITY = "步态稳定性图"
         IMAGE_STATUS = "当前运动状态的图片"
         TEXT_ACTIVITY = "动作识别结果"
@@ -61,7 +63,8 @@ class GuiManager:
                             self.plot_manager.fig_gait_acc.fig_width,
                             self.plot_manager.fig_gait_acc.fig_height),
                             key=self.KEYS.CANVAS_GEI_ACC)],
-                        [sg.Text(text=self.algorithm_manager.acc_data_pre_process.get_cycle_feature_for_gui(), key=self.KEYS.TEXT_ACC_CYCLE_FEATURE)]])
+                        [sg.Text(text=self.algorithm_manager.acc_data_pre_process.get_cycle_feature_for_gui(),
+                                 key=self.KEYS.TEXT_ACC_CYCLE_FEATURE)]])
                      ],
                     [sg.Frame("陀螺仪步态", [
                         [sg.Canvas(size=(
@@ -72,8 +75,20 @@ class GuiManager:
                             self.plot_manager.fig_gait_gyro.fig_width,
                             self.plot_manager.fig_gait_gyro.fig_height),
                             key=self.KEYS.CANVAS_GEI_GYRO)],
-                        [sg.Text(text=self.algorithm_manager.gyro_data_pre_process.get_cycle_feature_for_gui(), key=self.KEYS.TEXT_GYRO_CYCLE_FEATURE)]])
-                     ]
+                        [sg.Text(text=self.algorithm_manager.gyro_data_pre_process.get_cycle_feature_for_gui(),
+                                 key=self.KEYS.TEXT_GYRO_CYCLE_FEATURE)]])
+                     ],
+                    [sg.Frame("欧拉角步态", [
+                        [sg.Canvas(size=(
+                            self.plot_manager.fig_gait_ang.fig_width,
+                            self.plot_manager.fig_gait_ang.fig_height),
+                            key=self.KEYS.CANVAS_GAIT_ANG)],
+                        [sg.Canvas(size=(
+                            self.plot_manager.fig_gait_ang.fig_width,
+                            self.plot_manager.fig_gait_ang.fig_height),
+                            key=self.KEYS.CANVAS_GEI_ANG)]])
+                     ],
+
                 ]),
                 sg.Column([
                     [sg.Frame("步态稳定性", [
@@ -187,6 +202,11 @@ class GuiManager:
                                                           self._get_element(self.KEYS.CANVAS_GAIT_GYRO).TKCanvas,
                                                           self._get_element(self.KEYS.CANVAS_GEI_GYRO).TKCanvas,
                                                           self.plot_manager.fig_gait_gyro.gei)
+        ang_gait_and_gei_pic = self._update_gait_and_gei(self.plot_manager.fig_gait_ang.fig,
+                                                         self._get_element(self.KEYS.CANVAS_GAIT_ANG).TKCanvas,
+                                                         self._get_element(self.KEYS.CANVAS_GEI_ANG).TKCanvas,
+                                                         self.plot_manager.fig_gait_ang.gei)
+
         # 身份识别
         self._get_element(self.KEYS.TEXT_WHO_YOU_ARE).Update(value=self.algorithm_manager.who_you_are)
         gui_gait_stability = self._plot_pic(self.plot_manager.fig_stability.fig,
@@ -201,7 +221,7 @@ class GuiManager:
         if self.algorithm_manager.gyro_data_pre_process.last_cycle is not None:
             self._get_element(self.KEYS.TEXT_GYRO_CYCLE_FEATURE) \
                 .Update(value=self.algorithm_manager.gyro_data_pre_process.get_cycle_feature_for_gui())
-        return raw_data_pic, acc_gait_and_gei_pic, gyro_gait_and_gei_pic, gui_gait_stability
+        return raw_data_pic, acc_gait_and_gei_pic, gyro_gait_and_gei_pic, ang_gait_and_gei_pic, gui_gait_stability
 
     def run(self):
         while True:

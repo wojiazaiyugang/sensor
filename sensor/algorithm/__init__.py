@@ -6,7 +6,7 @@ from enum import Enum
 
 from sensor.algorithm.activity_recognition import ActivityRecognitionNetwork
 from sensor.algorithm.one_class_svm import AccOneClassSvm, GyroOneClassSvm
-from sensor.algorithm.data_pre_process import AccDataPreProcess, GyroDataPreProcess
+from sensor.algorithm.data_pre_process import AccDataPreProcess, GyroDataPreProcess, AngDataPreProcess
 from sensor.algorithm.cnn import CnnNetwork
 from sensor.sensor import SensorManager
 from settings import np
@@ -24,6 +24,7 @@ class AlgorithmManager:
         # self.activity_recognition_network = ActivityRecognitionNetwork()
         self.acc_data_pre_process = AccDataPreProcess(sensor_manager)
         self.gyro_data_pre_process = GyroDataPreProcess(sensor_manager)
+        self.ang_data_pre_process = AngDataPreProcess(sensor_manager)
 
         self.cnn = CnnNetwork()
         # 保证one class svm在cnn下面，因为svm会使用cnn生成的数据
@@ -84,6 +85,7 @@ class AlgorithmManager:
             # 更新步态
             self.acc_data_pre_process.update_gait_cycle()
             self.gyro_data_pre_process.update_gait_cycle()
+            self.ang_data_pre_process.update_gait_cycle()
             # 更新身份识别
             self.who_you_are = self.get_who_you_are()
         else:
@@ -91,6 +93,7 @@ class AlgorithmManager:
             self._sensor_manager.clear_data_to_detect_cycle()
             self.acc_data_pre_process.clear_template()
             self.gyro_data_pre_process.clear_template()
+            self.ang_data_pre_process.clear_template()
 
     def _get_stability(self) -> int:
         """

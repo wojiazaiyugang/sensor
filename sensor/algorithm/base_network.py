@@ -7,7 +7,7 @@ from typing import Union
 
 from settings import logger, MODEL_DIR, np
 from keras.models import load_model, save_model, Model
-
+from keras.utils.vis_utils import plot_model
 
 
 class Network:
@@ -25,7 +25,9 @@ class Network:
         model_full_path = os.path.join(MODEL_DIR, self.network_name + ".h5")
         if os.path.exists(model_full_path):
             logger.info("模型{0}已经存在，直接加载".format(model_full_path))
-            return load_model(model_full_path)
+            model = load_model(model_full_path)
+            model.summary()
+            return model
         else:
             logger.info("模型{0}不存在，开始训练".format(model_full_path))
             self.model = self._train()

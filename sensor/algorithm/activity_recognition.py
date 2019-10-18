@@ -94,3 +94,6 @@ class ActivityRecognitionNetwork(Network):
                                          epochs=self.EPOCHS, callbacks=callback)
         self.evaluate_history = network.evaluate(test_data, test_label, batch_size=self.BATCH_SIZE)
         return network
+
+if __name__ == "__main__":
+    n = ActivityRecognitionNetwork()
