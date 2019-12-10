@@ -13,5 +13,6 @@ class FigStability:
 
     def update(self):
         self.ax.cla()
-        self.ax.plot(self.algorithm_manager.stability, "r", label="ACC")
+        self.ax.plot(self.algorithm_manager.stability, "r", label="stability")
+        self.ax.plot(self.algorithm_manager.raw_stability, "b", label="raw_stability")
         self.fig.legend()

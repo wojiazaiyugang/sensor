@@ -2,7 +2,12 @@
 传感器数据相关支持
 """
 import os
+import struct
+import base64
+import hashlib
 from typing import Union
+import threading
+import socket
 
 import math
 import pywinusb.hid as hid
@@ -23,7 +28,6 @@ class SensorManager:
         初始化
         :param sensor_data: 数据类型，0 - 9 表示使用data0中的数据进行模拟，"usb"表示usb数据，"socket"表示使用socket
         """
-        assert (type(sensor_data) == int and 0<=sensor_data<=9) or sensor_data == "usb" or sensor_data == "socket"
         # 传感器，用于实时数据
         self.sensor = None
         # 模拟数据
@@ -41,8 +45,10 @@ class SensorManager:
         self.gyro_to_detect_cycle = []
         self.ang_to_detect_cycle = []
 
+        self.conn = None # socket连接
+
         logger.info("是否使用实时数据：{0}".format(bool(sensor_data is None)))
-        if type(sensor_data) == int and 0<=sensor_data<=9:
+        if type(sensor_data) == int and 0 <= sensor_data <= 9:
             assert sensor_data is None or 0 <= int(sensor_data) <= 9, "数据错误"
             self.last_data_index = 0  # 上一次载入的数据的index
             self.last_data_timestamp = None  # 传感器开始时间，用于模拟数据的时候读取数据
@@ -53,9 +59,138 @@ class SensorManager:
             logger.info("载入data0陀螺仪数据")
             self.gyro_data_lines = load_data0_data(
                 os.path.join(DATA_DIR, "data0", "gyrData{0}.txt".format(sensor_data)))
+            self.ang_data_lines = load_data0_data(os.path.join(DATA_DIR, "data0", "angData{0}.txt".format(sensor_data)))
             self.last_data_timestamp = get_current_timestamp()
-        else:
+        elif sensor_data == "usb":
             self.set_handler()
+        elif sensor_data == "socket":
+            logger.info("使用socket数据")
+            thread = threading.Thread(target=self._wait_socket_data)
+            thread.start()
+        else:
+            raise Exception("错误的数据类型")
+
+    def send_msg(self, msg_bytes):
+        """
+        WebSocket服务端向客户端发送消息
+        :param conn: 客户端连接到服务器端的socket对象,即： conn,address = socket.accept()
+        :param msg_bytes: 向客户端发送的字节
+        :return:
+        """
+        token = b"\x81"
+        length = len(msg_bytes)
+        if length < 126:
+            token += struct.pack("B", length)
+        elif length <= 0xFFFF:
+            token += struct.pack("!BH", 126, length)
+        else:
+            token += struct.pack("!BQ", 127, length)
+
+        msg = token + msg_bytes
+        try:
+            self.conn.send(msg)
+        except OSError as err:
+            logger.exception(err)
+            pass
+        return True
+
+    def _wait_socket_data(self):
+        """
+        起一个socket server等数据来
+        :return:
+        """
+        def get_headers(data):
+            """将请求头转换为字典"""
+            header_dict = {}
+            data = str(data, encoding="utf-8")
+
+            header, body = data.split("\r\n\r\n", 1)
+            header_list = header.split("\r\n")
+            for i in range(0, len(header_list)):
+                if i == 0:
+                    if len(header_list[0].split(" ")) == 3:
+                        header_dict['method'], header_dict['url'], header_dict['protocol'] = header_list[0].split(" ")
+                else:
+                    k, v = header_list[i].split(":", 1)
+                    header_dict[k] = v.strip()
+            return header_dict
+
+        def get_data(info):
+            logger.info(len(self.acc_to_display))
+            payload_len = info[1] & 127
+            if payload_len == 126:
+                extend_payload_len = info[2:4]
+                mask = info[4:8]
+                decoded = info[8:]
+            elif payload_len == 127:
+                extend_payload_len = info[2:10]
+                mask = info[10:14]
+                decoded = info[14:]
+            else:
+                extend_payload_len = None
+                mask = info[2:6]
+                decoded = info[6:]
+
+            bytes_list = bytearray()  # 这里我们使用字节将数据全部收集，再去字符串编码，这样不会导致中文乱码
+            for i in range(len(decoded)):
+                chunk = decoded[i] ^ mask[i % 4]  # 解码方式
+                bytes_list.append(chunk)
+            try:
+                body = str(bytes_list, encoding='utf-8')
+            except UnicodeDecodeError as err:
+                logger.exception(err)
+                return ""
+            return body
+
+        logger.info("等待连接")
+        sock = socket.socket()
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        sock.bind(("0.0.0.0", 80))
+        sock.listen(5)
+        while True:
+            # 等待用户连接
+            self.conn, addr = sock.accept()
+            logger.info("connect ")
+            # 获取握手消息，magic string ,sha1加密
+            # 发送给客户端
+            # 握手消息
+            data = self.conn.recv(8096)
+            headers = get_headers(data)
+            # 对请求头中的sec-websocket-key进行加密
+            response_tpl = "HTTP/1.1 101 Switching Protocols\r\n" \
+                           "Upgrade:websocket\r\n" \
+                           "Connection: Upgrade\r\n" \
+                           "Sec-WebSocket-Accept: %s\r\n" \
+                           "WebSocket-Location: ws://%s%s\r\n\r\n"
+
+            magic_string = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11'
+            value = headers['Sec-WebSocket-Key'] + magic_string
+            ac = base64.b64encode(hashlib.sha1(value.encode('utf-8')).digest())
+            response_str = response_tpl % (ac.decode('utf-8'), headers['Host'], headers['url'])
+            # 响应【握手】信息
+            self.conn.send(bytes(response_str, encoding='utf-8'))
+            # 可以进行通信
+            while True:
+                data = self.conn.recv(8096)
+                data = get_data(data)
+                if data:
+                    logger.info(data)
+                    try:
+                        data = eval(data)
+                    except Exception as err:
+                        logger.exception(err)
+                        continue
+                    if data[0] == "acc":
+                        data = [get_current_timestamp(), data[1], data[2], data[3]]
+                        self.acc_to_display.append(data)
+                        self.acc_to_detect_cycle.append(data)
+                    elif data[0] == "gyro":
+                        data = [get_current_timestamp(), data[1] *(math.pi/180), data[2]*(math.pi/180), data[3]*(math.pi/180)]
+                        self.gyro_to_display.append(data)
+                        self.gyro_to_detect_cycle.append(data)
+                    else:
+                        raise Exception("错误的socket数据")
+                self.fix_data_count()
 
     def _on_get_data(self, data: list):
         """
@@ -111,7 +246,6 @@ class SensorManager:
                     ang_data_found = True
                     self.ang_to_display.append(sensor_data)
                     self.ang_to_detect_cycle.append(sensor_data)
-
         self.fix_data_count()
 
     @staticmethod
@@ -146,7 +280,7 @@ class SensorManager:
         使用data0中的数据模拟真实数据
         :return:
         """
-        mock_data_count = 10
+        mock_data_count = 30
         current_data_index = self.last_data_index + mock_data_count
         acc_mock_data = self.acc_data_lines[self.last_data_index: current_data_index]
         self.acc_to_display.extend(acc_mock_data)
@@ -154,6 +288,9 @@ class SensorManager:
         gyro_mock_data = self.gyro_data_lines[self.last_data_index: current_data_index]
         self.gyro_to_display.extend(gyro_mock_data)
         self.gyro_to_detect_cycle.extend(gyro_mock_data)
+        ang_mock_data = self.ang_data_lines[self.last_data_index: current_data_index]
+        self.ang_to_display.extend(ang_mock_data)
+        self.ang_to_detect_cycle.extend(ang_mock_data)
         self.last_data_index = current_data_index
         self.fix_data_count()
         if current_data_index >= min(len(self.acc_data_lines), len(self.gyro_data_lines)):
@@ -165,7 +302,7 @@ class SensorManager:
         更新传感器原始数据。返回是否更新成功。如果是模拟数据并且使用完了就会返回失败,如果是实时数据就会一直成功
         :return:
         """
-        if self.sensor_data is not None:
+        if type(self.sensor_data) == int:
             return self._mock_real_time_data_from_data0()
         else:
             return True
@@ -190,4 +327,3 @@ class SensorManager:
         self.gyro_to_detect_cycle = self.gyro_to_detect_cycle[-self.GYRO_POINT_COUNT:]
         self.ang_to_display = self.ang_to_display[-self.ANG_POINT_COUNT:]
         self.ang_to_detect_cycle = self.ang_to_detect_cycle[-self.ANG_POINT_COUNT:]
-

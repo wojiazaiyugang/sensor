@@ -3,6 +3,5 @@ import matplotlib
 import sys
 from sensor.gui import GuiManager
 
-print(sys.path)
 if __name__ == "__main__":
     GuiManager().run()

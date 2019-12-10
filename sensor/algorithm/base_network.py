@@ -26,7 +26,6 @@ class Network:
         if os.path.exists(model_full_path):
             logger.info("模型{0}已经存在，直接加载".format(model_full_path))
             model = load_model(model_full_path)
-            model.summary()
             return model
         else:
             logger.info("模型{0}不存在，开始训练".format(model_full_path))

@@ -1,6 +1,7 @@
 """
 算法manager
 """
+import time
 from typing import Union
 from enum import Enum
 
@@ -9,7 +10,7 @@ from sensor.algorithm.one_class_svm import AccOneClassSvm, GyroOneClassSvm
 from sensor.algorithm.data_pre_process import AccDataPreProcess, GyroDataPreProcess, AngDataPreProcess
 from sensor.algorithm.cnn import CnnNetwork
 from sensor.sensor import SensorManager
-from settings import np
+from settings import np, logger
 
 
 class CycleDetectResult(Enum):
@@ -21,7 +22,7 @@ class CycleDetectResult(Enum):
 class AlgorithmManager:
     def __init__(self, sensor_manager: SensorManager):
         self._sensor_manager = sensor_manager
-        # self.activity_recognition_network = ActivityRecognitionNetwork()
+        self.activity_recognition_network = ActivityRecognitionNetwork()
         self.acc_data_pre_process = AccDataPreProcess(sensor_manager)
         self.gyro_data_pre_process = GyroDataPreProcess(sensor_manager)
         self.ang_data_pre_process = AngDataPreProcess(sensor_manager)
@@ -37,6 +38,8 @@ class AlgorithmManager:
                                      CycleDetectResult}  # 周期检测的历史纪录，用于记录次数
 
         self.stability = []  # 步态稳定性
+        self.raw_stability = []  # 步态稳定性
+        self.last_stable_time = None  # 上一次稳定的时间
 
     def get_who_you_are(self) -> Union[int, None]:
         """
@@ -50,6 +53,30 @@ class AlgorithmManager:
                     axis=1).T)
         else:
             return None
+
+    def get_current_activity(self) -> str:
+        """
+        获取当前的运动状态
+        :return:
+        """
+        # 预测动作
+        if len(self._sensor_manager.acc_to_display) >= 100:
+            predict_result = self.activity_recognition_network.predict(
+                [np.array(self._sensor_manager.acc_to_display)[-100:, 1:]])
+            predict_number = int(np.argmax(predict_result[0]))
+            # self._sensor_manager.conn.send(str(predict_number).encode("utf-8"))
+            m = {
+                0: "骑车",
+                1: "静止",
+                2: "步行",
+                3: "上楼",
+                4: "下楼",
+            }
+            if self.is_walking:
+                return "步行"
+            return m.get(predict_number)
+        else:
+            return ""
 
     def _is_walking(self) -> bool:
         """
@@ -69,6 +96,7 @@ class AlgorithmManager:
         is_walking = is_mag_ok and (is_x_ok or is_y_ok or is_z_ok)
         if not is_walking:  # 没在走路的话去清空数据
             self._sensor_manager.clear_data_to_detect_cycle()
+        # self._sensor_manager.send_msg(bytes("行走:{0}".format(is_walking),encoding="utf-8"))
         return is_walking
 
     def update_data(self):
@@ -79,6 +107,7 @@ class AlgorithmManager:
         # 更新是否在走路
         self.is_walking = self._is_walking()
         # 更新步态稳定性
+        self.raw_stability.append(self._get_raw_stability()-0.5)
         self.stability.append(self._get_stability())
         self.update_cycle_detect_result(self.is_walking)
         if self.is_walking:
@@ -100,10 +129,16 @@ class AlgorithmManager:
         计算一下步态的稳定性
         :return:
         """
+        if self.last_stable_time and int(time.time() * 1000) - self.last_stable_time < 5000:  # 稳定状态会稳定3S
+            if self.is_walking and self.acc_data_pre_process.last_cycle is not None:
+                self.last_stable_time = int(time.time() * 1000)
+            return 2
         if not self.is_walking:
             return 0
         if self.acc_data_pre_process.last_cycle is None:
+            self.last_stable_time = int(time.time() * 1000)
             return 1
+        self.last_stable_time = int(time.time() * 1000)
         return 2
 
     def update_cycle_detect_result(self, is_walking):
@@ -121,3 +156,10 @@ class AlgorithmManager:
                 self.cycle_detect_history[CycleDetectResult.WALK_BUT_NO_CYCLE] += 1
         else:
             self.cycle_detect_history[CycleDetectResult.NOT_WALKING] += 1
+
+    def _get_raw_stability(self):
+        if not self.is_walking:
+            return 0
+        if self.acc_data_pre_process.last_cycle is None:
+            return 1
+        return 2

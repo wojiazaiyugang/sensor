@@ -301,8 +301,9 @@ class DataPreProcess:
             if len(data) >= self.count_threshold_to_clear_template:
                 self.template = None
             return None
-        # transformed_cycle = self.transform(first_cycle)
-        # if len(transformed_cycle) < 4:  # 点的数量太少无法插值
+        # first_cycle = self.transform(first_cycle)
+        # if len(first_cycle) > 4:  # 点的数量太少无法插值
+        #     first_cycle = self.interpolate(first_cycle)
         #     return [], None
         # interpolated_cycle = self.interpolate(transformed_cycle)
         interpolated_cycle_without_transform = self.interpolate(first_cycle)

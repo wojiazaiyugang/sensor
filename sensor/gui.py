@@ -34,6 +34,7 @@ class GuiManager:
         TEXT_CYCLE_DETECT_HISTORY = "步态周期的检测历史"
         TEXT_ACC_CYCLE_FEATURE = "加速度周期的特征"
         TEXT_GYRO_CYCLE_FEATURE = "陀螺仪周期的特征"
+        TEXT_ANG_CYCLE_FEATURE = "欧拉角周期的特征"
 
     def __init__(self):
         # gui通用设置
@@ -86,7 +87,10 @@ class GuiManager:
                         [sg.Canvas(size=(
                             self.plot_manager.fig_gait_ang.fig_width,
                             self.plot_manager.fig_gait_ang.fig_height),
-                            key=self.KEYS.CANVAS_GEI_ANG)]])
+                            key=self.KEYS.CANVAS_GEI_ANG)],
+                        [sg.Text(text=self.algorithm_manager.ang_data_pre_process.get_cycle_feature_for_gui(),
+                                 key=self.KEYS.TEXT_ANG_CYCLE_FEATURE)]],
+                              ),
                      ],
 
                 ]),
@@ -99,13 +103,13 @@ class GuiManager:
                         )]
                     ])],
                     [sg.Frame("步行检测", [
-                        [sg.Text(text="", key=self.KEYS.TEXT_IS_WALK_LIKE_DATA0)],
+                        [sg.Text(text="  " * 50, key=self.KEYS.TEXT_IS_WALK_LIKE_DATA0)],
                     ])],
                     [sg.Frame("身份识别结果", [
-                        [sg.Text(text="", key=self.KEYS.TEXT_WHO_YOU_ARE)],
+                        [sg.Text(text="                                         ", key=self.KEYS.TEXT_WHO_YOU_ARE)],
                     ])],
                     [sg.Frame("动作识别结果", [
-                        [sg.Text(text="", key=self.KEYS.TEXT_ACTIVITY)],
+                        [sg.Text(text="                                          ", key=self.KEYS.TEXT_ACTIVITY)],
                     ])],
                     [sg.Frame("步态周期历史", [
                         [sg.Text(text=" " * 100, key=self.KEYS.TEXT_CYCLE_DETECT_HISTORY)]  # 100是为了搞个长的长度，不然显示不全
@@ -192,7 +196,12 @@ class GuiManager:
         raw_data_pic = self._plot_pic(self.plot_manager.fig_raw_data.fig,
                                       self._get_element(self.KEYS.CANVAS_RAW_DATA).TKCanvas)
         # 当前是否在步行
-        self._get_element(self.KEYS.TEXT_IS_WALK_LIKE_DATA0).Update(value=self.algorithm_manager.is_walking)
+        try:
+            m = {0: "非步行", 1: "步行未稳定", 2: "步行稳定"}
+            v = "{0}  状态：{1} ".format(self.algorithm_manager.is_walking, m.get(self.algorithm_manager.stability[-1]))
+        except Exception as err:
+            v = ""
+        self._get_element(self.KEYS.TEXT_IS_WALK_LIKE_DATA0).Update(value=v)
         # 步态周期图
         acc_gait_and_gei_pic = self._update_gait_and_gei(self.plot_manager.fig_gait_acc.fig,
                                                          self._get_element(self.KEYS.CANVAS_GAIT_ACC).TKCanvas,
@@ -208,7 +217,7 @@ class GuiManager:
                                                          self.plot_manager.fig_gait_ang.gei)
 
         # 身份识别
-        self._get_element(self.KEYS.TEXT_WHO_YOU_ARE).Update(value=self.algorithm_manager.who_you_are)
+        self._get_element(self.KEYS.TEXT_WHO_YOU_ARE).Update(value="{0}号志愿者".format(self.algorithm_manager.who_you_are))
         gui_gait_stability = self._plot_pic(self.plot_manager.fig_stability.fig,
                                             self._get_element(self.KEYS.CANVAS_STABILITY).TKCanvas)
         self._get_element(self.KEYS.TEXT_CYCLE_DETECT_HISTORY).Update(value=" ".join(["{0}:{1}".format(
@@ -221,6 +230,21 @@ class GuiManager:
         if self.algorithm_manager.gyro_data_pre_process.last_cycle is not None:
             self._get_element(self.KEYS.TEXT_GYRO_CYCLE_FEATURE) \
                 .Update(value=self.algorithm_manager.gyro_data_pre_process.get_cycle_feature_for_gui())
+        if self.algorithm_manager.ang_data_pre_process.last_cycle is not None:
+            self._get_element(self.KEYS.TEXT_ANG_CYCLE_FEATURE) \
+                .Update(value=self.algorithm_manager.ang_data_pre_process.get_cycle_feature_for_gui())
+        self._get_element(self.KEYS.TEXT_ACTIVITY).Update(value=self.algorithm_manager.get_current_activity())
+        if self.sensor_manager.conn:
+            self.sensor_manager.send_msg(bytes("步行检测{0}\n步行状态{1}\n身份识别{2}\n" \
+                                               "{3}".format(
+                self.algorithm_manager.is_walking,
+                self.algorithm_manager.stability[-1],
+                self.algorithm_manager.who_you_are,
+                " ".join(["{0}:{1}".format(
+                    cycle_detect_result.value[0], self.algorithm_manager.cycle_detect_history[cycle_detect_result])
+                    for cycle_detect_result in
+                    CycleDetectResult])
+            ), encoding="utf-8"))
         return raw_data_pic, acc_gait_and_gei_pic, gyro_gait_and_gei_pic, ang_gait_and_gei_pic, gui_gait_stability
 
     def run(self):

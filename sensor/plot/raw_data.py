@@ -65,8 +65,9 @@ class RawDataAngAxes(_RawDataAxes):
     def __init__(self, ax, sensor_manager):
         self.data_type = "ang"
         ax.set_xlim(0, sensor_manager.ANG_POINT_COUNT)
-        ax.set_ylim(-180, 180)
+        ax.set_ylim(-20, 20)
         super().__init__(ax, sensor_manager)
+        ax.get_yaxis().set_visible(False)
 
     def get_raw_data(self):
         return self.sensor_manager.ang_to_display
